@@ -426,7 +426,122 @@
       </div>
 
       <!-- 线索回流统计 -->
-      <div id="tab-return" class="tab-panel" style="display:none;">
+      <div id="tab-return" class="tab-panel" style="display:none; padding: 16px; flex-direction: column; box-sizing: border-box;">
+        <!-- 业务说明栏 -->
+        <div style="background: #fafafa; border-left: 4px solid #1677ff; padding: 10px 14px; margin-bottom: 12px; border-radius: 0 4px 4px 0; font-size: 13px; color: #595959; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
+          统计业务系统传入后，提交到外呼和回传业务系统的数据。
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label>统计时间：</label>
+            <div class="filter-date-range">
+              <input type="date" class="filter-input" style="width: 130px;" placeholder="开始时间">
+              <span class="sep">—</span>
+              <input type="date" class="filter-input" style="width: 130px;" placeholder="结束时间">
+            </div>
+          </div>
+          <div class="filter-item">
+            <label>场景名称：</label>
+            <select class="filter-select" style="width: 160px;">
+              <option value="">全部</option>
+              <option value="scene1">燃油车新线索</option>
+            </select>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-default" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary" onclick="doQuery()" style="background: #1677ff; border-color: #1677ff;">
+              <svg viewBox="0 0 1024 1024" width="12" height="12" fill="currentColor" style="margin-right: 4px;"><path d="M909.6 854.5L729 673.9c56.8-63 91.4-146.2 91.4-237.5 0-200.7-162.7-363.4-363.4-363.4S93.6 235.7 93.6 436.4s162.7 363.4 363.4 363.4c91.3 0 174.5-34.6 237.5-91.4l180.6 180.6c15.2 15.2 40 15.2 55.2 0l21.9-21.9c15.2-15.2 15.2-40 0-55.2zM457 721.8c-157.6 0-285.4-127.8-285.4-285.4S299.4 151 457 151s285.4 127.8 285.4 285.4-127.8 285.4-285.4 285.4z"></path></svg>
+              搜索
+            </button>
+          </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="table-wrap">
+          <div class="table-container">
+            <table class="data-table" style="min-width: 100%;">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">序号</th>
+                  <th>
+                    统计时间 
+                    <span style="font-size: 10px; color: #bfbfbf; margin-left: 4px; cursor: pointer; user-select: none;">⇅</span>
+                  </th>
+                  <th>场景名称</th>
+                  <th>线索传入数</th>
+                  <th>提交外呼数</th>
+                  <th>线索回流数</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>2015-10-10</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">88</td>
+                  <td style="font-weight: 500; color: #262626;">78</td>
+                  <td style="font-weight: 500; color: #52c41a;">34</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>2015-10-09</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">125</td>
+                  <td style="font-weight: 500; color: #262626;">123</td>
+                  <td style="font-weight: 500; color: #52c41a;">22</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>2015-10-08</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">67</td>
+                  <td style="font-weight: 500; color: #262626;">45</td>
+                  <td style="font-weight: 500; color: #52c41a;">33</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>2015-10-07</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">34</td>
+                  <td style="font-weight: 500; color: #262626;">23</td>
+                  <td style="font-weight: 500; color: #52c41a;">2</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>2015-10-06</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">333</td>
+                  <td style="font-weight: 500; color: #262626;">234</td>
+                  <td style="font-weight: 500; color: #52c41a;">44</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 分页栏 -->
+          <div class="pagination">
+            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">6</button>
+            <button class="page-btn">7</button>
+            <button class="page-btn">8</button>
+            <button class="page-btn">9</button>
+            <button class="page-btn">&gt;</button>
+            <select class="page-select">
+              <option>10条/页</option>
+              <option>20条/页</option>
+            </select>
+            <div class="page-jump">
+              跳至 <input type="text" class="filter-input" style="width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; outline: none;" value="5"> 页
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
