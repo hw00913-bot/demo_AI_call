@@ -261,3 +261,66 @@ function initDefaultDates() {
     }
   });
 }
+/* ===== 级联菜单逻辑 (大区 -> 小区 -> 门店) ===== */
+const storeHierarchy = {
+  "华东": {
+    "浙江区": ["杭州旗舰店", "杭州西湖店", "杭州滨江店"],
+    "上海区": ["上海静安店", "上海徐汇店"]
+  },
+  "华南": {
+    "广东一区": ["广州天河店", "深圳南山店"],
+    "广东二区": ["佛山顺德店"]
+  },
+  "华北": {
+    "北京区": ["北京朝阳店", "北京海淀店"]
+  }
+};
+
+function handleRegionChange(selectElem) {
+  const region = selectElem.value;
+  const parentContainer = selectElem.closest('.filter-bar');
+  const districtSelect = parentContainer.querySelector('.district-select');
+  const storeDropdown = parentContainer.querySelector('.store-dropdown');
+  
+  // 清空小区
+  districtSelect.innerHTML = '<option value="">全部</option>';
+  // 清空门店
+  storeDropdown.innerHTML = '<div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>';
+  
+  // 如果选择了大区，则填充对应的小区
+  if (region && storeHierarchy[region]) {
+    for (let district in storeHierarchy[region]) {
+      const option = document.createElement('option');
+      option.value = district;
+      option.textContent = district;
+      districtSelect.appendChild(option);
+    }
+  }
+  
+  // 更新门店显示文本
+  parentContainer.querySelector('.multi-select-display').innerText = '全部';
+}
+
+function handleDistrictChange(selectElem) {
+  const district = selectElem.value;
+  const parentContainer = selectElem.closest('.filter-bar');
+  const region = parentContainer.querySelector('.region-select').value;
+  const storeDropdown = parentContainer.querySelector('.store-dropdown');
+  
+  // 清空门店
+  storeDropdown.innerHTML = '<div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>';
+  
+  // 如果选择了小区，则填充对应的门店
+  if (region && district && storeHierarchy[region][district]) {
+    const stores = storeHierarchy[region][district];
+    stores.forEach(store => {
+      const div = document.createElement('div');
+      div.className = 'multi-select-option';
+      div.innerHTML = `<input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>${store}</label>`;
+      storeDropdown.appendChild(div);
+    });
+  }
+  
+  // 更新门店显示文本
+  parentContainer.querySelector('.multi-select-display').innerText = '全部';
+}

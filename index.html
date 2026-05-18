@@ -246,13 +246,26 @@
                 </select>
             </div>
             <div class="filter-item">
+                <label>大区：</label>
+                <select class="filter-select region-select" onchange="handleRegionChange(this)">
+                    <option value="">全部</option>
+                    <option value="华东">华东大区</option>
+                    <option value="华南">华南大区</option>
+                    <option value="华北">华北大区</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>小区：</label>
+                <select class="filter-select district-select" onchange="handleDistrictChange(this)">
+                    <option value="">全部</option>
+                </select>
+            </div>
+            <div class="filter-item">
                 <label>门店：</label>
                 <div class="multi-select-wrap">
                     <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
-                    <div class="multi-select-dropdown">
+                    <div class="multi-select-dropdown store-dropdown">
                         <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
-                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>杭州旗舰店</label></div>
-                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>上海静安店</label></div>
                     </div>
                 </div>
             </div>
@@ -346,12 +359,26 @@
                 </select>
             </div>
             <div class="filter-item">
+                <label>大区：</label>
+                <select class="filter-select region-select" onchange="handleRegionChange(this)">
+                    <option value="">全部</option>
+                    <option value="华东">华东大区</option>
+                    <option value="华南">华南大区</option>
+                    <option value="华北">华北大区</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>小区：</label>
+                <select class="filter-select district-select" onchange="handleDistrictChange(this)">
+                    <option value="">全部</option>
+                </select>
+            </div>
+            <div class="filter-item">
                 <label>门店：</label>
                 <div class="multi-select-wrap">
                     <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
-                    <div class="multi-select-dropdown">
+                    <div class="multi-select-dropdown store-dropdown">
                         <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
-                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>广州天河店</label></div>
                     </div>
                 </div>
             </div>
