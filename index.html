@@ -335,7 +335,12 @@
                 <div class="multi-select-wrap">
                     <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
                     <div class="multi-select-dropdown store-dropdown">
-                        <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        <div class="store-search-wrap" style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0;">
+                            <input type="text" placeholder="输入门店名称过滤..." oninput="handleStoreSearch(this)" class="filter-input" style="width: 100%; box-sizing: border-box; height: 26px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid #d9d9d9;">
+                        </div>
+                        <div class="store-options-list">
+                            <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -459,7 +464,12 @@
                 <div class="multi-select-wrap">
                     <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
                     <div class="multi-select-dropdown store-dropdown">
-                        <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        <div class="store-search-wrap" style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0;">
+                            <input type="text" placeholder="输入门店名称过滤..." oninput="handleStoreSearch(this)" class="filter-input" style="width: 100%; box-sizing: border-box; height: 26px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid #d9d9d9;">
+                        </div>
+                        <div class="store-options-list">
+                            <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        </div>
                     </div>
                 </div>
             </div>

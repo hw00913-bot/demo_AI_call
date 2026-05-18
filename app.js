@@ -138,6 +138,11 @@ function resetFilter() {
     items.forEach(i => i.checked = false);
     updateMultiSelectDisplay(wrap);
   });
+  /* 重置门店模糊搜索 */
+  document.querySelectorAll('.store-search-wrap input').forEach(inp => {
+    inp.value = '';
+    handleStoreSearch(inp);
+  });
   showToast('已重置筛选条件');
 }
 
@@ -290,12 +295,19 @@ function handleRegionChange(selectElem) {
   const region = selectElem.value;
   const parentContainer = selectElem.closest('.filter-bar');
   const districtSelect = parentContainer.querySelector('.district-select');
-  const storeDropdown = parentContainer.querySelector('.store-dropdown');
+  const storeList = parentContainer.querySelector('.store-options-list');
+  const searchInput = parentContainer.querySelector('.store-search-wrap input');
   
   // 清空小区
   districtSelect.innerHTML = '<option value="">全部</option>';
-  // 清空门店
-  storeDropdown.innerHTML = '<div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>';
+  
+  // 清空门店选项与搜索框
+  if (storeList) {
+    storeList.innerHTML = '<div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>';
+  }
+  if (searchInput) {
+    searchInput.value = '';
+  }
   
   // 如果选择了大区，则填充对应的小区
   if (region && storeHierarchy[region]) {
@@ -315,10 +327,16 @@ function handleDistrictChange(selectElem) {
   const district = selectElem.value;
   const parentContainer = selectElem.closest('.filter-bar');
   const region = parentContainer.querySelector('.region-select').value;
-  const storeDropdown = parentContainer.querySelector('.store-dropdown');
+  const storeList = parentContainer.querySelector('.store-options-list');
+  const searchInput = parentContainer.querySelector('.store-search-wrap input');
   
-  // 清空门店
-  storeDropdown.innerHTML = '<div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>';
+  // 清空门店与搜索框
+  if (storeList) {
+    storeList.innerHTML = '<div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>';
+  }
+  if (searchInput) {
+    searchInput.value = '';
+  }
   
   // 如果选择了小区，则填充对应的门店
   if (region && district && storeHierarchy[region][district]) {
@@ -327,10 +345,40 @@ function handleDistrictChange(selectElem) {
       const div = document.createElement('div');
       div.className = 'multi-select-option';
       div.innerHTML = `<input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>${store}</label>`;
-      storeDropdown.appendChild(div);
+      if (storeList) storeList.appendChild(div);
     });
   }
   
   // 更新门店显示文本
   parentContainer.querySelector('.multi-select-display').innerText = '全部';
+}
+
+/* ===== 门店模糊搜索功能 ===== */
+function handleStoreSearch(inputElem) {
+  const query = inputElem.value.trim().toLowerCase();
+  const dropdown = inputElem.closest('.multi-select-dropdown');
+  const storeList = dropdown.querySelector('.store-options-list');
+  if (!storeList) return;
+  const options = storeList.querySelectorAll('.multi-select-option');
+  
+  options.forEach(option => {
+    const label = option.querySelector('label');
+    if (label) {
+      const text = label.textContent.toLowerCase();
+      if (text === '全部') {
+        // 搜索时隐藏"全部"选项以使搜索结果更精准干净
+        if (query) {
+          option.style.display = 'none';
+        } else {
+          option.style.display = 'flex';
+        }
+      } else {
+        if (text.includes(query)) {
+          option.style.display = 'flex';
+        } else {
+          option.style.display = 'none';
+        }
+      }
+    }
+  });
 }
