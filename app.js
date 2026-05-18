@@ -110,8 +110,22 @@ document.addEventListener('DOMContentLoaded', function () {
   initDefaultDates();
 
   /* 点击页面其他区域关闭所有多选下拉 */
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('open'));
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.multi-select-wrap')) {
+      document.querySelectorAll('.multi-select-dropdown').forEach(d => d.classList.remove('open'));
+    }
+  });
+
+  /* 允许点击多选项任意区域（如文字或整行空白处）选中复选框 */
+  document.addEventListener('click', (e) => {
+    const option = e.target.closest('.multi-select-option');
+    if (option && e.target.tagName !== 'INPUT') {
+      const checkbox = option.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
   });
 
 });
