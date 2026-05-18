@@ -23,22 +23,70 @@
 <div class="main-layout">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div style="width:24px;height:24px;background:#1677ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">D</div>
-      <span class="logo-text">智能外呼中台</span>
+      <!-- Diamond SVG Logo matching mockup exactly -->
+      <svg width="20" height="20" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <path d="M64 12L116 64L64 116L12 64L64 12Z" stroke="#1677ff" stroke-width="12" fill="none" />
+        <path d="M64 36L92 64L64 92L36 64L64 36Z" fill="#ff4d4f" />
+      </svg>
+      <span class="logo-text" style="font-size: 15px; font-weight: 700; color: #fff;">智能外呼</span>
     </div>
+
+    <!-- 首页 -->
     <div class="nav-item" id="nav-home" onclick="setActive(this)">
       <div class="nav-item-inner">
         <span class="label">首页</span>
       </div>
     </div>
-    <div class="nav-item active-parent open" id="nav-report" onclick="toggleMenu(this, 'report')">
+
+    <!-- 外呼场景 -->
+    <div class="nav-item" id="nav-scene" onclick="toggleMenu(this, 'scene')">
       <div class="nav-item-inner">
-        <span class="label">统计报表</span>
+        <span class="label">外呼场景</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub" id="sub-scene">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '外呼列表')">外呼列表</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '外呼拦截')">外呼拦截</div>
+    </div>
+
+    <!-- 统计分析 -->
+    <div class="nav-item open active-parent" id="nav-report" onclick="toggleMenu(this, 'report')">
+      <div class="nav-item-inner">
+        <span class="label">统计分析</span>
       </div>
       <span class="arrow">▾</span>
     </div>
     <div class="nav-sub open" id="sub-report">
-      <div class="nav-sub-item active">线索统计</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '通话统计')">通话统计</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '计费统计')">计费统计</div>
+      <div class="nav-sub-item active" onclick="selectSubMenu(this, '线索统计')">线索统计</div>
+    </div>
+
+    <!-- 外呼结果 -->
+    <div class="nav-item" id="nav-result" onclick="toggleMenu(this, 'result')">
+      <div class="nav-item-inner">
+        <span class="label">外呼结果</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub" id="sub-result">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '通话记录')">通话记录</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '线索记录')">线索记录</div>
+    </div>
+
+    <!-- 系统管理 -->
+    <div class="nav-item" id="nav-system" onclick="toggleMenu(this, 'system')">
+      <div class="nav-item-inner">
+        <span class="label">系统管理</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub" id="sub-system">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '账号管理')">账号管理</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '租户管理')">租户管理</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '通道管理')">通道管理</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '业务场景')">业务场景</div>
     </div>
   </aside>
 

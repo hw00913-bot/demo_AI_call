@@ -30,6 +30,17 @@ function toggleMenu(el, key) {
   const sub = document.getElementById('sub-' + key);
   if (!sub) return;
   const isOpen = sub.classList.contains('open');
+  
+  // 优质微交互：展开时自动折叠其他无关的一级菜单，呈现高大上手风琴式体验
+  document.querySelectorAll('.nav-sub').forEach(s => {
+    if (s !== sub) {
+      s.classList.remove('open');
+      const parentId = s.id.replace('sub-', 'nav-');
+      const p = document.getElementById(parentId);
+      if (p) p.classList.remove('open', 'active-parent');
+    }
+  });
+
   if (isOpen) {
     sub.classList.remove('open');
     el.classList.remove('open', 'active-parent');
@@ -41,52 +52,37 @@ function toggleMenu(el, key) {
 
 /* ===== 首页点击激活 ===== */
 function setActive(el) {
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active', 'active-parent', 'open'));
+  document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
   el.classList.add('active');
+  showToast('欢迎来到智能外呼中台！当前切换至首页看板（演示模式，核心报表请见统计分析）', 'success');
 }
 
-/* ===== 子菜单项点击（激活 + 可扩展页面切换） ===== */
-function switchSubAndPage(el, pageKey) {
-  document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
+/* ===== 二级菜单项选择 ===== */
+function selectSubMenu(el, menuName) {
+  document.querySelectorAll('.nav-sub-item').forEach(item => item.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-parent'));
+  
   el.classList.add('active');
+  const sub = el.closest('.nav-sub');
+  if (sub) {
+    const parentId = sub.id.replace('sub-', 'nav-');
+    const parent = document.getElementById(parentId);
+    if (parent) {
+      parent.classList.add('active-parent');
+    }
+  }
+  
+  if (menuName !== '线索统计') {
+    showToast(`"${menuName}" 功能正在开发中，请查看统计分析下的"线索统计"报表`, 'info');
+  }
 }
 
 /* ===== 页面初始化 ===== */
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* 子菜单项点击激活高亮 */
-  document.querySelectorAll('.nav-sub-item[onclick]').forEach(item => {
-    item.addEventListener('click', function () {
-      document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
-      const sub = this.closest('.nav-sub');
-      if (sub) {
-        const parentId = sub.id.replace('sub-', 'nav-');
-        const parent = document.getElementById(parentId);
-        if (parent) {
-          document.querySelectorAll('.nav-item').forEach(p => {
-            if (p !== parent) p.classList.remove('active');
-          });
-          parent.classList.add('active-parent');
-        }
-      }
-    });
-  });
-
-  /* 一级菜单无子菜单时激活自身 */
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function () {
-      const key = this.id ? this.id.replace('nav-', '') : null;
-      const sub = key ? document.getElementById('sub-' + key) : null;
-      if (!sub) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active', 'active-parent'));
-        document.querySelectorAll('.nav-sub-item').forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-      }
-    });
-  });
-
-  /* 默认展开"统计报表"菜单 */
+  /* 默认展开"统计分析"菜单 */
   const navReport = document.getElementById('nav-report');
   if (navReport) navReport.classList.add('open', 'active-parent');
 
