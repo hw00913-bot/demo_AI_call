@@ -110,8 +110,8 @@
       <div id="tab-manual" class="tab-panel">
         <div class="sub-tab-bar">
           <div class="sub-tab-bar-inner">
-            <div class="sub-tab-item active" onclick="switchSubTab(this, 'manual-nev')">NEV 线索</div>
-            <div class="sub-tab-item" onclick="switchSubTab(this, 'manual-ice')">ICE 线索</div>
+            <div class="sub-tab-item active" onclick="switchSubTab(this, 'manual-nev')">总部 NEV 线索</div>
+            <div class="sub-tab-item" onclick="switchSubTab(this, 'manual-ice')">总部 ICE 线索</div>
           </div>
         </div>
         
@@ -128,9 +128,8 @@
             <div class="filter-item">
               <label>业务类型：</label>
               <select class="filter-select">
-                <option value="">全部</option>
+                <option value="cold" selected>冷线索</option>
                 <option value="new">新线索</option>
-                <option value="cold">冷线索</option>
               </select>
             </div>
             <div class="btn-group">
@@ -164,7 +163,7 @@
 
           <div class="pagination">
             <span class="total-text">共 5 条数据</span>
-            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn disabled"><</button>
             <button class="page-btn active">1</button>
             <button class="page-btn">2</button>
             <button class="page-btn">3</button>
@@ -174,7 +173,7 @@
             <button class="page-btn">7</button>
             <button class="page-btn">8</button>
             <button class="page-btn">9</button>
-            <button class="page-btn">&gt;</button>
+            <button class="page-btn">></button>
             <select class="page-select">
               <option>10 条/页</option>
               <option>20 条/页</option>
@@ -199,9 +198,8 @@
             <div class="filter-item">
               <label>业务类型：</label>
               <select class="filter-select">
-                <option value="">全部</option>
+                <option value="cold" selected>冷线索</option>
                 <option value="new">新线索</option>
-                <option value="cold">冷线索</option>
               </select>
             </div>
             <div class="btn-group">
@@ -235,7 +233,7 @@
 
           <div class="pagination">
             <span class="total-text">共 5 条数据</span>
-            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn disabled"><</button>
             <button class="page-btn active">1</button>
             <button class="page-btn">2</button>
             <button class="page-btn">3</button>
@@ -245,7 +243,7 @@
             <button class="page-btn">7</button>
             <button class="page-btn">8</button>
             <button class="page-btn">9</button>
-            <button class="page-btn">&gt;</button>
+            <button class="page-btn">></button>
             <select class="page-select">
               <option>10 条/页</option>
               <option>20 条/页</option>
@@ -262,8 +260,8 @@
       <div id="tab-ai" class="tab-panel" style="display:none;">
         <div class="sub-tab-bar">
           <div class="sub-tab-bar-inner">
-            <div class="sub-tab-item active" onclick="switchSubTab(this, 'ai-nev')">NEV 线索</div>
-            <div class="sub-tab-item" onclick="switchSubTab(this, 'ai-ice')">ICE 线索</div>
+            <div class="sub-tab-item active" onclick="switchSubTab(this, 'ai-nev')">总部 NEV 线索</div>
+            <div class="sub-tab-item" onclick="switchSubTab(this, 'ai-ice')">总部 ICE 线索</div>
           </div>
         </div>
 
@@ -278,7 +276,7 @@
               </div>
             </div>
             <div class="filter-item">
-              <label>首次外呼时间：</label>
+              <label>呼叫时间：</label>
               <div class="filter-date-range">
                 <input type="datetime-local" class="filter-input date" style="width:180px;">
                 <span class="sep">—</span>
@@ -294,7 +292,7 @@
               </select>
             </div>
             <div class="filter-item">
-                <label>意向级别：</label>
+                <label>意向级别（外呼中台）：</label>
                 <div class="multi-select-wrap">
                     <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
                     <div class="multi-select-dropdown">
@@ -310,39 +308,14 @@
             <div class="filter-item">
                 <label>业务类型：</label>
                 <select class="filter-select">
-                    <option value="">全部</option>
-                    <option value="new">新线索</option>
+                    <option value="" selected>全部</option>
                     <option value="cold">冷线索</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>大区：</label>
-                <select class="filter-select region-select" onchange="handleRegionChange(this)">
-                    <option value="">全部</option>
-                    <option value="华东">华东大区</option>
-                    <option value="华南">华南大区</option>
-                    <option value="华北">华北大区</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>小区：</label>
-                <select class="filter-select district-select" onchange="handleDistrictChange(this)">
-                    <option value="">全部</option>
+                    <option value="new">新线索</option>
                 </select>
             </div>
             <div class="filter-item">
                 <label>门店：</label>
-                <div class="multi-select-wrap">
-                    <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
-                    <div class="multi-select-dropdown store-dropdown">
-                        <div class="store-search-wrap" style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0;">
-                            <input type="text" placeholder="输入门店名称过滤..." oninput="handleStoreSearch(this)" class="filter-input" style="width: 100%; box-sizing: border-box; height: 26px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid #d9d9d9;">
-                        </div>
-                        <div class="store-options-list">
-                            <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
-                        </div>
-                    </div>
-                </div>
+                <input type="text" class="filter-input" placeholder="请输入门店关键字模糊查询..." style="width: 200px;">
             </div>
             <div class="btn-group">
               <button class="btn btn-default" onclick="resetFilter()">重置</button>
@@ -356,19 +329,19 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>序号</th><th>导入时间</th><th>线索编码</th><th>呼叫任务场景名称</th><th>业务类型</th><th>手机号</th><th>门店编码</th><th>门店名称</th><th>呼叫时间</th><th>通话状态</th><th>通话时长</th><th>意向级别</th><th>下发门店</th>
+                    <th>序号</th><th>导入时间</th><th>线索编码</th><th>呼叫任务场景名称</th><th>业务类型</th><th>手机号</th><th>门店编码</th><th>门店名称</th><th>呼叫时间</th><th>通话状态</th><th>通话时长</th><th>意向级别（外呼中台）</th><th>意向级别（业务系统）</th><th>下发门店</th>
                   </tr>
                 </thead>
                 <tbody>
-<tr><td>1</td><td>2023-10-25 10:00:00</td><td>XS202310250001</td><td>一知-nev-新线索</td><td>新线索</td><td>138****8888</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:05:00</td><td><span class="tag tag-green">已接听</span></td><td>02:30</td><td><span class="tag tag-blue">A</span></td><td>杭州西湖店</td></tr>
+<tr><td>1</td><td>2023-10-25 10:00:00</td><td>XS202310250001</td><td>一知-nev-新线索</td><td>新线索</td><td>138****8888</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:05:00</td><td><span class="tag tag-green">已接听</span></td><td>02:30</td><td><span class="tag tag-blue">A (高意向)</span></td><td><span class="tag tag-green">A (高意向)</span></td><td>杭州西湖店</td></tr>
 
-                  <tr><td>2</td><td>2023-10-25 10:15:00</td><td>XS202310250003</td><td>一知-nev-新线索</td><td>新线索</td><td>137****7777</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:20:00</td><td><span class="tag tag-green">已接听</span></td><td>01:45</td><td><span class="tag tag-blue">B</span></td><td>杭州滨江店</td></tr>
+                  <tr><td>2</td><td>2023-10-25 10:15:00</td><td>XS202310250003</td><td>一知-nev-新线索</td><td>新线索</td><td>137****7777</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:20:00</td><td><span class="tag tag-green">已接听</span></td><td>01:45</td><td><span class="tag tag-blue">B (潜在)</span></td><td><span class="tag tag-blue">B (潜在)</span></td><td>杭州滨江店</td></tr>
 
-                  <tr><td>3</td><td>2023-10-25 10:30:00</td><td>XS202310250005</td><td>一知-保有客户-回访</td><td>新线索</td><td>136****6666</td><td>MD003</td><td>上海静安店</td><td>2023-10-25 10:35:00</td><td><span class="tag tag-red">无应答</span></td><td>00:00</td><td><span class="tag tag-gray">C</span></td><td>上海静安店</td></tr>
+                  <tr><td>3</td><td>2023-10-25 10:30:00</td><td>XS202310250005</td><td>一知-保有客户-回访</td><td>新线索</td><td>136****6666</td><td>MD003</td><td>上海静安店</td><td>2023-10-25 10:35:00</td><td><span class="tag tag-red">无应答</span></td><td>00:00</td><td><span class="tag tag-gray">C (一般)</span></td><td><span class="tag tag-gray">C (一般)</span></td><td>上海静安店</td></tr>
 
-                  <tr><td>4</td><td>2023-10-25 10:45:00</td><td>XS202310250007</td><td>一知-nev-新线索</td><td>冷线索</td><td>135****5555</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:50:00</td><td><span class="tag tag-green">已接听</span></td><td>03:10</td><td><span class="tag tag-blue">A</span></td><td>杭州旗舰店</td></tr>
+                  <tr><td>4</td><td>2023-10-25 10:45:00</td><td>XS202310250007</td><td>一知-nev-新线索</td><td>冷线索</td><td>135****5555</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:50:00</td><td><span class="tag tag-green">已接听</span></td><td>03:10</td><td><span class="tag tag-blue">A (高意向)</span></td><td><span class="tag tag-green">A (高意向)</span></td><td>杭州旗舰店</td></tr>
 
-                  <tr><td>5</td><td>2023-10-25 11:00:00</td><td>XS202310250009</td><td>一知-nev-新线索</td><td>新线索</td><td>134****4444</td><td>MD005</td><td>杭州西湖店</td><td>2023-10-25 11:05:00</td><td><span class="tag tag-red">忙线中</span></td><td>00:00</td><td><span class="tag tag-gray">D</span></td><td>杭州西湖店</td></tr>
+                  <tr><td>5</td><td>2023-10-25 11:00:00</td><td>XS202310250009</td><td>一知-nev-新线索</td><td>新线索</td><td>134****4444</td><td>MD005</td><td>杭州西湖店</td><td>2023-10-25 11:05:00</td><td><span class="tag tag-red">忙线中</span></td><td>00:00</td><td><span class="tag tag-gray">D (忙碌/敷衍)</span></td><td><span class="tag tag-red">E (拒绝/无效/无应答)</span></td><td>杭州西湖店</td></tr>
 </tbody>
               </table>
             </div>
@@ -408,7 +381,7 @@
               </div>
             </div>
             <div class="filter-item">
-              <label>首次外呼时间：</label>
+              <label>呼叫时间：</label>
               <div class="filter-date-range">
                 <input type="datetime-local" class="filter-input date" style="width:180px;">
                 <span class="sep">—</span>
@@ -423,7 +396,7 @@
               </select>
             </div>
             <div class="filter-item">
-                <label>意向级别：</label>
+                <label>意向级别（外呼中台）：</label>
                 <div class="multi-select-wrap">
                     <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
                     <div class="multi-select-dropdown">
@@ -439,39 +412,14 @@
             <div class="filter-item">
                 <label>业务类型：</label>
                 <select class="filter-select">
-                    <option value="">全部</option>
-                    <option value="new">新线索</option>
+                    <option value="" selected>全部</option>
                     <option value="cold">冷线索</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>大区：</label>
-                <select class="filter-select region-select" onchange="handleRegionChange(this)">
-                    <option value="">全部</option>
-                    <option value="华东">华东大区</option>
-                    <option value="华南">华南大区</option>
-                    <option value="华北">华北大区</option>
-                </select>
-            </div>
-            <div class="filter-item">
-                <label>小区：</label>
-                <select class="filter-select district-select" onchange="handleDistrictChange(this)">
-                    <option value="">全部</option>
+                    <option value="new">新线索</option>
                 </select>
             </div>
             <div class="filter-item">
                 <label>门店：</label>
-                <div class="multi-select-wrap">
-                    <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
-                    <div class="multi-select-dropdown store-dropdown">
-                        <div class="store-search-wrap" style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0;">
-                            <input type="text" placeholder="输入门店名称过滤..." oninput="handleStoreSearch(this)" class="filter-input" style="width: 100%; box-sizing: border-box; height: 26px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid #d9d9d9;">
-                        </div>
-                        <div class="store-options-list">
-                            <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
-                        </div>
-                    </div>
-                </div>
+                <input type="text" class="filter-input" placeholder="请输入门店关键字模糊查询..." style="width: 200px;">
             </div>
             <div class="btn-group">
               <button class="btn btn-default" onclick="resetFilter()">重置</button>
@@ -485,19 +433,19 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>序号</th><th>导入时间</th><th>线索编码</th><th>呼叫任务场景名称</th><th>业务类型</th><th>手机号</th><th>门店编码</th><th>门店名称</th><th>呼叫时间</th><th>通话状态</th><th>通话时长</th><th>意向级别</th><th>下发门店</th>
+                    <th>序号</th><th>导入时间</th><th>线索编码</th><th>呼叫任务场景名称</th><th>业务类型</th><th>手机号</th><th>门店编码</th><th>门店名称</th><th>呼叫时间</th><th>通话状态</th><th>通话时长</th><th>意向级别（外呼中台）</th><th>意向级别（业务系统）</th><th>下发门店</th>
                   </tr>
                 </thead>
                 <tbody>
-<tr><td>1</td><td>2023-10-25 09:45:00</td><td>XS202310250002</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>139****9999</td><td>MD002</td><td>广州天河店</td><td>--</td><td><span class="tag tag-red">无应答</span></td><td>00:00</td><td><span class="tag tag-blue">B</span></td><td>广州天河店</td></tr>
+<tr><td>1</td><td>2023-10-25 09:45:00</td><td>XS202310250002</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>139****9999</td><td>MD002</td><td>广州天河店</td><td>--</td><td><span class="tag tag-red">无应答</span></td><td>00:00</td><td><span class="tag tag-blue">B (潜在)</span></td><td><span class="tag tag-blue">B (潜在)</span></td><td>广州天河店</td></tr>
 
-                  <tr><td>2</td><td>2023-10-25 10:20:00</td><td>XS202310250004</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>131****1111</td><td>MD004</td><td>深圳南山店</td><td>2023-10-25 10:25:00</td><td><span class="tag tag-green">已接听</span></td><td>01:10</td><td><span class="tag tag-blue">C</span></td><td>深圳南山店</td></tr>
+                  <tr><td>2</td><td>2023-10-25 10:20:00</td><td>XS202310250004</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>131****1111</td><td>MD004</td><td>深圳南山店</td><td>2023-10-25 10:25:00</td><td><span class="tag tag-green">已接听</span></td><td>01:10</td><td><span class="tag tag-blue">C (一般)</span></td><td><span class="tag tag-green">A (高意向)</span></td><td>深圳南山店</td></tr>
 
-                  <tr><td>3</td><td>2023-10-25 10:55:00</td><td>XS202310250006</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>132****2222</td><td>MD006</td><td>北京朝阳店</td><td>2023-10-25 11:00:00</td><td><span class="tag tag-green">已接听</span></td><td>02:05</td><td><span class="tag tag-blue">A</span></td><td>北京朝阳店</td></tr>
+                  <tr><td>3</td><td>2023-10-25 10:55:00</td><td>XS202310250006</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>132****2222</td><td>MD006</td><td>北京朝阳店</td><td>2023-10-25 11:00:00</td><td><span class="tag tag-green">已接听</span></td><td>02:05</td><td><span class="tag tag-blue">A (高意向)</span></td><td><span class="tag tag-green">A (高意向)</span></td><td>北京朝阳店</td></tr>
 
-                  <tr><td>4</td><td>2023-10-25 11:15:00</td><td>XS202310250008</td><td>一知-燃油车-冷线索</td><td>新线索</td><td>133****3333</td><td>MD002</td><td>广州天河店</td><td>2023-10-25 11:20:00</td><td><span class="tag tag-red">空号</span></td><td>00:00</td><td><span class="tag tag-gray">E</span></td><td>广州天河店</td></tr>
+                  <tr><td>4</td><td>2023-10-25 11:15:00</td><td>XS202310250008</td><td>一知-燃油车-冷线索</td><td>新线索</td><td>133****3333</td><td>MD002</td><td>广州天河店</td><td>2023-10-25 11:20:00</td><td><span class="tag tag-red">空号</span></td><td>00:00</td><td><span class="tag tag-gray">E (拒绝/无效/无应答)</span></td><td><span class="tag tag-gray">E (拒绝/无效/无应答)</span></td><td>广州天河店</td></tr>
 
-                  <tr><td>5</td><td>2023-10-25 11:40:00</td><td>XS202310250010</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>130****0000</td><td>MD008</td><td>南京新街口店</td><td>2023-10-25 11:45:00</td><td><span class="tag tag-green">已接听</span></td><td>00:55</td><td><span class="tag tag-blue">B</span></td><td>南京新街口店</td></tr>
+                  <tr><td>5</td><td>2023-10-25 11:40:00</td><td>XS202310250010</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>130****0000</td><td>MD008</td><td>南京新街口店</td><td>2023-10-25 11:45:00</td><td><span class="tag tag-green">已接听</span></td><td>00:55</td><td><span class="tag tag-blue">B (潜在)</span></td><td><span class="tag tag-blue">B (潜在)</span></td><td>南京新街口店</td></tr>
 </tbody>
               </table>
             </div>
