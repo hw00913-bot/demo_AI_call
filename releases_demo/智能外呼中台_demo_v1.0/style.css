@@ -704,6 +704,50 @@ p { margin-bottom: 8px; }
   color: #999;
   cursor: help;
   font-size: 12px;
+  position: relative;
+  display: inline-flex;
+}
+/* 自定义 tooltip */
+.overview-help::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.78);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: nowrap;
+  max-width: 280px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+  z-index: 9999;
+}
+/* tooltip 小箭头 */
+.overview-help::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0,0,0,0.78);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+  z-index: 9999;
+}
+.overview-help:hover::after,
+.overview-help:hover::before {
+  opacity: 1;
+  visibility: visible;
 }
 .overview-link {
   color: #1677ff;

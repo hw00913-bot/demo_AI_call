@@ -361,31 +361,31 @@
             <div class="overview-block-body">
               <div class="overview-grid cols-6">
                 <div class="overview-card">
-                  <div class="overview-card-title">导入客户数 <span class="overview-help" title="当前任务导入的客户手机号总数（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">导入客户数 <span class="overview-help" data-tooltip="当前任务导入的客户手机号总数（去重）">&#9432;</span></div>
                   <div class="overview-card-value">6</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">外呼客户数 <span class="overview-help" title="提交到外部智能呼叫系统接口的客户手机号总数（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">外呼客户数 <span class="overview-help" data-tooltip="提交到外部智能呼叫系统接口的客户手机号总数（去重）">&#9432;</span></div>
                   <div class="overview-card-value">1</div>
                   <div class="overview-card-sub">总外呼数：2</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title"><span class="overview-link">去重</span>过滤客户数 <span class="overview-help" title="从本地任务已过滤获取（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">过滤客户数 <span class="overview-help" data-tooltip="从本地任务已过滤获取（去重）">&#9432;</span></div>
                   <div class="overview-card-value">5</div>
                   <div class="overview-card-sub">过滤比例：83.33%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">接听数 <span class="overview-help" title="已接通的手机号数量（不去重）">&#9432;</span></div>
+                  <div class="overview-card-title">接听数 <span class="overview-help" data-tooltip="已接通的手机号数量（不去重）">&#9432;</span></div>
                   <div class="overview-card-value">0</div>
                   <div class="overview-card-sub">接听率：0%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">未接通数 <span class="overview-help" title="未接通的手机号数量（不去重）">&#9432;</span></div>
+                  <div class="overview-card-title">未接通数 <span class="overview-help" data-tooltip="未接通的手机号数量（不去重）">&#9432;</span></div>
                   <div class="overview-card-value">0</div>
                   <div class="overview-card-sub">未接通率：0%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">平均通话时长 <span class="overview-help" title="每次通话的平均时长">&#9432;</span></div>
+                  <div class="overview-card-title">平均通话时长 <span class="overview-help" data-tooltip="每次通话的平均时长">&#9432;</span></div>
                   <div class="overview-card-value">0<span class="overview-unit">秒</span></div>
                 </div>
               </div>
@@ -401,29 +401,29 @@
             <div class="overview-block-body">
               <div class="overview-grid cols-3">
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" title="意向等级1客户占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级1客户占比">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" title="意向等级2客户占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级2客户占比">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" title="意向等级1或2客户合计占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级1或2客户合计占比">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
               </div>
               <div class="overview-grid cols-3" style="margin-top:1px;">
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户数 <span class="overview-help" title="意向等级1客户数量">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级1客户数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户数 <span class="overview-help" title="意向等级2客户数量">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级2客户数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户数 <span class="overview-help" title="意向等级1或2客户合计数量">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级1或2客户合计数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
                 </div>
               </div>
@@ -858,19 +858,19 @@
       // 根据 title 属性的 tooltip 文本判断是哪类卡片
       const helpEl = title.querySelector('.overview-help');
       if (!helpEl) return;
-      const tooltip = helpEl.getAttribute('title') || '';
+      const tooltip = helpEl.getAttribute('data-tooltip') || '';
       if (tooltip === '意向等级1客户占比') {
-        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" title="意向等级1客户占比">&#9432;</span>';
+        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级1客户占比">&#9432;</span>';
       } else if (tooltip === '意向等级2客户占比') {
-        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" title="意向等级2客户占比">&#9432;</span>';
+        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级2客户占比">&#9432;</span>';
       } else if (tooltip === '意向等级1或2客户合计占比') {
-        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" title="意向等级1或2客户合计占比">&#9432;</span>';
+        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级1或2客户合计占比">&#9432;</span>';
       } else if (tooltip === '意向等级1客户数量') {
-        title.innerHTML = level1Tag + '类客户数 <span class="overview-help" title="意向等级1客户数量">&#9432;</span>';
+        title.innerHTML = level1Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级1客户数量">&#9432;</span>';
       } else if (tooltip === '意向等级2客户数量') {
-        title.innerHTML = level2Tag + '类客户数 <span class="overview-help" title="意向等级2客户数量">&#9432;</span>';
+        title.innerHTML = level2Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级2客户数量">&#9432;</span>';
       } else if (tooltip === '意向等级1或2客户合计数量') {
-        title.innerHTML = level1Tag + '/' + level2Tag + '类客户数 <span class="overview-help" title="意向等级1或2客户合计数量">&#9432;</span>';
+        title.innerHTML = level1Tag + '/' + level2Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级1或2客户合计数量">&#9432;</span>';
       }
     });
   }
