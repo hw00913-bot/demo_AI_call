@@ -506,7 +506,8 @@
     }
 
     // 找到当前激活的业务信息 tab 对应的表格
-    const activePanel = document.querySelector('.biz-inner-panel:not([style*="display: none"])') || document.getElementById('bizPanel-input');
+    // 兼容 style="display:none" 和 style="display: none" 两种写法
+    const activePanel = document.querySelector('.biz-inner-panel:not([style*="display:none"]):not([style*="display: none"])') || document.getElementById('bizPanel-input');
     const tbody = activePanel?.querySelector('tbody');
     if (!tbody) { closeFieldModal(); return; }
 

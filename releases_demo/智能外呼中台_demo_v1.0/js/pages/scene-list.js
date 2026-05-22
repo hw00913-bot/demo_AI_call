@@ -43,13 +43,11 @@
             <div class="stat-value">${item.called}</div>
           </div>
         </div>
-        <div class="card-actions">
-          <div class="card-action-btn-group">
+        <div class="card-action-btn-group">
             <button class="card-action-btn primary" onclick="window.Pages['scene-list'].showDetail(${item.id})">查看</button>
             <button class="card-action-btn default" onclick="showToast('编辑功能开发中','info')">编辑</button>
+            <span class="card-action-more" onclick="window.Pages['scene-list'].toggleMoreMenu(event,${item.id})">⋮</span>
           </div>
-          <span class="card-action-more" onclick="window.Pages['scene-list'].toggleMoreMenu(event,${item.id})">⋮</span>
-        </div>
       </div>
     `;
   }
@@ -495,7 +493,7 @@
     if (e && e.target !== e.currentTarget) return;
     const backdrop = document.getElementById('sceneDetailBackdrop');
     const drawer = backdrop ? backdrop.querySelector('.scene-detail-drawer') : null;
-    if (!backdrop && !drawer) return;
+    if (!backdrop || !drawer) return;
     if (backdrop) backdrop.classList.remove('open');
     if (drawer) drawer.classList.add('closing');
     setTimeout(() => {
@@ -573,7 +571,7 @@
         <td><span class="tag ${r.status === '已完成' ? 'tag-green' : 'tag-orange'}">${r.status}</span></td>
         <td>${r.time}</td>
         <td>${r.op}</td>
-        <td><a href="#" class="card-action-link" onclick="event.preventDefault();window.Pages['scene-list'].exportImportResult()">导出结果</a></td>
+        <td><a href="#" class="card-action-link" onclick="event.preventDefault();window.Pages['scene-list'].exportImportResult(${r.fail})">导出失败记录</a></td>
       </tr>
     `).join('');
     return `
@@ -651,7 +649,11 @@
     showToast('上传已开始，请稍后查看导入记录', 'success');
   }
 
-  function exportImportResult() {
+  function exportImportResult(failCount) {
+    if (failCount === 0) {
+      showToast('当前导入全部成功', 'success');
+      return;
+    }
     // 模拟导入结果数据
     const data = [
       { result: '成功', reason: '—', phone: '15975587676', orderNo: '0001', needRescue: '是', time: '2025.10.09 12:00' },

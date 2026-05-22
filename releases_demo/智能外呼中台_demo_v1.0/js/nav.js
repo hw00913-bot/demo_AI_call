@@ -11,7 +11,6 @@ const RouteMap = {
   'nav-report': { page: null,             bc: [] },
   'report-call':{ page: 'report-call',    bc: [{ label: '统计分析', link: 'nav-report' }, '通话统计'] },
   'report-billing':{ page: 'report-billing', bc: [{ label: '统计分析', link: 'nav-report' }, '计费统计'] },
-  'report-clue':{ page: 'report-clue',    bc: [{ label: '统计分析', link: 'nav-report' }, '线索统计'] },
   'nav-result': { page: null,             bc: [] },
   'result-records':{ page: 'result-records', bc: [{ label: '外呼结果', link: 'nav-result' }, '通话记录'] },
   'result-clue':{ page: 'result-clue',    bc: [{ label: '外呼结果', link: 'nav-result' }, '线索记录'] },
@@ -40,7 +39,7 @@ const RouteMap = {
             <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#999;">
               <div style="font-size:48px;opacity:.5">🚧</div>
               <div style="font-size:16px;font-weight:500">「${placeholderNames[key]}」功能正在开发中</div>
-              <div style="font-size:13px;color:#bbb">请查看已完成的「线索统计」或「外呼列表」报表</div>
+              <div style="font-size:13px;color:#bbb">请查看已完成的「外呼列表」报表</div>
             </div>
           `;
         },
@@ -144,7 +143,7 @@ function selectSubMenu(el, menuName) {
 function findNavIdByText(text) {
   const map = {
     '外呼列表': 'scene-list', '外呼拦截': 'scene-block',
-    '通话统计': 'report-call', '计费统计': 'report-billing', '线索统计': 'report-clue',
+    '通话统计': 'report-call', '计费统计': 'report-billing',
     '通话记录': 'result-records', '线索记录': 'result-clue',
     '账号管理': 'sys-account', '租户管理': 'sys-tenant',
     '通道管理': 'sys-channel', '业务场景': 'sys-scene'
@@ -159,8 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (navReport) navReport.classList.remove('open', 'active-parent');
   const subReport = document.getElementById('sub-report');
   if (subReport) subReport.classList.remove('open');
-  const clueItem = document.getElementById('report-clue');
-  if (clueItem) clueItem.classList.remove('active');
 
   // 默认展开"外呼场景"菜单并进入外呼列表
   const navScene = document.getElementById('nav-scene');

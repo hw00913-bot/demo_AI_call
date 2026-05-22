@@ -53,8 +53,92 @@ function doExport(event) {
   }, 2500);
 }
 
-function doQuery() { showToast('查询中...'); }
-function doRefresh() { showToast('已刷新'); }
+function doQuery() {
+  const activePanel = document.querySelector('.tab-panel[style*="display:flex"], .tab-panel[style*="display: flex"], .tab-panel:not([style*="display:none"]):not([style*="display: none"])');
+  // 若没有 tab-panel 结构（如外呼列表卡片页），降级为整个 page-content 容器
+  if (!activePanel) {
+    showToast('查询完成', 'info');
+    return;
+  }
+
+  const subPanels = activePanel.querySelectorAll('.sub-tab-panel');
+  const scope = (subPanels && subPanels.length > 0)
+    ? (Array.from(subPanels).find(sp => sp.style.display !== 'none') || subPanels[0])
+    : activePanel;
+
+  const conditions = [];
+  const dateInputs = scope.querySelectorAll('.filter-date-range input');
+  if (dateInputs.length === 2 && dateInputs[0].value && dateInputs[1].value) {
+    conditions.push(`时间: ${dateInputs[0].value} ~ ${dateInputs[1].value}`);
+  }
+  scope.querySelectorAll('.filter-select').forEach(sel => {
+    if (sel.value) conditions.push(sel.value);
+  });
+  scope.querySelectorAll('.multi-select-display').forEach(disp => {
+    const text = disp.textContent.trim();
+    if (text && text !== '全部') conditions.push(text);
+  });
+
+  // 优先在当前激活的面板 (scope) 内查找表格和统计元素，避免跨 tab 错误更新
+  const table = scope.querySelector('table.data-table');
+  let filteredCount = 0;
+
+  if (table) {
+    const tbody = table.querySelector('tbody');
+    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+    const hasFilters = conditions.length > 0;
+
+    rows.forEach(row => {
+      if (!hasFilters) {
+        row.style.display = '';
+        filteredCount++;
+        return;
+      }
+      const text = row.textContent.toLowerCase();
+      let match = false;
+      scope.querySelectorAll('.filter-select').forEach(sel => {
+        if (sel.value && text.includes(sel.value.toLowerCase())) match = true;
+      });
+      if (match || conditions.length === 0) {
+        row.style.display = '';
+        filteredCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    const totalEl = scope.querySelector('.total-text');
+    if (totalEl) totalEl.textContent = `共 ${filteredCount} 条数据`;
+  }
+
+  const msg = conditions.length > 0 ? `查询完成，筛选：${conditions.join('、')}，共 ${filteredCount} 条` : '查询完成，显示全部数据';
+  showToast(msg, 'info');
+}
+
+function doRefresh() {
+  const activePanel = document.querySelector('.tab-panel[style*="display:flex"], .tab-panel[style*="display: flex"], .tab-panel:not([style*="display:none"]):not([style*="display: none"])');
+  let scope = document.getElementById('page-content') || document;
+  
+  if (activePanel) {
+    const subPanels = activePanel.querySelectorAll('.sub-tab-panel');
+    scope = (subPanels && subPanels.length > 0)
+      ? (Array.from(subPanels).find(sp => sp.style.display !== 'none') || subPanels[0])
+      : activePanel;
+  }
+
+  scope.querySelectorAll('.filter-date-range input, .filter-input').forEach(inp => { inp.value = ''; });
+  scope.querySelectorAll('.multi-select-wrap').forEach(wrap => {
+    const allCb = wrap.querySelector('.opt-all');
+    const items = wrap.querySelectorAll('.opt-item');
+    if (allCb) allCb.checked = true;
+    items.forEach(i => i.checked = false);
+    updateMultiSelectDisplay(wrap);
+  });
+  scope.querySelectorAll('table.data-table tbody tr').forEach(row => { row.style.display = ''; });
+  scope.querySelectorAll('.total-text').forEach(el => { el.textContent = '共 5 条数据'; });
+  initDefaultDates(scope);
+  showToast('已刷新', 'success');
+}
 
 /* ===== 筛选重置（传入容器限定范围） ===== */
 function resetFilter(container) {
@@ -131,8 +215,8 @@ function initDefaultDates(container) {
         inputs[0].value = fmtDate(past);
         inputs[1].value = fmtDate(now);
       } else if (type === 'datetime-local') {
-        inputs[0].value = formatDateTime(past);
-        inputs[1].value = formatDateTime(now);
+        inputs[0].value = fmtDateTime(past);
+        inputs[1].value = fmtDateTime(now);
       }
     }
   });

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能外呼中台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="nav-arrows">
+    <button title="后退">←</button>
+    <button title="前进">→</button>
+    <button title="刷新">↻</button>
+  </div>
+  <span class="title">智能外呼中台</span>
+  <div class="right-area">
+    <button class="icon-btn">⚙</button>
+  </div>
+</div>
+
+<div class="main-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <!-- Diamond SVG Logo matching mockup exactly -->
+      <svg width="20" height="20" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <path d="M64 12L116 64L64 116L12 64L64 12Z" stroke="#1677ff" stroke-width="12" fill="none" />
+        <path d="M64 36L92 64L64 92L36 64L64 36Z" fill="#ff4d4f" />
+      </svg>
+      <span class="logo-text" style="font-size: 15px; font-weight: 700; color: #fff;">智能外呼</span>
+    </div>
+
+    <!-- 首页 -->
+    <div class="nav-item" id="nav-home" onclick="setActive(this)">
+      <div class="nav-item-inner">
+        <span class="label">首页</span>
+      </div>
+    </div>
+
+    <!-- 外呼场景 -->
+    <div class="nav-item" id="nav-scene" onclick="toggleMenu(this, 'scene')">
+      <div class="nav-item-inner">
+        <span class="label">外呼场景</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub" id="sub-scene">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '外呼列表')">外呼列表</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '外呼拦截')">外呼拦截</div>
+    </div>
+
+    <!-- 统计分析 -->
+    <div class="nav-item open active-parent" id="nav-report" onclick="toggleMenu(this, 'report')">
+      <div class="nav-item-inner">
+        <span class="label">统计分析</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub open" id="sub-report">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '通话统计')">通话统计</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '计费统计')">计费统计</div>
+      <div class="nav-sub-item active" onclick="selectSubMenu(this, '线索统计')">线索统计</div>
+    </div>
+
+    <!-- 外呼结果 -->
+    <div class="nav-item" id="nav-result" onclick="toggleMenu(this, 'result')">
+      <div class="nav-item-inner">
+        <span class="label">外呼结果</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub" id="sub-result">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '通话记录')">通话记录</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '线索记录')">线索记录</div>
+    </div>
+
+    <!-- 系统管理 -->
+    <div class="nav-item" id="nav-system" onclick="toggleMenu(this, 'system')">
+      <div class="nav-item-inner">
+        <span class="label">系统管理</span>
+      </div>
+      <span class="arrow">▾</span>
+    </div>
+    <div class="nav-sub" id="sub-system">
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '账号管理')">账号管理</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '租户管理')">租户管理</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '通道管理')">通道管理</div>
+      <div class="nav-sub-item" onclick="selectSubMenu(this, '业务场景')">业务场景</div>
+    </div>
+  </aside>
+
+  <div class="content-area">
+    <div class="page-header">
+      <span class="page-title">线索统计</span>
+      <div class="user-info">
+        <span>超级管理员</span>
+        <span class="arrow">▾</span>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchTab(this, 'tab-manual')">外呼线索统计</div>
+      <div class="tab-item" onclick="switchTab(this, 'tab-ai')">外呼线索明细</div>
+      <div class="tab-item" onclick="switchTab(this, 'tab-return')">线索回流统计</div>
+    </div>
+
+    <div class="content-main">
+      <!-- 外呼线索统计 -->
+      <div id="tab-manual" class="tab-panel">
+        <div class="sub-tab-bar">
+          <div class="sub-tab-bar-inner">
+            <div class="sub-tab-item active" onclick="switchSubTab(this, 'manual-nev')">NEV 线索</div>
+            <div class="sub-tab-item" onclick="switchSubTab(this, 'manual-ice')">ICE 线索</div>
+          </div>
+        </div>
+        
+        <div id="manual-nev" class="sub-tab-panel">
+          <div class="filter-bar">
+            <div class="filter-item">
+              <label>导入时间：</label>
+              <div class="filter-date-range">
+                <input type="date" class="filter-input" style="width: 130px;">
+                <span class="sep">—</span>
+                <input type="date" class="filter-input" style="width: 130px;">
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>业务类型：</label>
+              <select class="filter-select">
+                <option value="">全部</option>
+                <option value="new">新线索</option>
+                <option value="cold">冷线索</option>
+              </select>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-default" onclick="resetFilter()">重置</button>
+              <button class="btn btn-primary" onclick="doQuery()">查询</button>
+              <button class="btn btn-success" onclick="doExport(event)">导出</button>
+              <button class="btn btn-reload" onclick="doRefresh()">刷新</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>序号</th><th>导入日期</th><th>业务类型</th><th>导入线索量</th><th>AI 外呼已接通量</th><th>已下发线索数</th><th>AI 接通率</th><th>平均通话时长</th><th>A (高意向)客户数</th><th>B (潜在)客户数</th><th>C (一般)客户数</th><th>D (忙碌/敷衍)客户数</th><th>E (拒绝/无效/无应答)客户数</th>
+                  </tr>
+                </thead>
+                <tbody>
+<tr><td>1</td><td>2023-10-25</td><td>新线索</td><td>500</td><td>480</td><td>45</td><td>75.5%</td><td>02:15</td><td>45</td><td>120</td><td>80</td><td>35</td><td>200</td></tr>
+
+                  <tr><td>2</td><td>2023-10-24</td><td>新线索</td><td>450</td><td>445</td><td>52</td><td>78.2%</td><td>02:30</td><td>52</td><td>110</td><td>75</td><td>28</td><td>180</td></tr>
+
+                  <tr><td>3</td><td>2023-10-23</td><td>冷线索</td><td>600</td><td>580</td><td>30</td><td>65.0%</td><td>01:45</td><td>30</td><td>150</td><td>100</td><td>50</td><td>250</td></tr>
+
+                  <tr><td>4</td><td>2023-10-22</td><td>新线索</td><td>700</td><td>690</td><td>80</td><td>82.1%</td><td>02:50</td><td>80</td><td>180</td><td>120</td><td>40</td><td>270</td></tr>
+
+                  <tr><td>5</td><td>2023-10-21</td><td>冷线索</td><td>550</td><td>530</td><td>25</td><td>60.5%</td><td>01:20</td><td>25</td><td>130</td><td>90</td><td>60</td><td>225</td></tr>
+</tbody>
+              </table>
+            </div>
+
+          <div class="pagination">
+            <span class="total-text">共 5 条数据</span>
+            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">6</button>
+            <button class="page-btn">7</button>
+            <button class="page-btn">8</button>
+            <button class="page-btn">9</button>
+            <button class="page-btn">&gt;</button>
+            <select class="page-select">
+              <option>10 条/页</option>
+              <option>20 条/页</option>
+            </select>
+            <div class="page-jump">
+              跳至 <input type="text" class="filter-input" style="width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; outline: none;" value="5"> 页
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <div id="manual-ice" class="sub-tab-panel" style="display:none;">
+          <div class="filter-bar">
+            <div class="filter-item">
+              <label>导入时间：</label>
+              <div class="filter-date-range">
+                <input type="date" class="filter-input" style="width: 130px;">
+                <span class="sep">—</span>
+                <input type="date" class="filter-input" style="width: 130px;">
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>业务类型：</label>
+              <select class="filter-select">
+                <option value="">全部</option>
+                <option value="new">新线索</option>
+                <option value="cold">冷线索</option>
+              </select>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-default" onclick="resetFilter()">重置</button>
+              <button class="btn btn-primary" onclick="doQuery()">查询</button>
+              <button class="btn btn-success" onclick="doExport(event)">导出</button>
+              <button class="btn btn-reload" onclick="doRefresh()">刷新</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>序号</th><th>导入日期</th><th>业务类型</th><th>导入线索量</th><th>AI 外呼已接通量</th><th>已下发线索数</th><th>AI 接通率</th><th>平均通话时长</th><th>A (高意向)客户数</th><th>B (潜在)客户数</th><th>C (一般)客户数</th><th>D (忙碌/敷衍)客户数</th><th>E (拒绝/无效/无应答)客户数</th>
+                  </tr>
+                </thead>
+                <tbody>
+<tr><td>1</td><td>2023-10-25</td><td>冷线索</td><td>800</td><td>750</td><td>20</td><td>62.8%</td><td>01:30</td><td>20</td><td>90</td><td>150</td><td>120</td><td>370</td></tr>
+
+                  <tr><td>2</td><td>2023-10-24</td><td>新线索</td><td>300</td><td>295</td><td>40</td><td>80.0%</td><td>02:40</td><td>40</td><td>80</td><td>50</td><td>25</td><td>100</td></tr>
+
+                  <tr><td>3</td><td>2023-10-23</td><td>新线索</td><td>400</td><td>390</td><td>35</td><td>77.2%</td><td>02:20</td><td>35</td><td>100</td><td>60</td><td>30</td><td>165</td></tr>
+
+                  <tr><td>4</td><td>2023-10-22</td><td>冷线索</td><td>1000</td><td>950</td><td>15</td><td>55.5%</td><td>01:05</td><td>15</td><td>110</td><td>200</td><td>150</td><td>475</td></tr>
+
+                  <tr><td>5</td><td>2023-10-21</td><td>新线索</td><td>350</td><td>340</td><td>42</td><td>81.5%</td><td>02:55</td><td>42</td><td>90</td><td>55</td><td>20</td><td>133</td></tr>
+</tbody>
+              </table>
+            </div>
+
+          <div class="pagination">
+            <span class="total-text">共 5 条数据</span>
+            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">6</button>
+            <button class="page-btn">7</button>
+            <button class="page-btn">8</button>
+            <button class="page-btn">9</button>
+            <button class="page-btn">&gt;</button>
+            <select class="page-select">
+              <option>10 条/页</option>
+              <option>20 条/页</option>
+            </select>
+            <div class="page-jump">
+              跳至 <input type="text" class="filter-input" style="width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; outline: none;" value="5"> 页
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 外呼线索明细 -->
+      <div id="tab-ai" class="tab-panel" style="display:none;">
+        <div class="sub-tab-bar">
+          <div class="sub-tab-bar-inner">
+            <div class="sub-tab-item active" onclick="switchSubTab(this, 'ai-nev')">NEV 线索</div>
+            <div class="sub-tab-item" onclick="switchSubTab(this, 'ai-ice')">ICE 线索</div>
+          </div>
+        </div>
+
+        <div id="ai-nev" class="sub-tab-panel">
+          <div class="filter-bar">
+            <div class="filter-item">
+              <label>导入时间：</label>
+              <div class="filter-date-range">
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+                <span class="sep">—</span>
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>首次外呼时间：</label>
+              <div class="filter-date-range">
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+                <span class="sep">—</span>
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>呼叫任务场景名称：</label>
+              <select class="filter-select">
+                <option value="">全部</option>
+                <option value="scene1">一知-nev-新线索</option>
+                <option value="scene2">一知-保有客户-回访</option>
+              </select>
+            </div>
+            <div class="filter-item">
+                <label>意向级别：</label>
+                <div class="multi-select-wrap">
+                    <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
+                    <div class="multi-select-dropdown">
+                        <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>A (高意向)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>B (潜在)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>C (一般)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>D (忙碌/敷衍)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>E (拒绝/无效/无应答)</label></div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-item">
+                <label>业务类型：</label>
+                <select class="filter-select">
+                    <option value="">全部</option>
+                    <option value="new">新线索</option>
+                    <option value="cold">冷线索</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>大区：</label>
+                <select class="filter-select region-select" onchange="handleRegionChange(this)">
+                    <option value="">全部</option>
+                    <option value="华东">华东大区</option>
+                    <option value="华南">华南大区</option>
+                    <option value="华北">华北大区</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>小区：</label>
+                <select class="filter-select district-select" onchange="handleDistrictChange(this)">
+                    <option value="">全部</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>门店：</label>
+                <div class="multi-select-wrap">
+                    <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
+                    <div class="multi-select-dropdown store-dropdown">
+                        <div class="store-search-wrap" style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0;">
+                            <input type="text" placeholder="输入门店名称过滤..." oninput="handleStoreSearch(this)" class="filter-input" style="width: 100%; box-sizing: border-box; height: 26px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid #d9d9d9;">
+                        </div>
+                        <div class="store-options-list">
+                            <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-default" onclick="resetFilter()">重置</button>
+              <button class="btn btn-primary" onclick="doQuery()">查询</button>
+              <button class="btn btn-success" onclick="doExport(event)">导出</button>
+              <button class="btn btn-reload" onclick="doRefresh()">刷新</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>序号</th><th>导入时间</th><th>线索编码</th><th>呼叫任务场景名称</th><th>业务类型</th><th>手机号</th><th>门店编码</th><th>门店名称</th><th>呼叫时间</th><th>通话状态</th><th>通话时长</th><th>意向级别</th><th>下发门店</th>
+                  </tr>
+                </thead>
+                <tbody>
+<tr><td>1</td><td>2023-10-25 10:00:00</td><td>XS202310250001</td><td>一知-nev-新线索</td><td>新线索</td><td>138****8888</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:05:00</td><td><span class="tag tag-green">已接听</span></td><td>02:30</td><td><span class="tag tag-blue">A</span></td><td>杭州西湖店</td></tr>
+
+                  <tr><td>2</td><td>2023-10-25 10:15:00</td><td>XS202310250003</td><td>一知-nev-新线索</td><td>新线索</td><td>137****7777</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:20:00</td><td><span class="tag tag-green">已接听</span></td><td>01:45</td><td><span class="tag tag-blue">B</span></td><td>杭州滨江店</td></tr>
+
+                  <tr><td>3</td><td>2023-10-25 10:30:00</td><td>XS202310250005</td><td>一知-保有客户-回访</td><td>新线索</td><td>136****6666</td><td>MD003</td><td>上海静安店</td><td>2023-10-25 10:35:00</td><td><span class="tag tag-red">无应答</span></td><td>00:00</td><td><span class="tag tag-gray">C</span></td><td>上海静安店</td></tr>
+
+                  <tr><td>4</td><td>2023-10-25 10:45:00</td><td>XS202310250007</td><td>一知-nev-新线索</td><td>冷线索</td><td>135****5555</td><td>MD001</td><td>杭州旗舰店</td><td>2023-10-25 10:50:00</td><td><span class="tag tag-green">已接听</span></td><td>03:10</td><td><span class="tag tag-blue">A</span></td><td>杭州旗舰店</td></tr>
+
+                  <tr><td>5</td><td>2023-10-25 11:00:00</td><td>XS202310250009</td><td>一知-nev-新线索</td><td>新线索</td><td>134****4444</td><td>MD005</td><td>杭州西湖店</td><td>2023-10-25 11:05:00</td><td><span class="tag tag-red">忙线中</span></td><td>00:00</td><td><span class="tag tag-gray">D</span></td><td>杭州西湖店</td></tr>
+</tbody>
+              </table>
+            </div>
+
+          <div class="pagination">
+            <span class="total-text">共 5 条数据</span>
+            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">6</button>
+            <button class="page-btn">7</button>
+            <button class="page-btn">8</button>
+            <button class="page-btn">9</button>
+            <button class="page-btn">&gt;</button>
+            <select class="page-select">
+              <option>10 条/页</option>
+              <option>20 条/页</option>
+            </select>
+            <div class="page-jump">
+              跳至 <input type="text" class="filter-input" style="width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; outline: none;" value="5"> 页
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <div id="ai-ice" class="sub-tab-panel" style="display:none;">
+          <div class="filter-bar">
+            <div class="filter-item">
+              <label>导入时间：</label>
+              <div class="filter-date-range">
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+                <span class="sep">—</span>
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>首次外呼时间：</label>
+              <div class="filter-date-range">
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+                <span class="sep">—</span>
+                <input type="datetime-local" class="filter-input date" style="width:180px;">
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>呼叫任务场景名称：</label>
+              <select class="filter-select">
+                <option value="">全部</option>
+                <option value="scene_ice">一知-燃油车-冷线索</option>
+              </select>
+            </div>
+            <div class="filter-item">
+                <label>意向级别：</label>
+                <div class="multi-select-wrap">
+                    <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
+                    <div class="multi-select-dropdown">
+                        <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>A (高意向)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>B (潜在)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>C (一般)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>D (忙碌/敷衍)</label></div>
+                        <div class="multi-select-option"><input type="checkbox" class="opt-item" onchange="handleOptionItem(this)"><label>E (拒绝/无效/无应答)</label></div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-item">
+                <label>业务类型：</label>
+                <select class="filter-select">
+                    <option value="">全部</option>
+                    <option value="new">新线索</option>
+                    <option value="cold">冷线索</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>大区：</label>
+                <select class="filter-select region-select" onchange="handleRegionChange(this)">
+                    <option value="">全部</option>
+                    <option value="华东">华东大区</option>
+                    <option value="华南">华南大区</option>
+                    <option value="华北">华北大区</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>小区：</label>
+                <select class="filter-select district-select" onchange="handleDistrictChange(this)">
+                    <option value="">全部</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>门店：</label>
+                <div class="multi-select-wrap">
+                    <div class="multi-select-display" onclick="toggleMultiSelect(event, this)">全部</div>
+                    <div class="multi-select-dropdown store-dropdown">
+                        <div class="store-search-wrap" style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0;">
+                            <input type="text" placeholder="输入门店名称过滤..." oninput="handleStoreSearch(this)" class="filter-input" style="width: 100%; box-sizing: border-box; height: 26px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid #d9d9d9;">
+                        </div>
+                        <div class="store-options-list">
+                            <div class="multi-select-option"><input type="checkbox" class="opt-all" checked onchange="handleAllOptions(this)"><label>全部</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-default" onclick="resetFilter()">重置</button>
+              <button class="btn btn-primary" onclick="doQuery()">查询</button>
+              <button class="btn btn-success" onclick="doExport(event)">导出</button>
+              <button class="btn btn-reload" onclick="doRefresh()">刷新</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>序号</th><th>导入时间</th><th>线索编码</th><th>呼叫任务场景名称</th><th>业务类型</th><th>手机号</th><th>门店编码</th><th>门店名称</th><th>呼叫时间</th><th>通话状态</th><th>通话时长</th><th>意向级别</th><th>下发门店</th>
+                  </tr>
+                </thead>
+                <tbody>
+<tr><td>1</td><td>2023-10-25 09:45:00</td><td>XS202310250002</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>139****9999</td><td>MD002</td><td>广州天河店</td><td>--</td><td><span class="tag tag-red">无应答</span></td><td>00:00</td><td><span class="tag tag-blue">B</span></td><td>广州天河店</td></tr>
+
+                  <tr><td>2</td><td>2023-10-25 10:20:00</td><td>XS202310250004</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>131****1111</td><td>MD004</td><td>深圳南山店</td><td>2023-10-25 10:25:00</td><td><span class="tag tag-green">已接听</span></td><td>01:10</td><td><span class="tag tag-blue">C</span></td><td>深圳南山店</td></tr>
+
+                  <tr><td>3</td><td>2023-10-25 10:55:00</td><td>XS202310250006</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>132****2222</td><td>MD006</td><td>北京朝阳店</td><td>2023-10-25 11:00:00</td><td><span class="tag tag-green">已接听</span></td><td>02:05</td><td><span class="tag tag-blue">A</span></td><td>北京朝阳店</td></tr>
+
+                  <tr><td>4</td><td>2023-10-25 11:15:00</td><td>XS202310250008</td><td>一知-燃油车-冷线索</td><td>新线索</td><td>133****3333</td><td>MD002</td><td>广州天河店</td><td>2023-10-25 11:20:00</td><td><span class="tag tag-red">空号</span></td><td>00:00</td><td><span class="tag tag-gray">E</span></td><td>广州天河店</td></tr>
+
+                  <tr><td>5</td><td>2023-10-25 11:40:00</td><td>XS202310250010</td><td>一知-燃油车-冷线索</td><td>冷线索</td><td>130****0000</td><td>MD008</td><td>南京新街口店</td><td>2023-10-25 11:45:00</td><td><span class="tag tag-green">已接听</span></td><td>00:55</td><td><span class="tag tag-blue">B</span></td><td>南京新街口店</td></tr>
+</tbody>
+              </table>
+            </div>
+
+          <div class="pagination">
+            <span class="total-text">共 5 条数据</span>
+            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">6</button>
+            <button class="page-btn">7</button>
+            <button class="page-btn">8</button>
+            <button class="page-btn">9</button>
+            <button class="page-btn">&gt;</button>
+            <select class="page-select">
+              <option>10 条/页</option>
+              <option>20 条/页</option>
+            </select>
+            <div class="page-jump">
+              跳至 <input type="text" class="filter-input" style="width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; outline: none;" value="5"> 页
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 线索回流统计 -->
+      <div id="tab-return" class="tab-panel" style="display:none; padding: 16px; flex-direction: column; box-sizing: border-box;">
+        <!-- 业务说明栏 -->
+        <div style="background: #fafafa; border-left: 4px solid #1677ff; padding: 10px 14px; margin-bottom: 12px; border-radius: 0 4px 4px 0; font-size: 13px; color: #595959; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
+          统计业务系统传入后，提交到外呼和回传业务系统的数据。
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label>统计时间：</label>
+            <div class="filter-date-range">
+              <input type="date" class="filter-input" style="width: 130px;" placeholder="开始时间">
+              <span class="sep">—</span>
+              <input type="date" class="filter-input" style="width: 130px;" placeholder="结束时间">
+            </div>
+          </div>
+          <div class="filter-item">
+            <label>场景名称：</label>
+            <select class="filter-select" style="width: 160px;">
+              <option value="">全部</option>
+              <option value="scene1">燃油车新线索</option>
+            </select>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-default" onclick="resetFilter()">重置</button>
+            <button class="btn btn-primary" onclick="doQuery()" style="background: #1677ff; border-color: #1677ff;">
+              <svg viewBox="0 0 1024 1024" width="12" height="12" fill="currentColor" style="margin-right: 4px;"><path d="M909.6 854.5L729 673.9c56.8-63 91.4-146.2 91.4-237.5 0-200.7-162.7-363.4-363.4-363.4S93.6 235.7 93.6 436.4s162.7 363.4 363.4 363.4c91.3 0 174.5-34.6 237.5-91.4l180.6 180.6c15.2 15.2 40 15.2 55.2 0l21.9-21.9c15.2-15.2 15.2-40 0-55.2zM457 721.8c-157.6 0-285.4-127.8-285.4-285.4S299.4 151 457 151s285.4 127.8 285.4 285.4-127.8 285.4-285.4 285.4z"></path></svg>
+              搜索
+            </button>
+          </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="table-wrap">
+          <div class="table-container">
+            <table class="data-table" style="min-width: 100%;">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">序号</th>
+                  <th>
+                    统计时间 
+                    <span style="font-size: 10px; color: #bfbfbf; margin-left: 4px; cursor: pointer; user-select: none;">⇅</span>
+                  </th>
+                  <th>场景名称</th>
+                  <th>线索传入数</th>
+                  <th>提交外呼数</th>
+                  <th>线索回流数</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>2015-10-10</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">88</td>
+                  <td style="font-weight: 500; color: #262626;">78</td>
+                  <td style="font-weight: 500; color: #52c41a;">34</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>2015-10-09</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">125</td>
+                  <td style="font-weight: 500; color: #262626;">123</td>
+                  <td style="font-weight: 500; color: #52c41a;">22</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>2015-10-08</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">67</td>
+                  <td style="font-weight: 500; color: #262626;">45</td>
+                  <td style="font-weight: 500; color: #52c41a;">33</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>2015-10-07</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">34</td>
+                  <td style="font-weight: 500; color: #262626;">23</td>
+                  <td style="font-weight: 500; color: #52c41a;">2</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>2015-10-06</td>
+                  <td>燃油车新线索</td>
+                  <td style="font-weight: 500; color: #262626;">333</td>
+                  <td style="font-weight: 500; color: #262626;">234</td>
+                  <td style="font-weight: 500; color: #52c41a;">44</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 分页栏 -->
+          <div class="pagination">
+            <span class="total-text">共 5 条数据</span>
+            <button class="page-btn disabled">&lt;</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">6</button>
+            <button class="page-btn">7</button>
+            <button class="page-btn">8</button>
+            <button class="page-btn">9</button>
+            <button class="page-btn">&gt;</button>
+            <select class="page-select">
+              <option>10 条/页</option>
+              <option>20 条/页</option>
+            </select>
+            <div class="page-jump">
+              跳至 <input type="text" class="filter-input" style="width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; outline: none;" value="5"> 页
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
