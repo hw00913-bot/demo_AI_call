@@ -13,6 +13,24 @@
     '手动导入': { bg: '#e6f4ff', color: '#1677ff', border: '#91caff' },
     '接口传入': { bg: '#f6ffed', color: '#52c41a', border: '#b7eb8f' },
   };
+  const FocusRankData = [
+    { name: '询问地址', value: 67 },
+    { name: '询问价格', value: 25 },
+    { name: '询问优惠', value: 24 },
+    { name: '询问身份', value: 16 },
+    { name: '卖什么车', value: 8 },
+    { name: '置换补贴', value: 7 },
+    { name: '询问新能源车型', value: 4 },
+    { name: '介绍某款车', value: 4 },
+    { name: '机器人', value: 3 },
+    { name: '质疑号码外显', value: 3 },
+    { name: '询问营业时间', value: 2 },
+    { name: '询问试驾', value: 2 },
+    { name: '询问贷款政策', value: 2 },
+    { name: '询问现车', value: 1 },
+    { name: '询问售后服务', value: 1 },
+    { name: '询问保养', value: 1 },
+  ];
 
   function renderCard(item) {
     const s = StatusMap[item.status] || StatusMap.not_started;
@@ -338,6 +356,56 @@
     container.innerHTML = renderMainTabContent(tabName);
   }
 
+  function renderFocusRows(list) {
+    const maxValue = FocusRankData[0] ? FocusRankData[0].value : 1;
+    return list.map(item => {
+      const width = Math.max(Math.round((item.value / maxValue) * 100), 4);
+      return `<div class="focus-row"><span>${item.name}</span><div class="focus-track"><i style="width:${width}%;"></i></div><em>${item.value}</em></div>`;
+    }).join('');
+  }
+
+  function renderFocusRankModal() {
+    const rows = FocusRankData.map((item, index) => `
+      <div class="focus-rank-row">
+        <span class="focus-rank-index">${index + 1}</span>
+        <span class="focus-rank-name">${item.name}</span>
+        <div class="focus-rank-track"><i style="width:${Math.max(Math.round((item.value / FocusRankData[0].value) * 100), 4)}%;"></i></div>
+        <span class="focus-rank-value">${item.value}</span>
+      </div>
+    `).join('');
+
+    return `
+      <div class="focus-rank-backdrop" id="focusRankBackdrop" onclick="window.Pages['scene-list'].closeFocusRankModal(event)">
+        <div class="focus-rank-modal" onclick="event.stopPropagation()">
+          <div class="focus-rank-header">
+            <span class="focus-rank-title">全部客户关注点排名</span>
+            <span class="focus-rank-close" onclick="window.Pages['scene-list'].closeFocusRankModal()">&#10005;</span>
+          </div>
+          <div class="focus-rank-body">
+            <div class="focus-rank-summary">共 ${FocusRankData.length} 个关注点，按出现次数降序排列</div>
+            <div class="focus-rank-list">${rows}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function showFocusRankModal() {
+    const old = document.getElementById('focusRankBackdrop');
+    if (old) old.remove();
+    document.body.insertAdjacentHTML('beforeend', renderFocusRankModal());
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFocusRankModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const backdrop = document.getElementById('focusRankBackdrop');
+    if (backdrop) backdrop.remove();
+    if (!document.getElementById('sceneDetailBackdrop') && !document.getElementById('intentConfigBackdrop')) {
+      document.body.style.overflow = '';
+    }
+  }
+
   function renderMainTabContent(tabName) {
     if (tabName === 'callList') {
       return `
@@ -425,6 +493,58 @@
                 <div class="overview-card">
                   <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级1或2客户合计数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== 区块三：意向洞察 ===== -->
+          <div class="overview-block">
+            <div class="overview-block-header">
+              <div class="overview-block-title blue">意向洞察</div>
+            </div>
+            <div class="overview-block-body">
+              <div class="intent-donut-panel">
+                <div class="intent-donut-chart" aria-label="意向分类占比图">
+                  <div class="intent-donut-ring"></div>
+                  <div class="intent-donut-label label-a"><span>A(高意向): 1.65%</span></div>
+                  <div class="intent-donut-label label-b"><span>B(低意向): 2.48%</span></div>
+                  <div class="intent-donut-label label-c"><span>C(意向待定): 5.73%</span></div>
+                  <div class="intent-donut-label label-d"><span>D(无意向): 31.34%</span></div>
+                  <div class="intent-donut-label label-e"><span>E(未接通): 54.42%</span></div>
+                  <div class="intent-donut-label label-f"><span>F(停机/空号): 4.38%</span></div>
+                </div>
+              </div>
+
+              <div class="overview-insight-grid">
+                <div class="overview-chart-panel focus-panel">
+                  <div class="overview-chart-header">
+                    <div class="overview-chart-title">客户关注点</div>
+                    <div class="overview-chart-tabs">
+                      <span class="active">前十</span>
+                      <span class="clickable" onclick="window.Pages['scene-list'].showFocusRankModal()">全部</span>
+                    </div>
+                  </div>
+                  <div class="focus-list">
+                    ${renderFocusRows(FocusRankData.slice(0, 10))}
+                  </div>
+                </div>
+
+                <div class="overview-chart-panel duration-panel">
+                  <div class="overview-chart-title">通话时长</div>
+                  <div class="duration-axis-title">客户数量（位）</div>
+                  <div class="duration-chart">
+                    <div class="duration-grid-lines"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="duration-bars">
+                      <div class="duration-bar-item"><strong>180</strong><i style="height:12%;"></i><span>0s~5s</span></div>
+                      <div class="duration-bar-item"><strong>656</strong><i style="height:44%;"></i><span>5s~10s</span></div>
+                      <div class="duration-bar-item"><strong>1341</strong><i style="height:89%;"></i><span>10s～30s</span></div>
+                      <div class="duration-bar-item"><strong>272</strong><i style="height:18%;"></i><span>30s~60s</span></div>
+                      <div class="duration-bar-item"><strong>45</strong><i style="height:3%;"></i><span>60s~90s</span></div>
+                      <div class="duration-bar-item"><strong>28</strong><i style="height:2%;"></i><span>&gt;90s</span></div>
+                    </div>
+                    <div class="duration-y-axis"><span>1500</span><span>1200</span><span>900</span><span>600</span><span>300</span><span>0</span></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -878,5 +998,5 @@
   function init() {}
 
   window.Pages = window.Pages || {};
-  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, switchImportTab, exportImportResult, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption };
+  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, switchImportTab, exportImportResult, showFocusRankModal, closeFocusRankModal, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption };
 })();

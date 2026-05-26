@@ -9,13 +9,25 @@
     paused:      { text: '用户暂停', color: '#faad14', dot: '#faad14' },
     terminated:  { text: '已终止',   color: '#ff4d4f', dot: '#ff4d4f' },
   };
+  const BinglanStatusMap = {
+    running:    { text: '跟进中', color: '#52c41a', dot: '#52c41a' },
+    completed:  { text: '已完成', color: '#52c41a', dot: '#52c41a' },
+    terminated: { text: '已终止', color: '#ff4d4f', dot: '#ff4d4f' },
+  };
   const SourceTag = {
     '手动导入': { bg: '#e6f4ff', color: '#1677ff', border: '#91caff' },
     '接口传入': { bg: '#f6ffed', color: '#52c41a', border: '#b7eb8f' },
   };
 
+  function getDisplayStatus(item) {
+    if (item && item.platform === '冰兰') {
+      return BinglanStatusMap[item.status] || StatusMap[item.status] || StatusMap.not_started;
+    }
+    return StatusMap[item.status] || StatusMap.not_started;
+  }
+
   function renderCard(item) {
-    const s = StatusMap[item.status] || StatusMap.not_started;
+    const s = getDisplayStatus(item);
     const tag = SourceTag[item.source] || SourceTag['手动导入'];
     return `
       <div class="scene-card" data-id="${item.id}">
@@ -43,13 +55,11 @@
             <div class="stat-value">${item.called}</div>
           </div>
         </div>
-        <div class="card-actions">
-          <div class="card-action-btn-group">
+        <div class="card-action-btn-group">
             <button class="card-action-btn primary" onclick="window.Pages['scene-list'].showDetail(${item.id})">查看</button>
             <button class="card-action-btn default" onclick="showToast('编辑功能开发中','info')">编辑</button>
+            <span class="card-action-more" onclick="window.Pages['scene-list'].toggleMoreMenu(event,${item.id})">⋮</span>
           </div>
-          <span class="card-action-more" onclick="window.Pages['scene-list'].toggleMoreMenu(event,${item.id})">⋮</span>
-        </div>
       </div>
     `;
   }
@@ -66,7 +76,6 @@
           </div>
         </div>
 
-        <!-- 筛选栏 -->
         <div class="filter-bar">
           <div class="filter-item">
             <label>场景名称：</label>
@@ -88,7 +97,6 @@
           </div>
         </div>
 
-        <!-- 卡片网格 -->
         <div class="scene-card-grid">
           ${cards}
         </div>
@@ -183,44 +191,6 @@
       ? `<button class="btn btn-primary" onclick="showToast('导出功能开发中','info')">导出</button>`
       : '';
 
-    // 导入记录特殊处理
-    if (cfg.isImportRecord) {
-      const importRows = cfg.rows.map(r => `
-        <tr>
-          <td>${r.name}</td>
-          <td>${r.total.toLocaleString()}</td>
-          <td>${r.success.toLocaleString()}</td>
-          <td>${r.fail.toLocaleString()}</td>
-          <td><span class="tag ${r.status === '已完成' ? 'tag-green' : 'tag-orange'}">${r.status}</span></td>
-          <td>${r.time}</td>
-          <td>${r.op}</td>
-          <td>
-            <a href="#" class="card-action-link" onclick="event.preventDefault();showToast('查看详情功能开发中','info')">详情</a>
-          </td>
-        </tr>
-      `).join('');
-      return `
-        <div class="scene-detail-summary">
-          <span>${cfg.summary}</span>
-        </div>
-        <div class="scene-detail-table-wrap">
-          <table class="scene-detail-table">
-            <thead><tr>
-              <th>文件名</th>
-              <th>导入总数</th>
-              <th>成功数</th>
-              <th>失败数</th>
-              <th>状态</th>
-              <th>导入时间</th>
-              <th>操作人</th>
-              <th>操作</th>
-            </tr></thead>
-            <tbody>${importRows}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
     const colsHtml = cfg.cols.map(c => `<th>${c}</th>`).join('');
 
     let bodyHtml = '';
@@ -271,8 +241,11 @@
   function showDetail(id) {
     const item = MockSceneList.find(d => d.id === id);
     if (!item) return;
-    const s = StatusMap[item.status] || StatusMap.not_started;
+    const s = getDisplayStatus(item);
     const tag = SourceTag[item.source] || SourceTag['手动导入'];
+    const platform = item.platform || '一知科技';
+    const taskActionText = platform === '冰兰' ? '终止任务' : '启/停任务';
+    const taskActionToast = platform === '冰兰' ? '终止任务功能开发中' : '启停任务功能开发中';
 
     const html = `
       <div class="scene-detail-backdrop" id="sceneDetailBackdrop" onclick="window.Pages['scene-list'].closeDetail(event)">
@@ -290,11 +263,11 @@
                   <label>状态：</label>
                   <span class="status-dot" style="background:${s.dot}"></span>
                   <span style="color:${s.color}">${s.text}</span>
-                  <button class="scene-toggle-btn" onclick="showToast('启停任务功能开发中','info')">启/停任务</button>
+                  <button class="scene-toggle-btn" onclick="showToast('${taskActionToast}','info')">${taskActionText}</button>
                 </div>
               </div>
               <div class="scene-detail-tags">
-                <span class="scene-detail-tag" style="background:${tag.bg};color:${tag.color};border:1px solid ${tag.border}">一知科技</span>
+                <span class="scene-detail-tag" style="background:${tag.bg};color:${tag.color};border:1px solid ${tag.border}">${platform}</span>
                 <span class="scene-detail-tag" style="background:${tag.bg};color:${tag.color};border:1px solid ${tag.border}">${item.source}</span>
               </div>
             </div>
@@ -363,31 +336,31 @@
             <div class="overview-block-body">
               <div class="overview-grid cols-6">
                 <div class="overview-card">
-                  <div class="overview-card-title">导入客户数 <span class="overview-help" title="当前任务导入的客户手机号总数（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">导入客户数 <span class="overview-help" data-tooltip="当前任务导入的客户手机号总数（去重）">&#9432;</span></div>
                   <div class="overview-card-value">6</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">外呼客户数 <span class="overview-help" title="提交到外部智能呼叫系统接口的客户手机号总数（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">外呼客户数 <span class="overview-help" data-tooltip="提交到外部智能呼叫系统接口的客户手机号总数（去重）">&#9432;</span></div>
                   <div class="overview-card-value">1</div>
                   <div class="overview-card-sub">总外呼数：2</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title"><span class="overview-link">去重</span>过滤客户数 <span class="overview-help" title="从本地任务已过滤获取（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">过滤客户数 <span class="overview-help" data-tooltip="从本地任务已过滤获取（去重）">&#9432;</span></div>
                   <div class="overview-card-value">5</div>
                   <div class="overview-card-sub">过滤比例：83.33%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">接听数 <span class="overview-help" title="已接通的手机号数量（不去重）">&#9432;</span></div>
+                  <div class="overview-card-title">接听数 <span class="overview-help" data-tooltip="已接通的手机号数量（不去重）">&#9432;</span></div>
                   <div class="overview-card-value">0</div>
                   <div class="overview-card-sub">接听率：0%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">未接通数 <span class="overview-help" title="未接通的手机号数量（不去重）">&#9432;</span></div>
+                  <div class="overview-card-title">未接通数 <span class="overview-help" data-tooltip="未接通的手机号数量（不去重）">&#9432;</span></div>
                   <div class="overview-card-value">0</div>
                   <div class="overview-card-sub">未接通率：0%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">平均通话时长 <span class="overview-help" title="每次通话的平均时长">&#9432;</span></div>
+                  <div class="overview-card-title">平均通话时长 <span class="overview-help" data-tooltip="每次通话的平均时长">&#9432;</span></div>
                   <div class="overview-card-value">0<span class="overview-unit">秒</span></div>
                 </div>
               </div>
@@ -403,29 +376,29 @@
             <div class="overview-block-body">
               <div class="overview-grid cols-3">
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" title="意向等级1客户占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级1客户占比">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" title="意向等级2客户占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级2客户占比">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" title="意向等级1或2客户合计占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级1或2客户合计占比">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
               </div>
               <div class="overview-grid cols-3" style="margin-top:1px;">
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户数 <span class="overview-help" title="意向等级1客户数量">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级1客户数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户数 <span class="overview-help" title="意向等级2客户数量">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级2客户数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户数 <span class="overview-help" title="意向等级1或2客户合计数量">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级1或2客户合计数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
                 </div>
               </div>
@@ -442,7 +415,7 @@
           </div>
           <div class="task-detail-row">
             <div class="task-detail-label">话术名称</div>
-            <div class="task-detail-value">东风日产【渝兴店】店端售前-客户名录</div>
+            <div class="task-detail-value">东风日产线索机器人</div>
           </div>
           <div class="task-detail-row">
             <div class="task-detail-label">任务id</div>
@@ -495,7 +468,7 @@
     if (e && e.target !== e.currentTarget) return;
     const backdrop = document.getElementById('sceneDetailBackdrop');
     const drawer = backdrop ? backdrop.querySelector('.scene-detail-drawer') : null;
-    if (!backdrop && !drawer) return;
+    if (!backdrop || !drawer) return;
     if (backdrop) backdrop.classList.remove('open');
     if (drawer) drawer.classList.add('closing');
     setTimeout(() => {
@@ -573,7 +546,7 @@
         <td><span class="tag ${r.status === '已完成' ? 'tag-green' : 'tag-orange'}">${r.status}</span></td>
         <td>${r.time}</td>
         <td>${r.op}</td>
-        <td><a href="#" class="card-action-link" onclick="event.preventDefault();window.Pages['scene-list'].exportImportResult()">导出结果</a></td>
+        <td><a href="#" class="card-action-link" onclick="event.preventDefault();window.Pages['scene-list'].exportImportResult(${r.fail})">导出失败记录</a></td>
       </tr>
     `).join('');
     return `
@@ -651,7 +624,11 @@
     showToast('上传已开始，请稍后查看导入记录', 'success');
   }
 
-  function exportImportResult() {
+  function exportImportResult(failCount) {
+    if (failCount === 0) {
+      showToast('当前导入全部成功', 'success');
+      return;
+    }
     // 模拟导入结果数据
     const data = [
       { result: '成功', reason: '—', phone: '15975587676', orderNo: '0001', needRescue: '是', time: '2025.10.09 12:00' },
@@ -856,19 +833,19 @@
       // 根据 title 属性的 tooltip 文本判断是哪类卡片
       const helpEl = title.querySelector('.overview-help');
       if (!helpEl) return;
-      const tooltip = helpEl.getAttribute('title') || '';
+      const tooltip = helpEl.getAttribute('data-tooltip') || '';
       if (tooltip === '意向等级1客户占比') {
-        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" title="意向等级1客户占比">&#9432;</span>';
+        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级1客户占比">&#9432;</span>';
       } else if (tooltip === '意向等级2客户占比') {
-        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" title="意向等级2客户占比">&#9432;</span>';
+        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级2客户占比">&#9432;</span>';
       } else if (tooltip === '意向等级1或2客户合计占比') {
-        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" title="意向等级1或2客户合计占比">&#9432;</span>';
+        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级1或2客户合计占比">&#9432;</span>';
       } else if (tooltip === '意向等级1客户数量') {
-        title.innerHTML = level1Tag + '类客户数 <span class="overview-help" title="意向等级1客户数量">&#9432;</span>';
+        title.innerHTML = level1Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级1客户数量">&#9432;</span>';
       } else if (tooltip === '意向等级2客户数量') {
-        title.innerHTML = level2Tag + '类客户数 <span class="overview-help" title="意向等级2客户数量">&#9432;</span>';
+        title.innerHTML = level2Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级2客户数量">&#9432;</span>';
       } else if (tooltip === '意向等级1或2客户合计数量') {
-        title.innerHTML = level1Tag + '/' + level2Tag + '类客户数 <span class="overview-help" title="意向等级1或2客户合计数量">&#9432;</span>';
+        title.innerHTML = level1Tag + '/' + level2Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级1或2客户合计数量">&#9432;</span>';
       }
     });
   }

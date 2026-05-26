@@ -121,6 +121,12 @@ function setActive(el) {
 
 /* ===== 二级菜单项选择 ===== */
 function selectSubMenu(el, menuName) {
+  const navId = el.id || findNavIdByText(menuName);
+  if (navId === 'report-clue') {
+    window.location.href = '../线索报表_v1.0/index.html';
+    return;
+  }
+
   document.querySelectorAll('.nav-sub-item').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active', 'active-parent'));
 
@@ -133,7 +139,6 @@ function selectSubMenu(el, menuName) {
   }
 
   // 找到对应的 navId 和 pageKey
-  const navId = el.id || findNavIdByText(menuName);
   if (navId && RouteMap[navId]) {
     navigateTo(RouteMap[navId].page, navId);
   } else {
@@ -162,13 +167,21 @@ document.addEventListener('DOMContentLoaded', function () {
   const clueItem = document.getElementById('report-clue');
   if (clueItem) clueItem.classList.remove('active');
 
-  // 默认展开"外呼场景"菜单并进入外呼列表
+  // 清理外呼场景初始状态
   const navScene = document.getElementById('nav-scene');
-  if (navScene) navScene.classList.add('open', 'active-parent');
-
-  // 激活"外呼列表"菜单项
+  if (navScene) navScene.classList.remove('open', 'active-parent');
+  const subScene = document.getElementById('sub-scene');
+  if (subScene) subScene.classList.remove('open');
   const listItem = document.getElementById('scene-list');
-  if (listItem) listItem.classList.add('active');
+  if (listItem) listItem.classList.remove('active');
 
-  navigateTo('scene-list', 'scene-list');
+  // 默认展开"系统管理"菜单并进入"业务场景"
+  const navSystem = document.getElementById('nav-system');
+  if (navSystem) navSystem.classList.add('open', 'active-parent');
+  const subSystem = document.getElementById('sub-system');
+  if (subSystem) subSystem.classList.add('open');
+  const sceneItem = document.getElementById('sys-scene');
+  if (sceneItem) sceneItem.classList.add('active');
+
+  navigateTo('sys-scene', 'sys-scene');
 });
