@@ -26,6 +26,13 @@ var MockCalledRows = [
   { phone: '136****9012', submitTime: '2026-05-18 11:00:00', dialCount: 1, result: '未接听', channel: '通道A', lastCallTime: '2026-05-18 11:01:00', duration: '00:00:00', summary: '无人接听', lastNode: '外呼' }
 ];
 
+/* ===== 待呼叫数据 ===== */
+var MockPendingRows = [
+  { id: 'pending-001', phone: '188****2301', submitTime: '2026-05-27 09:12:20', dialCount: 0, waitDuration: '00:08:32', channel: '冰兰外呼通道 / 一知线路' },
+  { id: 'pending-002', phone: '186****7288', submitTime: '2026-05-27 09:18:45', dialCount: 0, waitDuration: '00:02:07', channel: '冰兰外呼通道 / 一知线路' },
+  { id: 'pending-003', phone: '177****0935', submitTime: '2026-05-27 09:20:10', dialCount: 0, waitDuration: '00:00:42', channel: '冰兰外呼通道 / 一知线路' }
+];
+
 /* ===== 呼叫失败数据 ===== */
 var MockFailedRows = [
   { phone: '150****3456', submitTime: '2026-05-18 14:00:00', reason: '空号' },

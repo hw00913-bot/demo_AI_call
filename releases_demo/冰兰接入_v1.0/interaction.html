@@ -7,18 +7,21 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; padding: 40px 20px; color: #333; line-height: 1.6; }
-    .container { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 48px; }
+    .container { max-width: 1180px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 48px; }
     h1 { font-size: 24px; font-weight: 600; margin-bottom: 32px; color: #1a1a1a; border-bottom: 2px solid #1677ff; padding-bottom: 12px; }
     h2 { font-size: 18px; font-weight: 600; margin: 32px 0 16px; color: #1a1a1a; }
     h3 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; color: #333; }
-    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
-    th, td { border: 1px solid #d9d9d9; padding: 10px 12px; text-align: left; }
-    th { background: #fafafa; font-weight: 600; color: #333; }
+    p { margin: 8px 0; font-size: 14px; }
+    strong { color: #333; }
+    a { color: #1677ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid #d9d9d9; padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #fafafa; font-weight: 600; color: #333; white-space: nowrap; }
     tr:hover { background: #fafafa; }
     hr { border: none; border-top: 1px solid #e8e8e8; margin: 24px 0; }
     .section-divider { margin: 32px 0; }
-    p { margin: 8px 0; font-size: 14px; }
-    strong { color: #333; }
     .jump-btn { display: inline-block; padding: 8px 20px; background: #1677ff; color: #fff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; }
     .jump-btn:hover { background: #4096ff; text-decoration: none; }
   </style>
@@ -29,197 +32,294 @@
       <a href="index.html" class="jump-btn">跳转演示页面 →</a>
     </div>
     <h1>功能说明文档</h1>
-
     <h2>一. 版本说明</h2>
-    <table>
-      <thead>
-        <tr><th>版本号</th><th>更新时间</th><th>更新内容</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>v1.0</td><td>2026-05-20</td><td>1.新增数据概览模块；2.新增任务详情模块；3.手工导入新增异步导入逻辑；4.一知大小模型模型选项新增关联账号功能。</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>版本号</th><th>更新时间</th><th>更新内容</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>v1.0</td><td>2026-05-27</td><td>1. 系统管理-业务场景新增冰兰任务场景创建的功能；2.外呼场景-外呼场景新增冰兰接入后的内容；3.统计分析-通话统计新增冰兰接入后的数据统计；4.外呼结果-通话记录/线索记录新增冰兰接入后的功能。</td></tr>
+        </tbody>
+      </table>
+    </div>
     <h2>二. 项目范围</h2>
-    <table>
-      <thead>
-        <tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th><th>对接系统范围</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>智能外呼系统</td><td>外呼列表</td><td>数据概览</td><td>科大、一知、冰兰</td></tr>
-        <tr><td>智能外呼系统</td><td>外呼列表</td><td>任务详情</td><td>一知</td></tr>
-        <tr><td>智能外呼系统</td><td>外呼列表</td><td>手工导入</td><td>科大、一知、冰兰</td></tr>
-        <tr><td>智能外呼系统</td><td>业务场景</td><td>大小模型关联账号</td><td>一知</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th><th>对接系统范围</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>智能外呼系统</td><td>外呼列表</td><td>外呼任务卡片</td><td>冰兰</td></tr>
+          <tr><td>智能外呼系统</td><td>统计分析</td><td>通话统计</td><td>冰兰</td></tr>
+          <tr><td>智能外呼系统</td><td>外呼结果</td><td>通话记录</td><td>冰兰</td></tr>
+          <tr><td>智能外呼系统</td><td>外呼结果</td><td>线索记录</td><td>冰兰</td></tr>
+          <tr><td>智能外呼系统</td><td>系统管理</td><td>业务场景</td><td>冰兰</td></tr>
+        </tbody>
+      </table>
+    </div>
     <h2>三. 逻辑说明</h2>
-    <table>
-      <thead>
-        <tr><th>流程名称</th><th>跳转地址</th></tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>流程名称</th><th>跳转地址</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>新增场景-纯冰兰任务</td><td><a href="https://www.processon.com/embed/6a14176f4c0774245b14734a" target="_blank" rel="noopener">https://www.processon.com/embed/6a14176f4c0774245b14734a</a></td></tr>
+          <tr><td>纯冰兰通话记录回调</td><td><a href="https://www.processon.com/embed/6a14f69b4c0774245b15950a" target="_blank" rel="noopener">https://www.processon.com/embed/6a14f69b4c0774245b15950a</a></td></tr>
+          <tr><td>ai 任务调度流程</td><td><a href="https://www.processon.com/embed/6960c3e35767dc11ccca872f" target="_blank" rel="noopener">https://www.processon.com/embed/6960c3e35767dc11ccca872f</a></td></tr>
+          <tr><td>纯冰兰呼叫流程</td><td><a href="https://www.processon.com/embed/6a15051867737640057cda5b" target="_blank" rel="noopener">https://www.processon.com/embed/6a15051867737640057cda5b</a></td></tr>
+          <tr><td>纯冰兰任务终止流程</td><td><a href="https://www.processon.com/embed/6a1537e74b767f1a32e73a2b" target="_blank" rel="noopener">https://www.processon.com/embed/6a1537e74b767f1a32e73a2b</a></td></tr>
+          <tr><td>查询纯冰兰任务记录流程</td><td><a href="https://www.processon.com/embed/6a153c436a0a10375b703a02" target="_blank" rel="noopener">https://www.processon.com/embed/6a153c436a0a10375b703a02</a></td></tr>
+        </tbody>
+      </table>
+    </div>
     <h2>四. 功能说明</h2>
-    <hr>
-
-    <h3>1. 外呼场景-外呼列表-查看-数据概览</h3>
-    <p><strong>1）功能名称：</strong>数据概览</p>
-    <p><strong>2）交互说明：</strong>如图。</p>
-    <p><strong>3）数据来源：</strong>一知平台回调接口。</p>
-    <p><strong>4）逻辑说明：</strong>点击页面后传入任务id查询到当前任务的相关数据。</p>
-    <p><strong>5）功能明细</strong></p>
-    <table>
-      <thead>
-        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>外呼数据区块标题</td><td>标识外呼数据统计区域</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>导入客户数</td><td>当前任务导入的客户手机号总数（去重）</td><td>AI 智能外呼中台</td><td>通过本地任务 id 查询导入到系统的总数</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>外呼客户数</td><td>提交到外部智能呼叫系统接口的客户手机号总数（去重）</td><td>AI 智能外呼中台</td><td>提交到接口后记录下数据，并以手机号去重</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>去重过滤客户数</td><td>从本地任务已过滤获取（去重）</td><td>AI 智能外呼中台</td><td>从回调的通话状态识别</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>总接听率</td><td>已接听/外呼客户数</td><td>前端Mock</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
-        <tr><td>挂机率</td><td>客户主动挂断的比例</td><td>前端Mock</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
-        <tr><td>平均通话时长</td><td>每次通话的平均时长</td><td>前端Mock</td><td>聚合计算</td><td>秒数</td><td>0秒</td><td>--</td></tr>
-        <tr><td>总外呼数</td><td>提交到外部智能呼叫系统接口的客户手机号总数（不去重）</td><td>AI 智能外呼中台</td><td>提交到接口后记录下数据</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>过滤比例</td><td>过滤客户数/导入客户数</td><td>前端Mock</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
-        <tr><td>接听数</td><td>已接通的手机号数量（不去重）</td><td>回调接口获取</td><td>无</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>未接通数</td><td>未接通的手机号数量（不去重）</td><td>回调接口获取</td><td>无</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>意向分类区块标题</td><td>标识意向分类统计区域</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>配置按钮</td><td>意向分类配置功能</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-        <tr><td>某类客户占比</td><td>意向等级配置标签</td><td>AI智能外呼中台</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
-        <tr><td>某类客户数</td><td>意向等级配置标签</td><td>AI智能外呼中台</td><td>取配置的选中的意向标签名称对应的客户数</td><td>整数</td><td>0</td><td>--</td></tr>
-      </tbody>
-    </table>
-
     <hr class="section-divider">
-
-    <h3>2. 外呼场景-外呼列表-查看-任务详情</h3>
-    <p><strong>1）功能名称：</strong>任务详情</p>
-    <p><strong>2）交互说明：</strong>如图。</p>
-    <p><strong>3）数据来源：</strong>一知平台任务详情查询接口。</p>
-    <p><strong>4）逻辑说明：</strong>通过任务id查询接口获取对应字段。</p>
+    <h3>1. 系统管理-业务场景-新增冰兰任务场景</h3>
+    <p><strong>1）功能名称：</strong> 新增冰兰业务场景</p>
+    <p><strong>2）交互说明：</strong> 新建业务场景弹窗默认支持选择智能平台“冰兰”。选择冰兰后展示冰兰专属字段，包括数据导入方式、呼叫通道、线路、机器人 id、等配置。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台配置。</p>
+    <p><strong>4）逻辑说明：</strong> 用户选择冰兰平台后，当呼叫通道选择“冰兰外呼通道”时，该任务判定为纯冰兰任务。</p>
     <p><strong>5）功能明细</strong></p>
-    <table>
-      <thead>
-        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>创建日期</td><td>展示任务创建时间</td><td>一知接口</td><td>取createTime</td><td>字符串</td><td>--</td><td>--</td></tr>
-        <tr><td>话术名称</td><td>展示话术名称</td><td>一知接口</td><td>取dialogFlowName</td><td>字符串</td><td>--</td><td>--</td></tr>
-        <tr><td>任务id</td><td>展示任务id</td><td>一知接口</td><td>取robotCallJobId</td><td>字符串</td><td>--</td><td>--</td></tr>
-        <tr><td>任务描述</td><td>展示任务描述</td><td>一知接口</td><td>取description</td><td>字符串</td><td>--</td><td>--</td></tr>
-        <tr><td>启动方式</td><td>展示任务的启动方式</td><td>一知接口</td><td>取mode</td><td>字符串</td><td>--</td><td>--</td></tr>
-        <tr><td>拨打时段</td><td>展示任务的拨打时段</td><td>一知接口</td><td>取daysOfWeek+dailyStartTime+dailyEndTime</td><td>字符串</td><td>--</td><td>--</td></tr>
-        <tr><td>风控策略</td><td>展示风控策略 id</td><td>一知接口</td><td>取riskControlStrategyId</td><td>long</td><td>--</td><td>--</td></tr>
-        <tr><td>自动重拨设置</td><td>展示自动重拨设置</td><td>一知接口</td><td>取redialSettingList</td><td>数字统计</td><td>--</td><td>--</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>智能平台</td><td>选择场景对接平台</td><td>前端配置</td><td>可选冰兰、科大讯飞、一知科技</td><td>单选</td><td>冰兰</td><td>未选择时提示必填</td></tr>
+          <tr><td>场景类型</td><td>配置业务场景类型</td><td>前端配置</td><td>冰兰仅允许新线索、冷线索</td><td>单选</td><td>--</td><td>非法类型不允许提交</td></tr>
+          <tr><td>数据导入方式</td><td>配置冰兰任务数据来源</td><td>前端配置</td><td>手动导入/接口传入</td><td>单选</td><td>--</td><td>未选择时提示必填</td></tr>
+          <tr><td>呼叫通道</td><td>配置外呼通道</td><td>前端配置</td><td>联友 VCP/冰兰外呼通道</td><td>下拉</td><td>--</td><td>未选择时提示必填</td></tr>
+          <tr><td>线路</td><td>配置冰兰外呼线路</td><td>写死提供给冰兰的一知线路</td><td>选择冰兰外呼通道后展示</td><td>下拉</td><td>--</td><td>未选择时提示必填</td></tr>
+          <tr><td>机器人id</td><td>配置冰兰机器人</td><td>冰兰接口</td><td>选中冰兰外呼通道后通过调用接口获取</td><td>下拉</td><td>--</td><td>未填写时提示必填</td></tr>
+          <tr><td>优先级</td><td>配置任务调度优先级</td><td>前端配置</td><td>选中冰兰外呼通道后隐藏</td><td>下拉</td><td>--</td><td>未选择时提示必填</td></tr>
+          <tr><td>呼叫时段</td><td>配置允许外呼的日期和时间段</td><td>前端配置</td><td>选中冰兰外呼通道后隐藏</td><td>复合字段</td><td>--</td><td>--</td></tr>
+          <tr><td>自动重拨</td><td>配置未接通后的重拨策略</td><td>前端配置</td><td>选中冰兰外呼通道后隐藏</td><td>复合字段</td><td>关闭</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
     <hr class="section-divider">
-
-    <h3>3. 外呼场景-外呼列表-查看-呼叫名单-手动导入</h3>
-    <p><strong>1）功能名称：</strong>号码文件上传与导入记录管理</p>
-    <p><strong>2）交互说明：</strong>弹窗内包含两个tab：上传文件和导入记录。上传文件tab支持拖拽上传；导入记录tab支持查看历史记录和导出结果。</p>
-    <p><strong>3）数据来源：</strong>前端Mock数据。</p>
-    <p><strong>4）逻辑说明：</strong>点击开始上传后关闭弹窗，可切换到导入记录查看。</p>
+    <h3>2. 外呼场景-外呼列表</h3>
+    <p><strong>1）功能名称：</strong> 冰兰外呼任务卡片</p>
+    <p><strong>2）交互说明：</strong> 当纯冰兰任务（智能平台=冰兰+呼叫通道=冰兰外呼通道）配置了 AI 外呼调动规则后，在列表显示该任务卡片。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台任务数据。</p>
+    <p><strong>4）逻辑说明：</strong> 见流程查询纯冰兰任务记录流程。</p>
     <p><strong>5）功能明细</strong></p>
-    <table>
-      <thead>
-        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>弹窗尺寸</td><td>手动导入弹窗宽度</td><td>前端CSS</td><td>无</td><td>1040px</td><td>--</td><td>--</td></tr>
-        <tr><td>tab-上传文件</td><td>文件上传tab</td><td>前端行为</td><td>无</td><td>Tabs组件</td><td>--</td><td>--</td></tr>
-        <tr><td>tab-导入记录</td><td>导入历史记录tab</td><td>前端行为</td><td>无</td><td>Tabs组件</td><td>--</td><td>--</td></tr>
-        <tr><td>上传区域</td><td>拖拽或点击上传文件</td><td>前端行为</td><td>无</td><td>上传组件</td><td>--</td><td>--</td></tr>
-        <tr><td>上传提示</td><td>支持的文件格式和数量限制</td><td>前端配置</td><td>无</td><td>文本提示</td><td>--</td><td>--</td></tr>
-        <tr><td>开始上传按钮</td><td>执行文件上传（开发中）</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-        <tr><td>导入记录列表</td><td>历史导入记录表格</td><td>前端Mock</td><td>无</td><td>表格</td><td>空</td><td>--</td></tr>
-        <tr><td>导出结果按钮</td><td>导出导入结果CSV</td><td>前端JS</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>任务名称</td><td>展示外呼任务名称</td><td>AI 智能外呼中台</td><td>取任务名称</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>平台标识</td><td>展示任务所属平台</td><td>AI 智能外呼中台</td><td>非总部租户隐藏</td><td>标签</td><td>--</td><td>--</td></tr>
+          <tr><td>数据来源</td><td>展示线索导入方式</td><td>AI 智能外呼中台</td><td>手动导入/接口传入</td><td>标签</td><td>--</td><td>--</td></tr>
+          <tr><td>任务状态</td><td>展示冰兰任务状态</td><td>冰兰任务状态</td><td>根据接口返回</td><td>文本+状态点</td><td>跟进中</td><td>未识别时按未开始展示</td></tr>
+          <tr><td>查看</td><td>点击跳转到查看外呼页面</td><td>AI 智能外呼中台</td><td>前端按钮</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>编辑</td><td>纯冰兰任务不支持编辑</td><td>AI 智能外呼中台</td><td>当前纯冰兰任务不支持编辑，按钮置灰</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>暂停/启动</td><td>本地状态暂停后任务将不再提交数据给冰兰</td><td>AI 智能外呼中台</td><td>--</td><td>--</td><td>--</td><td>--</td></tr>
+          <tr><td>删除</td><td>点击二次确认删除本地任务，删除本地任务</td><td>前端行为</td><td>如果是启动状态不能删除</td><td>--</td><td>--</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
     <hr class="section-divider">
-
-    <h3>4. 外呼场景-外呼列表-查看-呼叫名单-手动导入-导出结果功能</h3>
-    <p><strong>1）功能名称：</strong>导入结果Excel导出</p>
-    <p><strong>2）交互说明：</strong>点击导出结果按钮后，生成包含导入结果的CSV文件并自动下载。</p>
-    <p><strong>3）数据来源：</strong>前端Mock数据。</p>
-    <p><strong>4）逻辑说明：</strong>生成CSV文件（兼容Excel），包含BOM防止中文乱码。</p>
+    <h3>3. 外呼场景-外呼列表-查看-数据概览</h3>
+    <p><strong>1）功能名称：</strong> 冰兰任务数据概览</p>
+    <p><strong>2）交互说明：</strong> 查看外呼详情默认进入数据概览 tab，包含外呼数据、意向分类和意向洞察三个区块。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台、冰兰回调。</p>
+    <p><strong>4）逻辑说明：</strong> 根据任务 id 查询本地任务统计和冰兰回调结果，聚合展示任务导入、提交、过滤、接听、未接通、通话时长和意向等级等数据。</p>
     <p><strong>5）功能明细</strong></p>
-    <table>
-      <thead>
-        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>导出字段-导入结果</td><td>导入成功或失败</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>导出字段-失败原因</td><td>失败原因说明</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>导出字段-手机号</td><td>客户手机号</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>导出字段-场景传入信息</td><td>模版填写的业务字段</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>导出字段-导入时间</td><td>必填时间戳</td><td>前端Mock</td><td>无</td><td>日期时间</td><td>--</td><td>--</td></tr>
-        <tr><td>文件名格式</td><td>导入结果_日期.csv</td><td>前端JS</td><td>日期格式化</td><td>文本</td><td>--</td><td>--</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>导入客户数</td><td>当前任务导入客户手机号总数（去重）</td><td>AI 智能外呼中台</td><td>按任务 id 聚合导入手机号</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>外呼客户数</td><td>提交到冰兰接口的客户手机号总数（去重）</td><td>AI 智能外呼中台</td><td>以手机号去重统计</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>总外呼数</td><td>提交到冰兰接口的外呼次数（不去重）</td><td>AI 智能外呼中台</td><td>按接口提交记录统计</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>过滤客户数</td><td>本地过滤客户数量（去重）</td><td>AI 智能外呼中台</td><td>取通话结果黑名单和规则拦截的数据</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>过滤比例</td><td>过滤客户数/导入客户数</td><td>前端聚合</td><td>百分比计算</td><td>百分比</td><td>0%</td><td>分母为 0 时展示 0%</td></tr>
+          <tr><td>接听数</td><td>已接通号码数量</td><td>冰兰回调</td><td>话单状态为已接通</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>接听率</td><td>接听数/外呼客户数</td><td>前端聚合</td><td>百分比计算</td><td>百分比</td><td>0%</td><td>分母为 0 时展示 0%</td></tr>
+          <tr><td>未接通数</td><td>未接通号码数量</td><td>冰兰回调</td><td>话单状态为未接通</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>未接通率</td><td>未接通数/外呼客户数</td><td>前端聚合</td><td>百分比计算</td><td>百分比</td><td>0%</td><td>分母为 0 时展示 0%</td></tr>
+          <tr><td>平均通话时长</td><td>每次通话平均时长</td><td>冰兰回调</td><td>通话总时长/通话次数</td><td>秒数</td><td>0秒</td><td>--</td></tr>
+          <tr><td>意向分类</td><td>展示 A/B 及 A+B 客户占比和客户数</td><td>冰兰回调</td><td>取&quot;intentLevel&quot;</td><td>百分比/整数</td><td>0</td><td>--</td></tr>
+          <tr><td>意向配置</td><td>配置意向等级展示标签</td><td>前端行为</td><td>打开配置弹窗并保存</td><td>点击事件</td><td>--</td><td>最多选择 3 项</td></tr>
+          <tr><td>意向洞察</td><td>展示意向占比环形图</td><td>前端 Mock</td><td>按意向分类聚合</td><td>图表</td><td>--</td><td>--</td></tr>
+          <tr><td>通话时长</td><td>展示通话时长分布</td><td>前端 Mock</td><td>按通话时长区间聚合</td><td>柱状图</td><td>--</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
     <hr class="section-divider">
-
-    <h3>5. 业务场景-一知-大小模型选项关联账号</h3>
-    <p><strong>1）功能名称：</strong>一知大小模型选项关联账号</p>
-    <p><strong>2）交互说明：</strong>当用户选择"大模型"或"小模型"选项时，可关联对应的账号配置。</p>
-    <p><strong>3）数据来源：</strong>一知平台接口。</p>
-    <p><strong>4）逻辑说明：</strong>根据选择的模型类型，加载对应的账号列表供用户选择关联。</p>
+    <h3>4. 外呼场景-外呼列表-查看-任务详情</h3>
+    <p><strong>1）功能名称：</strong> 冰兰任务详情</p>
+    <p><strong>2）交互说明：</strong> 任务详情 tab 展示任务创建时间、话术名称、任务 id、任务描述、启动方式、拨打时段、风控策略和自动重拨设置。冰兰任务右上角操作按钮展示“终止任务”。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台、冰兰任务查询接口。</p>
+    <p><strong>4）逻辑说明：</strong> 通过任务 id 查询任务配置并展示；冰兰任务话术名称展示为“东风日产线索机器人”。</p>
     <p><strong>5）功能明细</strong></p>
-    <table>
-      <thead>
-        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>模型类型选择</td><td>大模型/小模型选项</td><td>一知接口</td><td>无</td><td>下拉选择</td><td>--</td><td>--</td></tr>
-        <tr><td>关联账号</td><td>关联对应的账号配置</td><td>一知接口</td><td>根据模型类型筛选</td><td>下拉选择</td><td>--</td><td>--</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>创建日期</td><td>展示任务创建时间</td><td>AI 智能外呼中台/冰兰</td><td>取任务创建时间</td><td>日期时间</td><td>--</td><td>--</td></tr>
+          <tr><td>话术名称</td><td>展示机器人/话术名称</td><td>冰兰任务配置</td><td>展示东风日产线索机器人</td><td>文本</td><td>东风日产线索机器人</td><td>--</td></tr>
+          <tr><td>任务id</td><td>展示外部任务 id</td><td>冰兰任务配置</td><td>取冰兰任务 id</td><td>字符串</td><td>--</td><td>--</td></tr>
+          <tr><td>任务描述</td><td>展示任务描述</td><td>AI 智能外呼中台</td><td>取任务描述</td><td>文本</td><td>无</td><td>空值展示无</td></tr>
+          <tr><td>启动方式</td><td>展示任务启动方式</td><td>AI 智能外呼中台/冰兰</td><td>自动/手动</td><td>文本</td><td>自动</td><td>--</td></tr>
+          <tr><td>拨打时段</td><td>展示任务允许拨打时间</td><td>冰兰任务配置</td><td>取每日开始和结束时间</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>风控策略</td><td>展示风控策略和账号黑名单</td><td>AI 智能外呼中台</td><td>取策略配置</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>自动重拨设置</td><td>展示重拨间隔、次数、条件</td><td>冰兰任务配置</td><td>取重拨策略列表</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>终止任务按钮</td><td>终止整个冰兰任务</td><td>前端行为/冰兰接口</td><td>点击后调用任务终止流程</td><td>点击事件</td><td>--</td><td>任务已完成时不可重复终止</td></tr>
+        </tbody>
+      </table>
+    </div>
     <hr class="section-divider">
-
-    <h3>6. 外呼场景-外呼列表-查看-数据概览-意向分类配置</h3>
-    <p><strong>1）功能名称：</strong>意向数据设置</p>
-    <p><strong>2）交互说明：</strong>点击"意向分类"区块的配置按钮，弹出配置弹窗。支持对意向等级1/2/3进行标签关联配置，配置多个标签是取多个标签的并集。</p>
-    <p><strong>3）数据来源：</strong>一知门店类租户/一知总部类租户，非一知平台的外呼任务无意向分类的统计看板。</p>
-    <p><strong>4）逻辑说明：</strong>见其他说明的意向枚举值说明。</p>
+    <h3>5. 外呼场景-外呼列表-查看-呼叫名单</h3>
+    <p><strong>1）功能名称：</strong> 冰兰呼叫名单</p>
+    <p><strong>2）交互说明：</strong> 呼叫名单包含已分配、待呼叫、已呼叫、已过滤、呼叫失败五个子 tab。待呼叫支持终止外呼，点击终止外呼后展示复选框，勾选后点击确认终止弹出二次确认。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台、冰兰回调、前端 Mock。</p>
+    <p><strong>4）逻辑说明：</strong> 按线索呼叫状态切分名单。待呼叫终止时，仅对尚未发起外呼或处于待重呼状态的线索终止后续外呼，并更新线索呼叫完成状态。</p>
     <p><strong>5）功能明细</strong></p>
-    <table>
-      <thead>
-        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>配置弹窗</td><td>意向数据设置弹窗</td><td>前端CSS</td><td>无</td><td>居中弹窗</td><td>--</td><td>--</td></tr>
-        <tr><td>弹窗标题</td><td>意向数据设置</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
-        <tr><td>配置提示</td><td>提示字段设置说明</td><td>前端配置</td><td>无</td><td>文本提示</td><td>--</td><td>--</td></tr>
-        <tr><td>意向等级1</td><td>关联标签配置行</td><td>取配置的标签名称</td><td>无</td><td>多选下拉框</td><td>--</td><td>--</td></tr>
-        <tr><td>意向等级2</td><td>关联标签配置行</td><td>取配置的标签名称</td><td>无</td><td>多选下拉框</td><td>--</td><td>--</td></tr>
-        <tr><td>意向等级3</td><td>关联标签配置行</td><td>取配置的标签名称</td><td>无</td><td>多选下拉框</td><td>--</td><td>--</td></tr>
-        <tr><td>取消按钮</td><td>关闭弹窗不保存</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-        <tr><td>保存按钮</td><td>保存配置并关闭弹窗</td><td>提交后根据配置重新读取数据</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-        <tr><td>关闭图标</td><td>右上角关闭按钮</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-        <tr><td>背景点击</td><td>点击半透明背景关闭弹窗</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
-      </tbody>
-    </table>
-
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>已分配 tab</td><td>展示已分配但未提交呼叫的号码</td><td>AI 智能外呼中台</td><td>按号码分配状态筛选</td><td>表格</td><td>空</td><td>--</td></tr>
+          <tr><td>待呼叫 tab</td><td>展示等待呼叫队列的号码</td><td>AI 智能外呼中台/冰兰</td><td>按待呼叫状态筛选</td><td>表格</td><td>空</td><td>--</td></tr>
+          <tr><td>已呼叫 tab</td><td>展示已有最终呼叫结果的号码</td><td>冰兰回调</td><td>按已呼叫状态筛选</td><td>表格</td><td>空</td><td>--</td></tr>
+          <tr><td>已过滤 tab</td><td>展示被本地过滤的号码</td><td>AI 智能外呼中台</td><td>按过滤状态筛选</td><td>表格</td><td>空</td><td>--</td></tr>
+          <tr><td>呼叫失败 tab</td><td>展示呼叫失败号码及原因</td><td>冰兰回调</td><td>按失败状态筛选</td><td>表格</td><td>空</td><td>--</td></tr>
+          <tr><td>终止外呼按钮</td><td>进入待呼叫号码选择态</td><td>前端行为</td><td>点击后展示表头和行复选框</td><td>点击事件</td><td>--</td><td>无待呼叫记录时展示空态</td></tr>
+          <tr><td>终止外呼 tooltip</td><td>说明终止外呼处理规则</td><td>前端配置</td><td>hover 展示说明</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>确认终止按钮</td><td>对选中号码发起终止确认</td><td>前端行为/冰兰接口</td><td>已选择号码时弹出确认框</td><td>点击事件</td><td>--</td><td>未选择号码提示请选择</td></tr>
+          <tr><td>二次确认弹窗</td><td>确认终止风险提示</td><td>前端行为</td><td>展示“确认终止后，后续将停止该线索的外呼任务。”</td><td>弹窗</td><td>--</td><td>取消不处理</td></tr>
+          <tr><td>终止后移除</td><td>终止成功后从待呼叫列表移除</td><td>AI 智能外呼中台/冰兰</td><td>按选中线索 id 移除并刷新数量</td><td>表格刷新</td><td>--</td><td>失败时保留原记录</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <hr class="section-divider">
+    <h3>6. 统计分析-通话统计</h3>
+    <p><strong>1）功能名称：</strong> 冰兰通话统计</p>
+    <p><strong>2）交互说明：</strong> 通话统计页面包含外呼统计和客户统计两个 tab，支持按呼叫时间和场景名称筛选。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台、冰兰回调。</p>
+    <p><strong>4）逻辑说明：</strong> 聚合冰兰回调话单数据，按日期和场景生成外呼统计与客户统计指标。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>外呼统计</td><td>展示拨打总次数、名单总数、接通数、未接通数、接通率、触达率、累计通话时长</td><td>冰兰回调/AI 智能外呼中台</td><td>按呼叫时间和场景聚合</td><td>表格</td><td>空</td><td>无数据展示空态</td></tr>
+          <tr><td>客户统计</td><td>展示客户总数、有效通话客户数、累计通话时长、客户平均通话时长</td><td>冰兰回调/AI 智能外呼中台</td><td>按客户维度聚合</td><td>表格</td><td>空</td><td>无数据展示空态</td></tr>
+          <tr><td>呼叫时间筛选</td><td>按时间范围筛选统计数据</td><td>前端行为</td><td>开始日期+结束日期</td><td>日期范围</td><td>近 30 天</td><td>--</td></tr>
+          <tr><td>场景名称筛选</td><td>按场景筛选统计数据</td><td>AI 智能外呼中台</td><td>下拉选择场景</td><td>下拉</td><td>全部</td><td>--</td></tr>
+          <tr><td>刷新按钮</td><td>刷新统计数据</td><td>前端行为</td><td>重新查询当前筛选条件</td><td>点击事件</td><td>--</td><td>--</td></tr>
+          <tr><td>列设置按钮</td><td>表格列设置入口（开发中）</td><td>前端行为</td><td>点击提示开发中</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <hr class="section-divider">
+    <h3>7. 外呼结果-通话记录</h3>
+    <p><strong>1）功能名称：</strong> 冰兰通话记录</p>
+    <p><strong>2）交互说明：</strong> 通话记录页面支持按用户号码、通话时间、场景名称、通话状态、智能平台筛选，默认智能平台为冰兰。列表支持查看通话详情、刷新、列设置和导出入口。</p>
+    <p><strong>3）数据来源：</strong> 冰兰通话记录回调、AI 智能外呼中台。</p>
+    <p><strong>4）逻辑说明：</strong> 冰兰回调话单后，系统保存通话开始时间、结束时间、时长、状态、外呼总结、最后通话节点等信息，并在通话记录列表展示。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>用户号码</td><td>展示脱敏用户手机号</td><td>冰兰回调</td><td>取回调手机号并脱敏</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>通话开始时间</td><td>展示通话开始时间</td><td>冰兰回调</td><td>取 startTime</td><td>日期时间</td><td>--</td><td>--</td></tr>
+          <tr><td>通话结束时间</td><td>展示通话结束时间</td><td>冰兰回调</td><td>取 endTime</td><td>日期时间</td><td>--</td><td>--</td></tr>
+          <tr><td>通话时长</td><td>展示单次通话时长</td><td>冰兰回调</td><td>endTime-startTime</td><td>文本</td><td>-</td><td>未接通展示 -</td></tr>
+          <tr><td>场景名称</td><td>展示所属场景</td><td>AI 智能外呼中台</td><td>按任务/场景关联</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>通话状态</td><td>展示已接通、无人接听、占线、拒接、关机等状态</td><td>冰兰回调</td><td>按回调状态映射</td><td>文本</td><td>--</td><td>未识别状态按原值展示</td></tr>
+          <tr><td>外呼总结</td><td>展示机器人通话摘要</td><td>冰兰回调</td><td>取 summary</td><td>文本</td><td>空</td><td>--</td></tr>
+          <tr><td>智能平台</td><td>展示记录来源平台</td><td>AI 智能外呼中台</td><td>冰兰记录展示冰兰</td><td>文本</td><td>冰兰</td><td>--</td></tr>
+          <tr><td>最后通话节点</td><td>展示最后命中的机器人节点</td><td>冰兰回调</td><td>取 lastNode</td><td>文本</td><td>-</td><td>--</td></tr>
+          <tr><td>详情按钮</td><td>查看通话记录详情</td><td>前端行为</td><td>打开详情弹窗</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <hr class="section-divider">
+    <h3>8. 外呼结果-线索记录</h3>
+    <p><strong>1）功能名称：</strong> 冰兰线索记录</p>
+    <p><strong>2）交互说明：</strong> 线索记录页面展示回访时间、回访次数、最后通话状态、最后回访记录、意向级别、客户详细标签、场景名称和多次实际回访时间。</p>
+    <p><strong>3）数据来源：</strong> 冰兰回调、AI 智能外呼中台。</p>
+    <p><strong>4）逻辑说明：</strong> 按客户线索维度聚合冰兰通话结果，保存最后一次有效回访信息，并支持按用户号码、最后回访时间、最后通话状态、意向级别、场景名称筛选。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>最后回访时间</td><td>展示线索最后一次回访时间</td><td>冰兰回调</td><td>取最后一次回调时间</td><td>日期时间</td><td>--</td><td>--</td></tr>
+          <tr><td>回访次数</td><td>展示线索累计回访次数</td><td>AI 智能外呼中台</td><td>按线索聚合呼叫次数</td><td>整数</td><td>0</td><td>--</td></tr>
+          <tr><td>最后通话状态</td><td>展示最后一次通话状态</td><td>冰兰回调</td><td>取最后一次通话结果</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>最后回访记录</td><td>展示最后一次外呼总结</td><td>冰兰回调</td><td>取最后一次 summary</td><td>文本</td><td>空</td><td>--</td></tr>
+          <tr><td>最后通话意向级别</td><td>展示最新意向等级</td><td>冰兰回调/AI 智能外呼中台</td><td>取最后一次意向识别结果</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>客户详细标签</td><td>查看客户详细标签入口</td><td>AI 智能外呼中台</td><td>点击查看（开发中）</td><td>点击事件</td><td>--</td><td>--</td></tr>
+          <tr><td>场景名称</td><td>展示线索所属场景</td><td>AI 智能外呼中台</td><td>按任务关联场景</td><td>文本</td><td>--</td><td>--</td></tr>
+          <tr><td>首次实际回访时间</td><td>展示首次实际回访时间</td><td>冰兰回调</td><td>按时间升序取第 1 次</td><td>日期时间</td><td>-</td><td>--</td></tr>
+          <tr><td>二次实际回访时间</td><td>展示第二次实际回访时间</td><td>冰兰回调</td><td>按时间升序取第 2 次</td><td>日期时间</td><td>-</td><td>--</td></tr>
+          <tr><td>三次实际回访时间</td><td>展示第三次实际回访时间</td><td>冰兰回调</td><td>按时间升序取第 3 次</td><td>日期时间</td><td>-</td><td>--</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <hr class="section-divider">
     <h2>五. 其他说明</h2>
-
-    <h3>1. 意向枚举值说明</h3>
-    <table>
-      <thead>
-        <tr><th>智能平台</th><th>租户类型</th><th>数据来源</th><th>取值逻辑</th><th>意向等级枚举</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>一知</td><td>总部</td><td>百炼智能体</td><td>取百炼提取的意向等级</td><td>A (高意向)；B (潜在)；C (一般)；D (忙碌/敷衍)；E (拒绝/无效/无应答)</td></tr>
-        <tr><td>一知</td><td>门店</td><td>一知接口</td><td>取一知返回的意向级别</td><td>A (高意向)；B (低意向)；C (意向待定)；D (无意向)；E (未接通)；F（停机/空号）</td></tr>
-      </tbody>
-    </table>
+    <h3>1. 冰兰任务状态枚举说明</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>枚举值</th><th>任务状态</th><th>状态说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>跟进中</td><td>任务中至少有一条线索未完成呼叫。</td></tr>
+          <tr><td>2</td><td>已完成</td><td>任务中所有线索呼叫状态都是已完成。</td></tr>
+          <tr><td>3</td><td>已终止</td><td>任务被终止，任务下线索回调状态会变为“已完成”。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>2. 冰兰线索终止规则</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>规则项</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>适用范围</td><td>尚未发起外呼或处于待重呼状态的线索。</td></tr>
+          <tr><td>操作入口</td><td>外呼列表-查看-呼叫名单-待呼叫-终止外呼。</td></tr>
+          <tr><td>二次确认文案</td><td>确认终止后，后续将停止该线索的外呼任务。</td></tr>
+          <tr><td>终止后处理</td><td>系统停止该线索后续外呼，将线索呼叫完成状态更新为“已终止”，并推送对应的话单结果。</td></tr>
+          <tr><td>列表表现</td><td>终止成功后，该线索从待呼叫列表移除。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>3. 冰兰线路枚举说明</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>线路名称</th><th>线路 id</th><th>展示文案</th><th>触发条件</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>一知线路</td><td>000001</td><td>一知线路（线路 id000001）</td><td>新建业务场景选择冰兰外呼通道后展示。</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 </html>

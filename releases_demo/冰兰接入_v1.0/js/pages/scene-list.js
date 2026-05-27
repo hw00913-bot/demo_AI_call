@@ -18,6 +18,12 @@
     '手动导入': { bg: '#e6f4ff', color: '#1677ff', border: '#91caff' },
     '接口传入': { bg: '#f6ffed', color: '#52c41a', border: '#b7eb8f' },
   };
+  let pendingTerminateSelectMode = false;
+  const PendingTerminateTooltip = '系统会根据线索当前外呼状态进行处理，对于尚未发起外呼或处于待重呼状态的线索，系统将终止其后续外呼，并将线索呼叫完成状态更新为“已终止”，同时推送对应的话单结果。';
+
+  function isPendingTab(tabName) {
+    return tabName === '待呼叫';
+  }
 
   function getDisplayStatus(item) {
     if (item && item.platform === '冰兰') {
@@ -115,12 +121,18 @@
       renderRow: null,
     },
     '待呼叫': {
-      summary: '共 0 个外呼号码，正在等待呼叫队列。',
+      summary: null,
       actions: false,
       exportBtn: false,
       cols: ['用户号码','号码提交时间','已拨打次数','等待呼叫时长','正在排队通道'],
-      rows: null,
-      renderRow: null,
+      rows: MockPendingRows,
+      renderRow: r => `
+        ${pendingTerminateSelectMode ? `<td class="scene-select-cell"><input type="checkbox" class="scene-row-checkbox" value="${r.id}"></td>` : ''}
+        <td>${r.phone}</td>
+        <td>${r.submitTime}</td>
+        <td>${r.dialCount}</td>
+        <td>${r.waitDuration}</td>
+        <td>${r.channel}</td>`,
     },
     '已呼叫': {
       summary: `共 ${MockCalledRows.length} 个外呼号码，已呼叫。`,
@@ -183,15 +195,25 @@
 
   function renderSubContent(tabName) {
     const cfg = SubTabConfig[tabName] || SubTabConfig['已分配'];
-    const colCount = cfg.cols.length;
+    const isPending = isPendingTab(tabName);
+    const cols = (isPending && pendingTerminateSelectMode)
+      ? ['<input type="checkbox" class="scene-row-checkbox" onclick="window.Pages[\'scene-list\'].togglePendingSelectAll(this)">', ...cfg.cols]
+      : cfg.cols;
+    const colCount = cols.length;
     const actionsHtml = cfg.actions
       ? `<div class="scene-detail-actions"><button class="btn btn-default" onclick="window.Pages['scene-list'].showImportModal()">手动导入</button><button class="btn btn-default">批量移除</button></div>`
+      : '';
+    const pendingTerminateHtml = isPending
+      ? `<div class="pending-terminate-action"><button class="btn btn-default" onclick="window.Pages['scene-list'].showPendingTerminateSelect()">${pendingTerminateSelectMode ? '确认终止' : '终止外呼'}</button><span class="pending-terminate-help" data-tooltip="${PendingTerminateTooltip}">&#9432;</span></div>`
       : '';
     const exportHtml = cfg.exportBtn
       ? `<button class="btn btn-primary" onclick="showToast('导出功能开发中','info')">导出</button>`
       : '';
 
-    const colsHtml = cfg.cols.map(c => `<th>${c}</th>`).join('');
+    const colsHtml = cols.map((c, index) => `<th${index === 0 && isPending && pendingTerminateSelectMode ? ' class="scene-select-cell"' : ''}>${c}</th>`).join('');
+    const summaryText = isPending
+      ? `共 ${MockPendingRows.length} 个外呼号码，正在等待呼叫队列。`
+      : cfg.summary;
 
     let bodyHtml = '';
     if (cfg.rows && cfg.rows.length > 0 && cfg.renderRow) {
@@ -207,7 +229,7 @@
     const paginationHtml = (cfg.rows && cfg.rows.length > 0) ? `
       <div class="scene-detail-pagination">
         <span>第 1-${cfg.rows.length} 条/总共 ${cfg.rows.length} 条</span>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div class="scene-detail-page-controls">
           <div class="scene-detail-page-btn disabled">‹</div>
           <div class="scene-detail-page-btn active">1</div>
           <div class="scene-detail-page-btn disabled">›</div>
@@ -225,8 +247,8 @@
         </div>
       </div>
       <div class="scene-detail-summary">
-        <span>${cfg.summary}</span>
-        <div style="display:flex;gap:8px;align-items:center">${actionsHtml}${exportHtml}</div>
+        <span>${summaryText}</span>
+        <div class="scene-detail-toolbar">${actionsHtml}${pendingTerminateHtml}${exportHtml}</div>
       </div>
       <div class="scene-detail-table-wrap">
         <table class="scene-detail-table">
@@ -299,9 +321,80 @@
   function switchSubTab(el, tabName) {
     const container = document.getElementById('sceneSubContent');
     if (!container) return;
+    pendingTerminateSelectMode = false;
     document.querySelectorAll('.scene-detail-subtab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     container.innerHTML = renderSubContent(tabName);
+  }
+
+  function showPendingTerminateSelect() {
+    if (pendingTerminateSelectMode) {
+      showPendingTerminateConfirm();
+      return;
+    }
+    pendingTerminateSelectMode = true;
+    const container = document.getElementById('sceneSubContent');
+    if (container) container.innerHTML = renderSubContent('待呼叫');
+  }
+
+  function togglePendingSelectAll(el) {
+    document.querySelectorAll('#sceneSubContent tbody .scene-row-checkbox').forEach(input => {
+      input.checked = el.checked;
+    });
+  }
+
+  function getSelectedPendingIds() {
+    return Array.from(document.querySelectorAll('#sceneSubContent tbody .scene-row-checkbox:checked'))
+      .map(input => input.value);
+  }
+
+  function showPendingTerminateConfirm() {
+    const selectedIds = getSelectedPendingIds();
+    if (selectedIds.length === 0) {
+      showToast('请选择要终止外呼的号码', 'info');
+      return;
+    }
+    const old = document.getElementById('pendingTerminateConfirmBackdrop');
+    if (old) old.remove();
+    const html = `
+      <div class="pending-confirm-backdrop" id="pendingTerminateConfirmBackdrop" onclick="window.Pages['scene-list'].closePendingTerminateConfirm(event)">
+        <div class="pending-confirm-modal" onclick="event.stopPropagation()">
+          <div class="pending-confirm-header">
+            <span class="pending-confirm-title">终止外呼确认</span>
+            <span class="pending-confirm-close" onclick="window.Pages['scene-list'].closePendingTerminateConfirm()">&#10005;</span>
+          </div>
+          <div class="pending-confirm-body">确认终止后，后续将停止该线索的外呼任务。</div>
+          <div class="pending-confirm-footer">
+            <button class="btn btn-default" onclick="window.Pages['scene-list'].closePendingTerminateConfirm()">取消</button>
+            <button class="btn btn-primary" onclick="window.Pages['scene-list'].confirmPendingTerminate()">确认</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function closePendingTerminateConfirm(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const backdrop = document.getElementById('pendingTerminateConfirmBackdrop');
+    if (backdrop) backdrop.remove();
+  }
+
+  function confirmPendingTerminate() {
+    const selectedIds = getSelectedPendingIds();
+    if (selectedIds.length === 0) {
+      closePendingTerminateConfirm();
+      showToast('请选择要终止外呼的号码', 'info');
+      return;
+    }
+    for (let i = MockPendingRows.length - 1; i >= 0; i--) {
+      if (selectedIds.includes(MockPendingRows[i].id)) MockPendingRows.splice(i, 1);
+    }
+    closePendingTerminateConfirm();
+    pendingTerminateSelectMode = false;
+    const container = document.getElementById('sceneSubContent');
+    if (container) container.innerHTML = renderSubContent('待呼叫');
+    showToast('已终止外呼', 'success');
   }
 
   /* ===== 主 tab 切换（呼叫名单 / 数据概览 / 任务详情） ===== */
@@ -376,15 +469,15 @@
             <div class="overview-block-body">
               <div class="overview-grid cols-3">
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级1客户占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" data-intent-rate="level1" data-tooltip="该意向的用户总数/呼叫总数">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级2客户占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-intent-rate="level2" data-tooltip="该意向的用户总数/呼叫总数">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-tooltip="意向等级1或2客户合计占比">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-intent-rate="level12" data-tooltip="该意向的用户总数/呼叫总数">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
               </div>
@@ -400,6 +493,43 @@
                 <div class="overview-card">
                   <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户数 <span class="overview-help" data-tooltip="意向等级1或2客户合计数量">&#9432;</span></div>
                   <div class="overview-card-value sub">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== 区块三：意向洞察 ===== -->
+          <div class="overview-block">
+            <div class="overview-block-header">
+              <div class="overview-block-title blue">意向洞察</div>
+            </div>
+            <div class="overview-block-body">
+              <div class="intent-donut-panel">
+                <div class="intent-donut-chart" aria-label="意向分类占比图">
+                  <div class="intent-donut-ring"></div>
+                  <div class="intent-donut-label label-a"><span>A(高意向): 1.65%</span></div>
+                  <div class="intent-donut-label label-b"><span>B(低意向): 2.48%</span></div>
+                  <div class="intent-donut-label label-c"><span>C(意向待定): 5.73%</span></div>
+                  <div class="intent-donut-label label-d"><span>D(无意向): 31.34%</span></div>
+                  <div class="intent-donut-label label-e"><span>E(未接通): 54.42%</span></div>
+                  <div class="intent-donut-label label-f"><span>F(停机/空号): 4.38%</span></div>
+                </div>
+              </div>
+
+              <div class="overview-chart-panel duration-panel">
+                <div class="overview-chart-title">通话时长</div>
+                <div class="duration-axis-title">客户数量（位）</div>
+                <div class="duration-chart">
+                  <div class="duration-grid-lines"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                  <div class="duration-bars">
+                    <div class="duration-bar-item"><strong>180</strong><i style="height:12%;"></i><span>0s-5s</span></div>
+                    <div class="duration-bar-item"><strong>656</strong><i style="height:44%;"></i><span>6s-10s</span></div>
+                    <div class="duration-bar-item"><strong>1341</strong><i style="height:89%;"></i><span>11s-30s</span></div>
+                    <div class="duration-bar-item"><strong>272</strong><i style="height:18%;"></i><span>31s-60s</span></div>
+                    <div class="duration-bar-item"><strong>45</strong><i style="height:3%;"></i><span>61s-90s</span></div>
+                    <div class="duration-bar-item"><strong>28</strong><i style="height:2%;"></i><span>&gt;90s</span></div>
+                  </div>
+                  <div class="duration-y-axis"><span>1500</span><span>1200</span><span>900</span><span>600</span><span>300</span><span>0</span></div>
                 </div>
               </div>
             </div>
@@ -834,12 +964,15 @@
       const helpEl = title.querySelector('.overview-help');
       if (!helpEl) return;
       const tooltip = helpEl.getAttribute('data-tooltip') || '';
-      if (tooltip === '意向等级1客户占比') {
-        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级1客户占比">&#9432;</span>';
-      } else if (tooltip === '意向等级2客户占比') {
-        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级2客户占比">&#9432;</span>';
-      } else if (tooltip === '意向等级1或2客户合计占比') {
-        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" data-tooltip="意向等级1或2客户合计占比">&#9432;</span>';
+      if (tooltip === '该意向的用户总数/呼叫总数') {
+        const rateType = helpEl.getAttribute('data-intent-rate');
+        if (rateType === 'level1') {
+          title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" data-intent-rate="level1" data-tooltip="该意向的用户总数/呼叫总数">&#9432;</span>';
+        } else if (rateType === 'level2') {
+          title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" data-intent-rate="level2" data-tooltip="该意向的用户总数/呼叫总数">&#9432;</span>';
+        } else if (rateType === 'level12') {
+          title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" data-intent-rate="level12" data-tooltip="该意向的用户总数/呼叫总数">&#9432;</span>';
+        }
       } else if (tooltip === '意向等级1客户数量') {
         title.innerHTML = level1Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级1客户数量">&#9432;</span>';
       } else if (tooltip === '意向等级2客户数量') {
@@ -853,5 +986,5 @@
   function init() {}
 
   window.Pages = window.Pages || {};
-  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, switchImportTab, exportImportResult, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption };
+  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, showPendingTerminateSelect, togglePendingSelectAll, showPendingTerminateConfirm, closePendingTerminateConfirm, confirmPendingTerminate, switchMainTab, renderMainTabContent, closeDetail, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, switchImportTab, exportImportResult, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption };
 })();

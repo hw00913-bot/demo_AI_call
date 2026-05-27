@@ -396,7 +396,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label required">呼叫时段</label>
                     <div class="biz-form-field">
                       <div class="biz-inline-wrap">
@@ -414,7 +414,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label"></label>
                     <div class="biz-form-field">
                       <div id="binglanTimeSlots"></div>
@@ -422,7 +422,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label required">自动重拨</label>
                     <div class="biz-form-field">
                       <div class="biz-switch-row">
@@ -435,7 +435,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label"></label>
                     <div class="biz-form-field">
                       <div class="biz-redial-table-wrap">
@@ -478,7 +478,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label">黑名单拦截</label>
                     <div class="biz-form-field">
                       <label class="biz-switch">
@@ -488,7 +488,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label"></label>
                     <div class="biz-form-field" style="max-width:420px;">
                       <select class="biz-form-select">
@@ -499,7 +499,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label">规则拦截</label>
                     <div class="biz-form-field">
                       <label class="biz-switch">
@@ -509,7 +509,7 @@
                     </div>
                   </div>
 
-                  <div class="biz-form-row">
+                  <div class="biz-form-row binglan-channel-hidden-row">
                     <label class="biz-form-label"></label>
                     <div class="biz-form-field">
                       <select class="biz-form-select">
@@ -1034,7 +1034,11 @@
     const robotIdInputWrap = document.getElementById('binglanRobotIdInputWrap');
     const robotIdSelectWrap = document.getElementById('binglanRobotIdSelectWrap');
     if (!priorityRowBinglan || !selectElem) return;
-    if (selectElem.value === 'binglan_channel') {
+    const isBinglanChannel = selectElem.value === 'binglan_channel';
+    document.querySelectorAll('.binglan-channel-hidden-row').forEach(row => {
+      row.classList.toggle('hidden', isBinglanChannel);
+    });
+    if (isBinglanChannel) {
       priorityRowBinglan.classList.add('hidden');
       if (binglanLineRow) binglanLineRow.classList.remove('hidden');
       if (robotIdInputWrap) robotIdInputWrap.classList.add('hidden');

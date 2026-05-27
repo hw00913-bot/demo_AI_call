@@ -560,7 +560,10 @@ p { margin-bottom: 8px; }
   font-size: 12px;
   font-weight: 500;
 }
-.scene-detail-content { min-height: 200px; }
+.scene-detail-content {
+  min-height: 200px;
+  padding-top: 18px;
+}
 
 /* ===== 子标签页（呼叫名单） ===== */
 .scene-detail-subtabs {
