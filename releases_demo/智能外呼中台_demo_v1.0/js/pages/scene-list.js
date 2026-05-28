@@ -469,15 +469,15 @@
             <div class="overview-block-body">
               <div class="overview-grid cols-3">
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" data-intent-rate="level1" data-tooltip="该意向的用户总数/所有意向分类的客户总数">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}类客户占比 <span class="overview-help" data-intent-rate="level1" data-tooltip="该意向的用户总数/接通总数">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-intent-rate="level2" data-tooltip="该意向的用户总数/所有意向分类的客户总数">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-intent-rate="level2" data-tooltip="该意向的用户总数/接通总数">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-intent-rate="level12" data-tooltip="该意向的用户总数/所有意向分类的客户总数">&#9432;</span></div>
+                  <div class="overview-card-title">${getIntentLevel1Tag()}/${getIntentLevel2Tag()}类客户占比 <span class="overview-help" data-intent-rate="level12" data-tooltip="该意向的用户总数/接通总数">&#9432;</span></div>
                   <div class="overview-card-value sub">0<span class="overview-unit">%</span></div>
                 </div>
               </div>
@@ -981,11 +981,11 @@
       const tooltip = helpEl.getAttribute('data-tooltip') || '';
       const rateKey = helpEl.getAttribute('data-intent-rate') || '';
       if (rateKey === 'level1' || tooltip === '意向等级1客户占比') {
-        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" data-intent-rate="level1" data-tooltip="该意向的用户总数/所有意向分类的客户总数">&#9432;</span>';
+        title.innerHTML = level1Tag + '类客户占比 <span class="overview-help" data-intent-rate="level1" data-tooltip="该意向的用户总数/接通总数">&#9432;</span>';
       } else if (rateKey === 'level2' || tooltip === '意向等级2客户占比') {
-        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" data-intent-rate="level2" data-tooltip="该意向的用户总数/所有意向分类的客户总数">&#9432;</span>';
+        title.innerHTML = level2Tag + '类客户占比 <span class="overview-help" data-intent-rate="level2" data-tooltip="该意向的用户总数/接通总数">&#9432;</span>';
       } else if (rateKey === 'level12' || tooltip === '意向等级1或2客户合计占比') {
-        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" data-intent-rate="level12" data-tooltip="该意向的用户总数/所有意向分类的客户总数">&#9432;</span>';
+        title.innerHTML = level1Tag + '/' + level2Tag + '类客户占比 <span class="overview-help" data-intent-rate="level12" data-tooltip="该意向的用户总数/接通总数">&#9432;</span>';
       } else if (tooltip === '意向等级1客户数量') {
         title.innerHTML = level1Tag + '类客户数 <span class="overview-help" data-tooltip="意向等级1客户数量">&#9432;</span>';
       } else if (tooltip === '意向等级2客户数量') {

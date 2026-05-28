@@ -56,18 +56,16 @@
     `).join('');
   }
 
-  function renderOutboundResult(summary) {
+  function renderOutboundResult() {
     return `
-      <div class="record-detail-section-title">外呼小结</div>
-      <div class="record-detail-summary">${summary}</div>
       <div class="record-detail-fields">
-        <div><span>标签合集：</span>call_coll_tag_031:开着车忙</div>
-        <div><span>购车意向：</span>little_intention</div>
-        <div><span>计划到店时间：</span>-</div>
-        <div><span>预计购车时间：</span>-</div>
-        <div><span>意向品牌中文名：</span>-</div>
-        <div><span>意向车系中文名：</span>-</div>
-        <div><span>意向等级编码(A-E)：</span>C</div>
+        <div><span class="record-info-label">标签合集：</span><span class="record-info-value">call_coll_tag_031:开着车忙</span></div>
+        <div><span class="record-info-label">购车意向：</span><span class="record-info-value">little_intention</span></div>
+        <div><span class="record-info-label">计划到店时间：</span><span class="record-info-value">-</span></div>
+        <div><span class="record-info-label">预计购车时间：</span><span class="record-info-value">-</span></div>
+        <div><span class="record-info-label">意向品牌中文名：</span><span class="record-info-value">-</span></div>
+        <div><span class="record-info-label">意向车系中文名：</span><span class="record-info-value">-</span></div>
+        <div><span class="record-info-label">意向等级编码(A-E)：</span><span class="record-info-value">C</span></div>
       </div>
     `;
   }
@@ -109,7 +107,7 @@
     ];
 
     return `
-      <div class="record-detail-section-title">对话总结</div>
+      <div class="record-detail-section-title">外呼小结</div>
       <div class="record-detail-summary">姓孙的客户在对话中明确对轩逸的贷款优惠感兴趣，希望明天到静海店购车和试驾，询问了现车情况，同时也在对比比亚迪的车，想要加微信详聊。</div>
       <div class="record-info-list">
         ${fields.map(([label, value]) => `
@@ -149,12 +147,10 @@
               </div>
             </div>
             <div class="record-detail-right">
-              <div class="record-detail-tabs">
-                <button class="record-detail-tab active" onclick="window.Pages['result-records'].switchDetailTab(this,'result')">外呼结果</button>
-                <button class="record-detail-tab" onclick="window.Pages['result-records'].switchDetailTab(this,'info')">详细信息</button>
-              </div>
-              <div class="record-detail-tab-content" id="recordDetailTabContent" data-summary="${summary.replace(/"/g, '&quot;')}">
-                ${renderOutboundResult(summary)}
+              <div class="record-detail-content">
+                ${renderDetailInfo()}
+                <div class="record-detail-divider"></div>
+                ${renderOutboundResult()}
               </div>
             </div>
           </div>
@@ -173,18 +169,6 @@
       if (backdrop) backdrop.classList.add('open');
       if (drawer) drawer.classList.add('open');
     });
-  }
-
-  function switchDetailTab(el, tabName) {
-    document.querySelectorAll('.record-detail-tab').forEach(tab => tab.classList.remove('active'));
-    el.classList.add('active');
-    const content = document.getElementById('recordDetailTabContent');
-    if (!content) return;
-    if (tabName === 'info') {
-      content.innerHTML = renderDetailInfo();
-      return;
-    }
-    content.innerHTML = renderOutboundResult(content.getAttribute('data-summary') || '-');
   }
 
   function closeDetail(e) {
@@ -311,6 +295,5 @@
     resetFilters,
     showDetail,
     closeDetail,
-    switchDetailTab,
   };
 })();
