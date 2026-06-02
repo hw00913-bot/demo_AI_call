@@ -26,6 +26,7 @@
 
     return rows.map((item, index) => {
       const connectedRate = formatRate(item.connectedTotal, item.rosterTotal);
+      const touchRate = formatRate(item.connectedTotal + item.missedTotal, item.dialTotal);
       return `
         <tr>
           <td>${index + 1}</td>
@@ -36,7 +37,7 @@
           <td>${item.connectedTotal}</td>
           <td>${item.missedTotal}</td>
           <td>${connectedRate}</td>
-          <td>${connectedRate}</td>
+          <td>${touchRate}</td>
           <td>${item.duration}</td>
         </tr>
       `;

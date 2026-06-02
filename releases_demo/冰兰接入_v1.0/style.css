@@ -1647,7 +1647,6 @@ a:hover { text-decoration: underline; }
   appearance: auto;
 }
 .biz-form-select:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.12); }
-.biz-form-textarea:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.12); }
 .biz-char-count { font-size: 12px; color: #bbb; position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
 .biz-help-icon {
   font-size: 14px; color: #999; cursor: help; margin-left: 6px; transition: all 0.15s;
