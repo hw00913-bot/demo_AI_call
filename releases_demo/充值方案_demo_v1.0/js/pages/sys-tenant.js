@@ -51,6 +51,12 @@
     return row.rechargeStatus === '已支付' && (row.billingType === '仅通话费' || row.billingType === '坐席费+通话费');
   }
 
+  function canActivateValidity(row) {
+    return row && canGenerateValidity(row) &&
+           row.rechargeStatus === '已支付' &&
+           !row.validityActivated;
+  }
+
   function packageDays(packageName) {
     const map = { '半年套餐': 180, '全年套餐': 365 };
     return map[packageName] || 0;
@@ -97,6 +103,12 @@
     const validityRow = paidRows
       .filter(item => item.validFrom && item.validFrom !== '-' && item.validTo && item.validTo !== '-')
       .sort((a, b) => String(b.validTo).localeCompare(String(a.validTo)))[0];
+    // 检测是否有待生效的有效期行
+    const pendingRow = paidRows.find(item =>
+      item.rechargeStatus === '已支付' &&
+      (item.billingType === '仅坐席费' || item.billingType === '坐席费+通话费') &&
+      !item.validityActivated
+    );
     const balance = paidRows.reduce((sum, item) => sum + Number(item.callBalance || 0), 0);
     const frozen = getFrozenTasks()
       .filter(item => item.status === '冻结中' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName))
@@ -108,14 +120,16 @@
     const canCall = baseCanCall && manualEnabled;
 
     return {
-      validity: validityRow ? `${validityRow.validFrom} ~ ${validityRow.validTo}` : '未生成',
+      validity: validityRow ? `${validityRow.validFrom} ~ ${validityRow.validTo}`
+        : (pendingRow ? '待生效' : '未生成'),
       balance: formatBalance(balance),
       frozen: formatBalance(frozen),
       available: formatBalance(available),
       callStatus: canCall ? '可发起' : '不可发起',
       callStatusCls: canCall ? 'tenant-call-status-ok' : 'tenant-call-status-disabled',
       callManageEnabled: baseCanCall,
-      callManageText: manualEnabled ? '停用呼叫' : '启用呼叫'
+      callManageText: manualEnabled ? '停用呼叫' : '启用呼叫',
+      hasPendingValidity: !!pendingRow
     };
   }
 
@@ -129,17 +143,84 @@
     row.localAddedAt = row.localAddedAt || '2026-06-03 10:00:00';
 
     if (canGenerateValidity(row)) {
-      const baseDate = latestValidTo(row.tenantName);
-      row.validFrom = baseDate && baseDate >= row.localAddedAt.slice(0, 10)
-        ? addDays(baseDate, 2)
-        : row.localAddedAt.slice(0, 10);
-      row.validTo = addDays(row.validFrom, row.periodDays);
-      row.enabled = true;
+      // 有效期不再自动生成，需用户手动点击"生效"
+      row.validFrom = '-';
+      row.validTo = '-';
+      row.enabled = false;
+      row.validityActivated = false;
     } else {
       row.validFrom = '-';
       row.validTo = '-';
       row.enabled = false;
     }
+  }
+
+  function activateValidity(tenantName) {
+    const name = tenantName || document.getElementById('tenantName')?.value;
+    if (!name) {
+      showToast('租户名称无效', 'error');
+      return;
+    }
+
+    const row = findBillingByTenant(name);
+    if (!row) {
+      showToast('未找到租户计费信息', 'error');
+      return;
+    }
+    if (!canActivateValidity(row)) {
+      if (row.rechargeStatus !== '已支付') {
+        showToast('充值单未支付，无法生效', 'warning');
+      } else if (row.validityActivated) {
+        showToast('有效期已生效，无需重复操作', 'warning');
+      } else {
+        showToast('当前计费类型不适用有效期', 'warning');
+      }
+      return;
+    }
+
+    // 使用原有的有效期计算逻辑
+    const baseDate = latestValidTo(name);
+    const addedAt = row.localAddedAt.slice(0, 10);
+    row.validFrom = baseDate && baseDate >= addedAt
+      ? addDays(baseDate, 2)
+      : addedAt;
+    row.validTo = addDays(row.validFrom, row.periodDays);
+    row.enabled = true;
+    row.validityActivated = true;
+
+    // 同步历史记录中的有效期
+    const historyRow = getHistoryRows().find(function(item) {
+      return item.rechargeNo === row.rechargeNo &&
+        item.status === '已支付' &&
+        normalizeTenantName(item.tenantName) === normalizeTenantName(name);
+    });
+    if (historyRow) {
+      historyRow.validFrom = row.validFrom;
+      historyRow.validTo = row.validTo;
+    }
+
+    // 刷新列表
+    var container = document.getElementById('page-content');
+    if (container) container.innerHTML = render();
+
+    // 更新抽屉内字段
+    updateDrawerFieldsAfterActivation(name);
+
+    showToast('有效期已生效', 'success');
+  }
+
+  function updateDrawerFieldsAfterActivation(tenantName) {
+    var summary = getTenantBillingSummary(tenantName);
+    var validityInput = document.getElementById('tenantValidity');
+    if (validityInput) validityInput.value = summary.validity;
+    var balanceInput = document.getElementById('tenantCallBalance');
+    if (balanceInput) balanceInput.value = summary.balance;
+    var frozenInput = document.getElementById('tenantFrozenAmount');
+    if (frozenInput) frozenInput.value = summary.frozen;
+    var availableInput = document.getElementById('tenantAvailableBalance');
+    if (availableInput) availableInput.value = summary.available;
+    var callStatusInput = document.getElementById('tenantCallStatus');
+    if (callStatusInput) callStatusInput.value = summary.callStatus;
   }
 
   function findBillingByTenant(tenantName) {
@@ -163,13 +244,20 @@
       callBalance: 0,
       validFrom: '-',
       validTo: '-',
-      enabled: false
+      enabled: false,
+      validityActivated: false
     };
   }
 
   function renderRows() {
+    var pendingAnnoAdded = false;
     return getTenantRows().map((row, idx) => {
       const summary = getTenantBillingSummary(row.name);
+      var activateAnno = '';
+      if (summary.hasPendingValidity && !pendingAnnoAdded) {
+        activateAnno = ' data-anno="tenant-activate-validity"';
+        pendingAnnoAdded = true;
+      }
       return `
         <tr>
           <td>${row.no}</td>
@@ -186,8 +274,9 @@
           <td>${row.updater}</td>
           <td>${row.updateTime}</td>
           <td>
-            <button class="tenant-op-btn primary" onclick="window.Pages['sys-tenant'].showBillingDrawer('${row.name}')">充值单配置</button>
-            <button class="tenant-op-btn control ${summary.callManageEnabled ? '' : 'disabled'}" ${summary.callManageEnabled ? '' : 'disabled'} onclick="window.Pages['sys-tenant'].toggleCallControl('${row.name}')">${summary.callManageEnabled ? summary.callManageText : '管理呼叫'}</button>
+            <button class="tenant-op-btn primary"${idx === 0 ? ' data-anno="tenant-recharge-config"' : ''} onclick="window.Pages['sys-tenant'].showBillingDrawer('${row.name}')">充值单配置</button>
+            ${summary.hasPendingValidity ? '<button class="tenant-op-btn primary"' + activateAnno + ' onclick="window.Pages[\'sys-tenant\'].activateValidity(\'' + row.name + '\')">生效</button>' : ''}
+            <button class="tenant-op-btn control ${summary.callManageEnabled ? '' : 'disabled'}"${idx === 0 ? ' data-anno="tenant-call-control"' : ''} ${summary.callManageEnabled ? '' : 'disabled'} onclick="window.Pages['sys-tenant'].toggleCallControl('${row.name}')">${summary.callManageEnabled ? summary.callManageText : '管理呼叫'}</button>
             <button class="tenant-op-btn blue" onclick="showToast('编辑功能开发中','info')">编辑</button>
             <button class="tenant-op-btn red" onclick="showToast('删除功能开发中','info')">删除</button>
           </td>
@@ -250,7 +339,7 @@
               <span class="biz-icon-btn" onclick="showToast('设置功能开发中','info')" title="设置">&#x2699;</span>
             </div>
             <div class="table-container">
-              <table class="data-table tenant-native-table">
+              <table class="data-table tenant-native-table" data-anno="tenant-table">
                 <thead>
                   <tr>
                     <th>序号</th>
@@ -336,7 +425,10 @@
               </div>
               <div class="biz-form-row">
                 <label class="biz-form-label">有效期</label>
-                <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantValidity" value="${summary.validity}" readonly></div>
+                <div class="biz-form-field" style="display:flex;align-items:center;gap:8px;">
+                  <input class="biz-form-input readonly" id="tenantValidity" value="${summary.validity}" readonly style="flex:1;">
+                  ${summary.hasPendingValidity ? '<button class="btn btn-primary" onclick="window.Pages[\'sys-tenant\'].activateValidity()" style="height:36px;padding:0 14px;white-space:nowrap;">生效</button>' : ''}
+                </div>
               </div>
               <div class="biz-form-row">
                 <label class="biz-form-label">通话余额</label>
@@ -370,7 +462,7 @@
               <div class="tenant-order-preview" id="tenantOrderPreview"></div>
               <div class="biz-modal-notice tenant-notice">
                 <span class="biz-notice-icon">&#x26A0;</span>
-                <div class="biz-notice-body">仅坐席费生成有效期；仅通话费增加套餐话费；坐席费+通话费同时生成有效期并增加套餐话费。</div>
+                <div class="biz-notice-body">仅坐席费生成有效期（需手动点击"生效"）；仅通话费增加套餐话费；坐席费+通话费同时生成有效期（需手动点击"生效"）并增加套餐话费。</div>
               </div>
             </div>
 
@@ -435,12 +527,19 @@
       return;
     }
     const preview = buildSubmitPreview(order);
+    // 检查是否已提交且待生效
+    var billingTenantName = document.getElementById('tenantName')?.value || '';
+    var billingRow = findBillingByTenant(billingTenantName);
+    var isSubmitted = billingRow && billingRow.rechargeNo === order.no;
+    var validityDisplay = (!isSubmitted || !canGenerateValidity(billingRow) || billingRow.validityActivated)
+      ? preview.validity
+      : preview.validity + '（待生效）';
     box.innerHTML = `
       <div class="tenant-preview-grid">
         <div><span>充值单状态</span>${statusTag(order.status)}</div>
         <div><span>计费类型</span><strong>${order.billingType}</strong></div>
         <div><span>坐席费套餐</span><strong>${order.seatFeePackage || '-'}</strong></div>
-        <div><span>租户有效期</span><strong>${preview.validity}</strong></div>
+        <div><span>租户有效期</span><strong>${validityDisplay}</strong></div>
         <div><span>套餐话费</span><strong>${formatBalance(order.status === '已支付' ? order.callBalance : 0)}</strong></div>
       </div>
     `;
@@ -516,21 +615,11 @@
 
     const historyBody = document.getElementById('tenantHistoryBody');
     if (historyBody) historyBody.innerHTML = renderHistoryRows(row.tenantName);
-    const summary = getTenantBillingSummary(row.tenantName);
-    const validityInput = document.getElementById('tenantValidity');
-    if (validityInput) validityInput.value = summary.validity;
-    const balanceInput = document.getElementById('tenantCallBalance');
-    if (balanceInput) balanceInput.value = summary.balance;
-    const frozenInput = document.getElementById('tenantFrozenAmount');
-    if (frozenInput) frozenInput.value = summary.frozen;
-    const availableInput = document.getElementById('tenantAvailableBalance');
-    if (availableInput) availableInput.value = summary.available;
-    const callStatusInput = document.getElementById('tenantCallStatus');
-    if (callStatusInput) callStatusInput.value = summary.callStatus;
-    const successMsg = row.enabled
-      ? '充值单已提交，租户有效期和通话余额已更新'
+    updateDrawerFieldsAfterActivation(row.tenantName);
+    const successMsg = canGenerateValidity(row)
+      ? '充值单已提交，请手动点击"生效"生成有效期'
       : (canAddCallBalance(row) ? '充值单已提交，通话余额已更新' : `充值单未关联，当前状态：${row.rechargeStatus}`);
-    showToast(successMsg, row.enabled || canAddCallBalance(row) ? 'success' : 'warning');
+    showToast(successMsg, canGenerateValidity(row) || canAddCallBalance(row) ? 'success' : 'warning');
   }
 
   window.Pages = window.Pages || {};
@@ -541,6 +630,7 @@
     closeBillingDrawer,
     previewRechargeOrder,
     submitRechargeOrder,
+    activateValidity,
     toggleFrozenTooltip,
     toggleCallControl
   };
