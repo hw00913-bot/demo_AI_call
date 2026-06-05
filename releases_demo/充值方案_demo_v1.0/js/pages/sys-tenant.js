@@ -79,6 +79,11 @@
     return '2026-06-03';
   }
 
+  function isEveningTime() {
+    var now = new Date();
+    return now.getHours() >= 18;
+  }
+
   function latestValidTo(tenantName) {
     const validDates = getHistoryRows()
       .filter(item => item.status === '已支付' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) && item.validTo && item.validTo !== '-')
@@ -110,7 +115,8 @@
       !item.validityActivated
     );
     const balance = paidRows.reduce((sum, item) => sum + Number(item.callBalance || 0), 0);
-    const frozen = getFrozenTasks()
+    // 晚间（18:00后）冻结金额自动释放，不再从可用余额中扣除
+    const frozen = isEveningTime() ? 0 : getFrozenTasks()
       .filter(item => item.status === '冻结中' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName))
       .reduce((sum, item) => sum + Number(item.frozenAmount || 0), 0);
     const available = balance - frozen;
@@ -350,7 +356,7 @@
                       <span class="tenant-th-help">
                         冻结金额
                         <button type="button" class="tenant-help-trigger" onclick="window.Pages['sys-tenant'].toggleFrozenTooltip(event)" aria-label="冻结金额说明">&#9432;</button>
-                        <span class="tenant-help-popover">冻结金额是指发起外呼时会根据外呼量预先冻结预计的金额，最终根据实际外呼结果扣减对应费用后，优先从冻结金额扣除实际产生的通话费用。</span>
+                        <span class="tenant-help-popover">冻结金额是指发起外呼时会根据外呼量预先冻结预计的金额，最终根据实际外呼结果扣减对应费用后，优先从冻结金额扣除实际产生的通话费用。日终（18:00后）冻结金额自动释放回可用余额。</span>
                       </span>
                     </th>
                     <th>可用余额</th>
