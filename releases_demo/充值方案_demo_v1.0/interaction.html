@@ -38,6 +38,7 @@
       </thead>
       <tbody>
         <tr><td>v1.0</td><td>2026-05-20</td><td>1.新增数据概览模块；2.新增任务详情模块；3.手工导入新增异步导入逻辑；4.一知大小模型模型选项新增关联账号功能。</td></tr>
+        <tr><td>v1.1</td><td>2026-06-05</td><td>1.租户管理-充值单配置新增手动生效逻辑，有效期由自动生成改为手动点击"生效"按钮触发。</td></tr>
       </tbody>
     </table>
     <h2>二. 项目范围</h2>
@@ -50,6 +51,7 @@
         <tr><td>智能外呼系统</td><td>外呼列表</td><td>任务详情</td><td>一知</td></tr>
         <tr><td>智能外呼系统</td><td>外呼列表</td><td>手工导入</td><td>科大、一知、冰兰</td></tr>
         <tr><td>智能外呼系统</td><td>业务场景</td><td>大小模型关联账号</td><td>一知</td></tr>
+        <tr><td>智能外呼系统</td><td>租户管理</td><td>充值单配置-手动生效</td><td>--</td></tr>
       </tbody>
     </table>
     <h2>三. 逻辑说明</h2>
@@ -197,6 +199,26 @@
         <tr><td>保存按钮</td><td>保存配置并关闭弹窗</td><td>提交后根据配置重新读取数据</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
         <tr><td>关闭图标</td><td>右上角关闭按钮</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
         <tr><td>背景点击</td><td>点击半透明背景关闭弹窗</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>7. 系统管理-租户管理-充值单配置-手动生效</h3>
+    <p><strong>1）功能名称：</strong> 充值单配置-手动生效</p>
+    <p><strong>2）交互说明：</strong> 如图。</p>
+    <p><strong>3）数据来源：</strong> 前端Mock数据。</p>
+    <p><strong>4）逻辑说明：</strong> 关联充值单后有效期不再自动生成，需用户手动点击"生效"按钮触发有效期计算和激活。激活后同步更新历史充值记录中的有效期字段。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>有效期待生效状态</td><td>充值单已支付但有效期尚未激活时，有效期列显示"待生效"</td><td>前端Mock</td><td>充值单状态=已支付 且 计费类型支持有效期（仅坐席费/坐席费+通话费）且 validityActivated=false</td><td>文本</td><td>未生成</td><td>--</td></tr>
+        <tr><td>生效按钮-租户列表</td><td>待生效状态下，租户列表操作列显示"生效"按钮</td><td>前端行为</td><td>hasPendingValidity=true 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
+        <tr><td>生效按钮-充值单抽屉</td><td>待生效状态下，充值单配置抽屉的有效期字段旁显示"生效"按钮</td><td>前端行为</td><td>hasPendingValidity=true 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
+        <tr><td>手动生效触发</td><td>点击"生效"按钮后自动计算并激活有效期</td><td>前端JS</td><td>validFrom：若存在历史有效期且未过期，从历史截止日期次日开始（无缝续期）；否则从关联日期开始。validTo = validFrom + 套餐天数 - 1天。套餐天数：半年套餐=180天，全年套餐=365天</td><td>日期范围</td><td>--</td><td>充值单未支付提示"充值单未支付，无法生效"；已激活提示"有效期已生效，无需重复操作"</td></tr>
+        <tr><td>激活后状态更新</td><td>激活成功后有效期从"待生效"变为计算后的日期范围，按钮消失，租户变为可呼叫状态</td><td>前端JS</td><td>设置 validityActivated=true、enabled=true，同步更新历史记录</td><td>状态变更</td><td>--</td><td>--</td></tr>
+        <tr><td>计费类型区分</td><td>仅坐席费生成有效期；仅通话费增加话费不涉及有效期；坐席费+通话费同时支持</td><td>前端Mock</td><td>根据计费类型和套餐计算</td><td>逻辑分支</td><td>--</td><td>仅通话费类型不显示"生效"按钮</td></tr>
       </tbody>
     </table>
     <h2>五. 其他说明</h2>
