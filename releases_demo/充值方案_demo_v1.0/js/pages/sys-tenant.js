@@ -79,9 +79,12 @@
     return '2026-06-03';
   }
 
-  function isEveningTime() {
+  function isFrozenExpired(createdAt) {
+    if (!createdAt) return true;
+    var created = new Date(createdAt.replace(/-/g, '/'));
     var now = new Date();
-    return now.getHours() >= 18;
+    var hoursDiff = (now - created) / (1000 * 60 * 60);
+    return hoursDiff >= 24;
   }
 
   function latestValidTo(tenantName) {
@@ -115,9 +118,9 @@
       !item.validityActivated
     );
     const balance = paidRows.reduce((sum, item) => sum + Number(item.callBalance || 0), 0);
-    // 晚间（18:00后）冻结金额自动释放，不再从可用余额中扣除
-    const frozen = isEveningTime() ? 0 : getFrozenTasks()
-      .filter(item => item.status === '冻结中' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName))
+    // 冻结任务超过24小时后自动释放，不再从可用余额中扣除
+    const frozen = getFrozenTasks()
+      .filter(item => item.status === '冻结中' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) && !isFrozenExpired(item.createdAt))
       .reduce((sum, item) => sum + Number(item.frozenAmount || 0), 0);
     const available = balance - frozen;
     const baseCanCall = !!validityRow && validityRow.validFrom <= currentBizDate() && validityRow.validTo >= currentBizDate() && available > 0;
@@ -356,7 +359,7 @@
                       <span class="tenant-th-help">
                         冻结金额
                         <button type="button" class="tenant-help-trigger" onclick="window.Pages['sys-tenant'].toggleFrozenTooltip(event)" aria-label="冻结金额说明">&#9432;</button>
-                        <span class="tenant-help-popover">冻结金额是指发起外呼时会根据外呼量预先冻结预计的金额，最终根据实际外呼结果扣减对应费用后，优先从冻结金额扣除实际产生的通话费用。日终（18:00后）冻结金额自动释放回可用余额。</span>
+                        <span class="tenant-help-popover">冻结金额是指发起外呼时会根据外呼量预先冻结预计的金额，最终根据实际外呼结果扣减对应费用后，优先从冻结金额扣除实际产生的通话费用。冻结任务创建24小时后自动释放回可用余额。</span>
                       </span>
                     </th>
                     <th>可用余额</th>
