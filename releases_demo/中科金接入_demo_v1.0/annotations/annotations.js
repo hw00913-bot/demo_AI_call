@@ -28,7 +28,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：新增业务场景<br>2. 功能说明：创建使用智能外呼任务的业务场景，通过分配外呼平台的通话机器人和通话通道完成创建。<br>3. 权限范围：仅超级管理员、租户管理员可见和操作。租户运营不可见。<br>4. 数据来源：中台本地维护。中科金平台通过 API 获得 taskCode 回填。<br>5. 取值逻辑：场景名称、场景编码、可用租户为必填。<br>6. 字段说明：场景名称、场景编码、场景描述、可用租户、智能平台、场景类型、数据导入方式、平台面板字段、业务信息。<br>7. 交互说明：点击「新增业务场景」打开右侧抽屉表单。选择平台后展示对应面板。<br>8. 判断规则：进行中的场景不可删除。<br>9. 异常规则：平台切换时清空已有面板数据。<br>10. 其他说明：中科金任务id 对应 API taskCode。"
     },
     {
-      id: "3",
+      id: "2",
       page: "sys-scene",
       target: "[data-anno='sys-scene-zkj-taskid']",
       position: {
@@ -43,16 +43,16 @@ window.AnnotationData = {
         permissionScope: "超级管理员或租户管理员",
         dataSource: "中科金 API POST /outbound/openapi/v2/task/create 返回的 taskCode。",
         valueLogic: "用户在中科金后台创建外呼任务后，将返回的 taskCode 粘贴到此处。创建任务时需指定 robotId、robotName、outboundNo 等参数。",
-        fieldDesc: "1.场景名称：本地定义字段，输入见图；\n2.场景编码：本地定义字段，输入见图；\n3.场景描述：本地定义字段，输入  见图；\n4.可用租户：如果是租户账号默认选中且仅显示租户名称；\n5.智能平台：选中后显示对应平台的输入内容；\n6.场景类型：本地字段 ，单选；\n7.数据导入方式：本地字段，单选；\n8.大小模型选择：本地字段，单选；\n9.选择账号：本地字段，如果选中中科金，显示默认值不可修改，反显实际账号名称\n 10.业务信息：场景传入信息（必填），传入第三方扩展字段或变量，用于模型外呼，场景提取信息（非必填）用于匹配百炼智能体返回的 json，选中中科金默认在场景传入信息生成一个 name 的必填字段，如果提交到中科金接口，空值时默认填入“尊敬的客户”",
+        fieldDesc: "1.场景名称：本地定义字段，输入见图；\n2.场景编码：本地定义字段，输入见图；\n3.场景描述：本地定义字段，输入  见图；\n4.可用租户：如果是租户账号默认选中且仅显示租户名称；\n5.智能平台：选中后显示对应平台的输入内容；\n6.场景类型：本地字段 ，单选；\n7.数据导入方式：本地字段，单选；\n8.大小模型选择：本地字段，单选；\n9.选择账号：本地字段，如果选中中科金，显示默认值不可修改，反显实际账号名称\n 10.业务信息：场景传入信息（必填），传入第三方扩展字段或变量，用于模型外呼，场景提取信息（非必填）用于匹配百炼智能体返回的 json，选中中科金默认在场景传入信息生成一个 name 的必填字段，如果提交到中科金接口，空值时默认填入「尊敬的客户」",
         interactionDesc: "文本输入框，用户手动粘贴中科金任务id。",
         judgeRule: "是否校验 taskCode 格式和有效性。",
         exceptionRule: "taskCode 无效时的处理逻辑，提示任务编码无效，请检查是否提供正确的任务编码。",
         otherDesc: ""
       },
-      desc: "1. 功能名称：新建业务场景弹窗<br>2. 功能说明：关联中科金智能平台的外呼任务编码。该值来自中科金「创建外呼任务」API 返回的 taskCode（32位任务编码）。<br>3. 权限范围：超级管理员或租户管理员<br>4. 数据来源：中科金 API POST /outbound/openapi/v2/task/create 返回的 taskCode。<br>5. 取值逻辑：用户在中科金后台创建外呼任务后，将返回的 taskCode 粘贴到此处。创建任务时需指定 robotId、robotName、outboundNo 等参数。<br>6. 字段说明：1.场景名称：本地定义字段，输入见图；\n2.场景编码：本地定义字段，输入见图；\n3.场景描述：本地定义字段，输入  见图；\n4.可用租户：如果是租户账号默认选中且仅显示租户名称；\n5.智能平台：选中后显示对应平台的输入内容；\n6.场景类型：本地字段 ，单选；\n7.数据导入方式：本地字段，单选；\n8.大小模型选择：本地字段，单选；\n9.选择账号：本地字段，如果选中中科金，显示默认值不可修改，反显实际账号名称\n 10.业务信息：场景传入信息（必填），传入第三方扩展字段或变量，用于模型外呼，场景提取信息（非必填）用于匹配百炼智能体返回的 json，选中中科金默认在场景传入信息生成一个 name 的必填字段，如果提交到中科金接口，空值时默认填入“尊敬的客户”<br>7. 交互说明：文本输入框，用户手动粘贴中科金任务id。<br>8. 判断规则：是否校验 taskCode 格式和有效性。<br>9. 异常规则：taskCode 无效时的处理逻辑，提示任务编码无效，请检查是否提供正确的任务编码。<br>10. 其他说明：待确认"
+      desc: "1. 功能名称：新建业务场景弹窗<br>2. 功能说明：关联中科金智能平台的外呼任务编码。该值来自中科金「创建外呼任务」API 返回的 taskCode（32位任务编码）。<br>3. 权限范围：超级管理员或租户管理员<br>4. 数据来源：中科金 API POST /outbound/openapi/v2/task/create 返回的 taskCode。<br>5. 取值逻辑：用户在中科金后台创建外呼任务后，将返回的 taskCode 粘贴到此处。创建任务时需指定 robotId、robotName、outboundNo 等参数。<br>6. 字段说明：1.场景名称：本地定义字段，输入见图；\n2.场景编码：本地定义字段，输入见图；\n3.场景描述：本地定义字段，输入  见图；\n4.可用租户：如果是租户账号默认选中且仅显示租户名称；\n5.智能平台：选中后显示对应平台的输入内容；\n6.场景类型：本地字段 ，单选；\n7.数据导入方式：本地字段，单选；\n8.大小模型选择：本地字段，单选；\n9.选择账号：本地字段，如果选中中科金，显示默认值不可修改，反显实际账号名称\n 10.业务信息：场景传入信息（必填），传入第三方扩展字段或变量，用于模型外呼，场景提取信息（非必填）用于匹配百炼智能体返回的 json，选中中科金默认在场景传入信息生成一个 name 的必填字段，如果提交到中科金接口，空值时默认填入「尊敬的客户」<br>7. 交互说明：文本输入框，用户手动粘贴中科金任务id。<br>8. 判断规则：是否校验 taskCode 格式和有效性。<br>9. 异常规则：taskCode 无效时的处理逻辑，提示任务编码无效，请检查是否提供正确的任务编码。<br>10. 其他说明：待确认"
     },
     {
-      id: "4",
+      id: "3",
       page: "sys-scene",
       target: "[data-anno='sys-scene-submit-btn']",
       position: {
@@ -78,7 +78,7 @@ window.AnnotationData = {
   ],
   "scene-list": [
     {
-      id: "1",
+      id: "4",
       page: "scene-list",
       target: "[data-anno='scene-list-card-grid']",
       position: {
@@ -102,7 +102,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：外呼列表<br>2. 功能说明：展示外呼任务卡片，支持查看详情和启停操作<br>3. 权限范围：超管/租户管理员/租户运营可见，超管看全部，租户看本租户<br>4. 数据来源：中科金 API 外呼任务列表<br>5. 取值逻辑：按场景名称/状态/平台筛选，卡片展示已分配/待呼叫/已呼叫<br>6. 字段说明：场景名称、状态、平台、来源、数量<br>7. 交互说明：卡片网格 → 点击查看 → 右侧抽屉（数据概览/呼叫名单/任务详情）<br>8. 判断规则：待确认启停条件<br>9. 异常规则：待确认<br>10. 其他说明：任务详情已对接中科金 API 字段"
     },
     {
-      id: "2",
+      id: "5",
       page: "scene-list",
       target: "[data-anno='scene-list-task-detail']",
       position: {
@@ -126,7 +126,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：中科金任务详情<br>2. 功能说明：查看中科金外呼任务 API 返回的完整字段<br>3. 权限范围：同外呼列表<br>4. 数据来源：中科金 API task/{taskCode}<br>5. 取值逻辑：字段来自 API OpenCallTaskResponse<br>6. 字段说明：创建日期、机器人、任务编码、启动方式、拨打时段、AI坐席、重拨、黑名单、拦截策略、进度<br>7. 交互说明：查看外呼 → 任务详情 Tab<br>8. 判断规则：待确认<br>9. 异常规则：数据缺失时提示<br>10. 其他说明：拦截策略名称通过 API 查询匹配"
     },
     {
-      id: "3",
+      id: "6",
       page: "scene-list",
       target: "[data-anno='scene-list-data-overview']",
       position: {
@@ -150,7 +150,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：数据概览分页功能<br>2. 功能说明：外呼任务的数据概览页面，包含外呼数据、意向分类、意向洞察、通话时长统计四个区块。<br>3. 权限范围：待确认<br>4. 数据来源：通过中科金接口或本地数据进行统计<br>5. 取值逻辑：通过接口回调获取到通话记录，提供接口让中科金传入通话文本、本地存储数据字段<br>6. 字段说明：1.导入客户数 = 去重后的传入/导入手机号总数；\n2.外呼客户数 = 成功提交到外部接口的去重手机号数；\n客户数 = 从回调通话状态识别的过滤数；\n4.接听率 = 已接听/外呼客户数；\n5.未接通率 = 接通数/导入客户数；\n6.平均通话时长= 总通话时长/接通数；\n7.总外呼数 = 成功提交的不去重手机号数；\n8.过滤比例 = 过滤客户数/导入客户数；\n9.意向分布环形图按意向等级展示占比，意向分类取中科金【aiTagName】；\n10.意向分类区块：某类客户占比、某类客户数（取配置选中的意向标签对应的客户数）；\n11.通话时段占比：不同通话时长区间的占比。<br>7. 交互说明：外呼列表卡片点击「查看」→ 数据概览 Tab 默认展示。意向分类右上角「配置」按钮可设置意向等级标签。<br>8. 判断规则：1.通话状态枚举值等于 8 即为已过滤<br>9. 异常规则：无数据时隐藏<br>10. 其他说明：1.意向等级枚举：A (高意向)；B (低意向)；C (意向待定)；D (无意向)；E (未接通)；F（停机/空号）"
     },
     {
-      id: "4",
+      id: "7",
       page: "scene-list",
       target: "[data-anno='scene-list-call-list']",
       position: {
@@ -176,9 +176,8 @@ window.AnnotationData = {
   ],
   "result-records": [
     {
-      id: "1",
+      id: "8",
       page: "result-records",
-      revision: 2,
       target: "[data-anno='result-records-header']",
       position: {
         placement: "top-left",
@@ -201,7 +200,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：通话记录列表<br>2. 功能说明：查看每一通外呼的结果，包括通话时间、时长、通话状态、外呼总结、最后通话节点等信息。<br>3. 权限范围：超级管理员、租户管理员、租户运营可见。超级管理员读取全部通话记录，租户仅读取本租户数据。<br>4. 数据来源：中科金 API 通话记录回调+录音下载+录音文本推送<br>5. 取值逻辑：1.通话记录回调recordId+recordDate+callid；\n2.通过通话录音文件下载_V2接口callRoomId=callId+mediaRecordingId=recordId下载录音文件；\n3.通过查询录音转译文本callRoomId=callId+mediaRecordingId=recordId下载录音文件文本；\n4.如果当天查询没有返回，第二天通过\nwebhook录音转译推送返回<br>6. 字段说明：1.用户号码：对应接口文档 cellphone\n2.通话开始时间：对应接口文档callStartTime\n3.通话结束时间：对应接口文档callEndTime\n4.通话时长：对应接口文档callDurationSec\n5.场景名称：本地字段\n6.通话状态：对应接口文档callStatus\n7.外呼总结：百炼智能体返回的通话小结\n8.智能平台：取本地字段\n9.最后通话节点：仅科大显示<br>7. 交互说明：表格列表，支持按用户号码、场景名称、通话状态、智能平台筛选。点击「详情」打开通话详情弹窗，展示外呼小结、会话对话记录、标签合集、意向等级等。<br>8. 判断规则：待确认<br>9. 异常规则：待确认<br>10. 其他说明：中科金通话状态码与本地状态映射关系：4:等待重呼→等待重呼；5:未接听→无应答；6:拨打失败→外呼失败；7:已接听→已接听；8:限制拨打→呼叫受限；9:占线→忙线中；11:来电提醒→无应答；12:无法接通→无法接通；13:空号→空号；14:停机→停机；15:关机→关机；17:号码故障→号码故障；18:线路故障→线路故障"
     },
     {
-      id: "2",
+      id: "9",
       page: "result-records",
       target: "[data-anno='result-records-summary']",
       position: {
@@ -225,7 +224,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：外呼结果<br>2. 功能说明：展示通对话的外呼总结，由百炼智能体对通话内容进行分析后生成。<br>3. 权限范围：待确认<br>4. 数据来源：百炼智能体返回。<br>5. 取值逻辑：从通话记录回调接口获取 summary 字段直接展示。<br>6. 字段说明：从百炼获取小结和标签 json 字符<br>7. 交互说明：在通话详情弹窗右侧面板顶部展示。<br>8. 判断规则：未接通或通话异常的记录可能无小结，展示「暂无小结」。<br>9. 异常规则：summary 为空时展示「暂无小结」。<br>10. 其他说明：待确认"
     },
     {
-      id: "3",
+      id: "10",
       page: "result-records",
       target: "[data-anno='result-records-fields']",
       position: {
@@ -249,7 +248,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：通话详情信息字段<br>2. 功能说明：展示单条通话记录的详细信息，包含会话标识、通话时间、主被叫号码、归属地、意向标签等。<br>3. 权限范围：待确认<br>4. 数据来源：中科金 API 外呼记录详情 / 回调接口返回。<br>5. 取值逻辑：会话id 对应 API sessionId；通话状态对应 callStatus；通话开始/结束时间对应 callStartTime/callEndTime；主叫号码对应 callerNumber；通话时长对应 callDurationSec；被叫号码对应 cellphone；意向标签对应 aiTagName；提取标签对应 extendInfos 或回调标签；主叫号码归属对应 callerProvince/callerCity；被叫号码省份城市对应 numberAttribute。<br>6. 字段说明：1.会话 id：中科金回调 sessionId\n2.通话状态：对应 callStatus\n3.通话开始时间：callStartTime\n4.通话结束时间：callEndTime\n5.主叫号码：系统外呼号码\n6.通话时长：callDurationSec\n7.被叫号码：客户手机号 cellphone\n8.主叫号码归属：callerProvince/callerCity\n9.被叫号码省份城市：numberAttribute\n10.意向标签：aiTagName\n11.提取标签：extendInfos 解析或标签回调<br>7. 交互说明：在通话详情弹窗右侧面板，位于外呼小结下方以行列形式展示。<br>8. 判断规则：待确认<br>9. 异常规则：字段无数据时展示「-」。<br>10. 其他说明：当前原型映射：MockCallRecordRows。字段按中科金 API AudioCallbackResponse 结构映射。"
     },
     {
-      id: "4",
+      id: "11",
       page: "result-records",
       target: "[data-anno='result-records-audio']",
       position: {
@@ -275,7 +274,7 @@ window.AnnotationData = {
   ],
   "report-call": [
     {
-      id: "1",
+      id: "12",
       page: "report-call",
       target: "[data-anno='report-call-header']",
       position: {
@@ -301,8 +300,7 @@ window.AnnotationData = {
   ],
   "report-billing": [
     {
-      id: "1",
-      revision: "2",
+      id: "13",
       page: "report-billing",
       target: "[data-anno='report-billing-header']",
       position: {
@@ -326,7 +324,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：计费统计<br>2. 功能说明：按日期和租户查看计费时长并逐级追溯通话记录<br>3. 权限范围：超管查看全部，租户角色查看本租户<br>4. 数据来源：外呼平台通话记录，中台聚合计算<br>5. 取值逻辑：接通时长除以60后向上取整并按租户汇总<br>6. 字段说明：计费日期、租户名称、计费时长<br>7. 交互说明：筛选 → 租户汇总 → 通话计费明细<br>8. 判断规则：未接通不收费，未满1分钟按1分钟<br>9. 异常规则：无数据展示空状态，异常时长不计费<br>10. 其他说明：当前页面展示时长，不展示金额"
     },
     {
-      id: "2",
+      id: "14",
       page: "report-billing",
       target: "[data-anno='report-billing-rule']",
       position: {
@@ -350,7 +348,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：通话计费规则<br>2. 功能说明：说明接通计费和分钟向上取整规则<br>3. 权限范围：计费统计页面可见角色<br>4. 数据来源：接通状态与通话时长<br>5. 取值逻辑：秒数除以60向上取整<br>6. 字段说明：接通状态、实际时长、计费分钟<br>7. 交互说明：页面顶部常驻提示<br>8. 判断规则：未接通不计费，未满1分钟按1分钟<br>9. 异常规则：无效时长进入异常核对<br>10. 其他说明：不包含账号费和坐席费"
     },
     {
-      id: "3",
+      id: "15",
       page: "report-billing",
       target: "[data-anno='report-billing-summary-table']",
       position: {
@@ -374,7 +372,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：租户计费汇总<br>2. 功能说明：按日期和租户汇总计费分钟<br>3. 权限范围：超管全部，租户角色本租户<br>4. 数据来源：通话记录聚合<br>5. 取值逻辑：单通计费分钟求和<br>6. 字段说明：日期、租户、计费时长、操作<br>7. 交互说明：点击详情查看通话汇总<br>8. 判断规则：单位为分钟<br>9. 异常规则：无数据展示空状态，汇总不一致需核对<br>10. 其他说明：默认每页20条"
     },
     {
-      id: "4",
+      id: "16",
       page: "report-billing",
       target: "[data-anno='report-billing-detail-table']",
       position: {
@@ -398,7 +396,7 @@ window.AnnotationData = {
       desc: "1. 功能名称：租户计费详情<br>2. 功能说明：展示租户每日计费明细<br>3. 权限范围：继承计费统计权限<br>4. 数据来源：按日期和租户聚合<br>5. 取值逻辑：逐日展示计费时长，无数据展示「-」<br>6. 字段说明：计费日期、租户名称、模型类型、计费时长、操作<br>7. 交互说明：点击详情打开右侧明细抽屉<br>8. 判断规则：计费时长与日期范围内分钟合计一致<br>9. 异常规则：无数据展示「-」<br>10. 其他说明：从主列表下钻到每日维度"
     },
     {
-      id: "5",
+      id: "17",
       page: "report-billing",
       target: "[data-anno='report-billing-call-detail']",
       position: {
