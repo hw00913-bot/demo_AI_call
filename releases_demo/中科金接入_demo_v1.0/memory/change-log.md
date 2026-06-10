@@ -1,5 +1,23 @@
 # 项目变更记录
 
+## 2026-06-10
+
+### 业务场景 (sys-scene)
+
+- 场景传入信息 Tab 名称增加红色星号必填标识
+- 场景传入信息表格「是否必填」列：必填显示红色 `* 是`，选填显示 `否`
+- 新增 CSS 类 `.biz-required-tag`（红色加粗）和 `.biz-action-disabled`（置灰不可点击）
+- 平台切换时清空场景传入信息表格
+- 选中中科金智能时自动填充默认字段：姓名 / name / 必填（删除按钮置灰）
+- 中科金面板新增「选择中科金账号」行（disabled Select，默认值「默认账号」），选中模型类型后显示
+
+### 外呼列表 (scene-list)
+
+- 已呼叫子标签「通话记录」按钮改为两层抽屉弹窗：
+  1. 列表抽屉（右侧滑入，80%宽度）：该号码通话记录列表（9列）
+  2. 详情抽屉（右侧滑入）：左音频+对话记录，右 Tab（外呼结果/详细信息）
+- 新增函数：showCallRecordList / closeCallRecordList / showCallRecordDetail / closeCallRecordDetail / switchCallRecordTab
+
 ## 2026-06-09
 
 ### 页面与导航
