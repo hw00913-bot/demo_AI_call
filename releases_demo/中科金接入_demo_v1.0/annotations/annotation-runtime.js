@@ -84,9 +84,7 @@
       }
       return clone(cachedItem || item);
     }).sort(function (a, b) {
-      var aNum = Number(a.id), bNum = Number(b.id);
-      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
-      return String(a.id).localeCompare(String(b.id));
+      return Number(a.id) - Number(b.id);
     });
   }
 
