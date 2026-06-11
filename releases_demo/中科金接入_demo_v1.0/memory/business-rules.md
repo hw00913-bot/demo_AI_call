@@ -34,8 +34,8 @@
 - 已呼叫操作列「通话记录」→ 两层抽屉弹窗：
   1. 列表抽屉（右侧滑入）：该号码的通话记录列表（序号|用户号码|通话开始时间|通话结束时间|通话时长|场景名称|通话状态|外呼总结|操作）
   2. 详情抽屉（右侧滑入）：左音频+对话记录，右外呼结果/详细信息Tab
-- 任务详情按中科金 API 字段展示（10个字段）
-- 拦截策略通过接口匹配 strategyCode→名称
+- 任务详情展示创建日期、机器人名称、任务编码、启动方式、拨打时段、AI坐席数、自动重拨设置和外呼进度
+- 任务详情不展示黑名单组、拦截策略及相关风控信息
 - 手动导入号码上限 2,000
 
 ### 通话记录 (result-records)
@@ -88,7 +88,6 @@
 |------|------|
 | 外呼号码组 | GET/POST `/outbound/openapi/v1/speech` |
 | 机器人列表 | GET/POST `/outbound/openapi/v2/robot/queryRobotDialogList` |
-| 拦截策略 | GET/POST `/outbound/openapi/v2/task/interceptStrategy/designatedEnable` |
 | ASR文本 | GET/POST `/outbound/openapi/v2/content/{audioRecordCode}` |
 
 ### 通话统计

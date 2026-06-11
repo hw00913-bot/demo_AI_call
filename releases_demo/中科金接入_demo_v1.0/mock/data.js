@@ -300,10 +300,8 @@ var MockZkjTaskDetail = {
     maxRecallTimes: 1,
     recallPeriodMin: 30,
     recallStrategy: '[{"status":5,"time":1,"period":30},{"status":9,"time":1,"period":60}]',
-    blacklistGroupIds: 'groupA001',
     dialogTaskId: 'flow_hb_xcl_001',
     dialogTaskName: '新线索标准流程',
-    interceptStrategyCode: '6dk9gd823kv90o1am86kf9s',
     didStrategy: 1
   },
   14: {
@@ -332,10 +330,8 @@ var MockZkjTaskDetail = {
     maxRecallTimes: 2,
     recallPeriodMin: 20,
     recallStrategy: '',
-    blacklistGroupIds: '',
     dialogTaskId: 'flow_hd_hf_001',
     dialogTaskName: '保客回访标准流程',
-    interceptStrategyCode: '',
     didStrategy: 0
   },
   15: {
@@ -364,10 +360,8 @@ var MockZkjTaskDetail = {
     maxRecallTimes: 0,
     recallPeriodMin: 0,
     recallStrategy: '',
-    blacklistGroupIds: '',
     dialogTaskId: 'flow_hn_sj_001',
     dialogTaskName: '试驾邀约标准流程',
-    interceptStrategyCode: '',
     didStrategy: 0
   },
   16: {
@@ -396,19 +390,11 @@ var MockZkjTaskDetail = {
     maxRecallTimes: 3,
     recallPeriodMin: 15,
     recallStrategy: '[{"status":5,"time":3,"period":15},{"status":9,"time":2,"period":30}]',
-    blacklistGroupIds: 'groupB001,groupB002',
     dialogTaskId: 'flow_xn_ls_001',
     dialogTaskName: '流失预警标准流程',
-    interceptStrategyCode: '6dk9gd823kv90o1am86kf9s',
     didStrategy: 1
   }
 };
-
-/* ===== 中科金 拦截策略 Mock（模拟 /task/interceptStrategy/designatedEnable 返回） ===== */
-var MockZkjInterceptStrategies = [
-  { strategyCode: '6dk9gd823kv90o1am86kf9s', name: '测试策略0828' },
-  { strategyCode: 'x8fl2he934lw01p2bn97g0t', name: '空号过滤策略' }
-];
 
 /* ===== 中科金通话状态 → 本地状态映射 ===== */
 var ZkjCallStatusLabels = {

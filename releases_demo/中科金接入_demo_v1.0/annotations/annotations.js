@@ -97,7 +97,7 @@ window.AnnotationData = {
         interactionDesc: "卡片网格布局。点击「查看」打开右侧抽屉，包含数据概览、呼叫名单（已分配/待呼叫/已呼叫/已过滤/呼叫失败）、任务详情三个 Tab。更多操作菜单支持删除/暂停/终止/启动。",
         judgeRule: "待确认任务启停的前置条件和权限。",
         exceptionRule: "待确认网络异常或中科金 API 不可用时的降级策略。",
-        otherDesc: "当前原型映射：MockSceneList。任务详情已对接中科金 API 字段，展示任务编码、机器人名称、启动方式、拨打时段、AI坐席数、重呼策略、黑名单组、拦截策略、外呼进度。"
+        otherDesc: "当前原型映射：MockSceneList。任务详情已对接中科金 API 字段，展示任务编码、机器人名称、启动方式、拨打时段、AI坐席数、重呼策略、外呼进度。"
       },
       desc: "1. 功能名称：外呼列表<br>2. 功能说明：展示外呼任务卡片，支持查看详情和启停操作<br>3. 权限范围：超管/租户管理员/租户运营可见，超管看全部，租户看本租户<br>4. 数据来源：中科金 API 外呼任务列表<br>5. 取值逻辑：按场景名称/状态/平台筛选，卡片展示已分配/待呼叫/已呼叫<br>6. 字段说明：场景名称、状态、平台、来源、数量<br>7. 交互说明：卡片网格 → 点击查看 → 右侧抽屉（数据概览/呼叫名单/任务详情）<br>8. 判断规则：待确认启停条件<br>9. 异常规则：待确认<br>10. 其他说明：任务详情已对接中科金 API 字段"
     },
@@ -107,7 +107,7 @@ window.AnnotationData = {
       target: "[data-anno='scene-list-task-detail']",
       position: {
         placement: "top-right",
-        offsetX: 0,
+        offsetX: 1,
         offsetY: 0
       },
       title: "任务详情（中科金）",
@@ -116,14 +116,14 @@ window.AnnotationData = {
         functionDesc: "查看中科金外呼任务的详细信息，字段按中科金 API OpenCallTaskResponse 结构展示。",
         permissionScope: "同外呼列表。超级管理员查看全部任务详情，租户仅查看本租户任务。",
         dataSource: "中科金 API GET /outbound/openapi/v2/task/{taskCode}。",
-        valueLogic: "各字段直接来自 API 返回，包括：创建日期（本地字段）、机器人名称（robotName+robotId）、任务编码（taskCode）、启动方式（taskType 1手动/2定时）、拨打时段（外呼周期+外呼时段合并）、AI坐席数（aiSeatsNum/aiSeatsFlag）、自动重拨设置（recallModel/recallStrategy/recallStatus）、黑名单组、拦截策略、外呼进度。",
-        fieldDesc: "创建日期、机器人名称（含robotId）、任务编码（taskCode）、启动方式（手动/定时+日期）、拨打时段（每周几+时段区间）、AI坐席数（弹性坐席开关）、自动重拨设置（高级模式显示recallStrategy策略组，普通模式显示状态/次数/间隔，关闭显示关闭）、黑名单组（有则显示ID）、拦截策略（通过拦截策略查询接口匹配名称+code）、外呼进度（已完成/总数）。",
+        valueLogic: "各字段直接来自 API 返回，包括：创建日期（本地字段）、机器人名称（robotName+robotId）、任务编码（taskCode）、启动方式（taskType 1手动/2定时）、拨打时段（外呼周期+外呼时段合并）、AI坐席数（aiSeatsNum/aiSeatsFlag）、自动重拨设置（recallModel/recallStrategy/recallStatus）、外呼进度。",
+        fieldDesc: "创建日期、机器人名称（含robotId）、任务编码（taskCode）、启动方式（手动/定时+日期）、拨打时段（每周几+时段区间）、AI坐席数（弹性坐席开关）、自动重拨设置（高级模式显示recallStrategy策略组，普通模式显示状态/次数/间隔，关闭显示关闭）、外呼进度（已完成/总数）。",
         interactionDesc: "在外呼列表点击「查看」→ 抽屉中点击「任务详情」Tab 查看。",
         judgeRule: "待确认",
-        exceptionRule: "mock 数据缺失时显示「暂无任务详情数据」。",
-        otherDesc: "当前原型映射：MockZkjTaskDetail[id]。拦截策略名称通过 MockZkjInterceptStrategies 匹配 strategyCode 获取。"
+        exceptionRule: "数据缺失时显示「暂无任务详情数据」。",
+        otherDesc: "当前原型映射：MockZkjTaskDetail[id]。"
       },
-      desc: "1. 功能名称：中科金任务详情<br>2. 功能说明：查看中科金外呼任务 API 返回的完整字段<br>3. 权限范围：同外呼列表<br>4. 数据来源：中科金 API task/{taskCode}<br>5. 取值逻辑：字段来自 API OpenCallTaskResponse<br>6. 字段说明：创建日期、机器人、任务编码、启动方式、拨打时段、AI坐席、重拨、黑名单、拦截策略、进度<br>7. 交互说明：查看外呼 → 任务详情 Tab<br>8. 判断规则：待确认<br>9. 异常规则：数据缺失时提示<br>10. 其他说明：拦截策略名称通过 API 查询匹配"
+      desc: "1. 功能名称：中科金任务详情<br>2. 功能说明：查看中科金外呼任务的详细信息，字段按中科金 API OpenCallTaskResponse 结构展示。<br>3. 权限范围：同外呼列表。超级管理员查看全部任务详情，租户仅查看本租户任务。<br>4. 数据来源：中科金 API GET /outbound/openapi/v2/task/{taskCode}。<br>5. 取值逻辑：各字段直接来自 API 返回，包括：创建日期（本地字段）、机器人名称（robotName+robotId）、任务编码（taskCode）、启动方式（taskType 1手动/2定时）、拨打时段（外呼周期+外呼时段合并）、AI坐席数（aiSeatsNum/aiSeatsFlag）、自动重拨设置（recallModel/recallStrategy/recallStatus）、外呼进度。<br>6. 字段说明：创建日期、机器人名称（含robotId）、任务编码（taskCode）、启动方式（手动/定时+日期）、拨打时段（每周几+时段区间）、AI坐席数（弹性坐席开关）、自动重拨设置（高级模式显示recallStrategy策略组，普通模式显示状态/次数/间隔，关闭显示关闭）、外呼进度（已完成/总数）。<br>7. 交互说明：在外呼列表点击「查看」→ 抽屉中点击「任务详情」Tab 查看。<br>8. 判断规则：待确认<br>9. 异常规则：数据缺失时显示「暂无任务详情数据」。<br>10. 其他说明：当前原型映射：MockZkjTaskDetail[id]。"
     },
     {
       id: "6",

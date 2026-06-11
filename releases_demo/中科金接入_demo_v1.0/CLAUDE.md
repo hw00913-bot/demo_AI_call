@@ -10,8 +10,9 @@
 ## 项目边界
 
 - 项目是无构建步骤的静态前端原型，唯一演示入口为 `index.html`。
-- 默认页面为系统管理下的租户管理，路由 key 为 `sys-tenant`。
+- 默认页面为系统管理下的业务场景，路由 key 为 `sys-scene`。
 - 标注系统与业务代码分离；除稳定锚点外，不得为标注修改业务逻辑。
+- 当前项目已显式启用可选的本地标注写回能力：入口通过 `AnnotationConfig` 配置 `saveEndpoint` 和 `enableFileWriteback`，服务脚本为 `tools/annotation-save-server.js`；相关约束以 `.clauderules` 为准。
 
 ## 本轮迭代：中科金智能平台对接
 
