@@ -122,9 +122,50 @@
   function isFrozenExpired(createdAt) {
     if (!createdAt) return true;
     var created = new Date(createdAt.replace(/-/g, '/'));
-    var now = new Date();
-    var hoursDiff = (now - created) / (1000 * 60 * 60);
+    if (Number.isNaN(created.getTime())) return true;
+    var hoursDiff = (new Date() - created) / (1000 * 60 * 60);
     return hoursDiff >= 24;
+  }
+
+  function getFrozenReleaseReason(task) {
+    if (!task || task.status !== '冻结中') return '';
+    if (task.taskStatus === '已完成') return '任务已完成';
+    if (task.taskStatus === '已终止') return '任务已终止';
+    if (isFrozenExpired(task.createdAt)) return '冻结超过24小时';
+    return '';
+  }
+
+  function releaseFrozenTask(task, reason, releasedAt) {
+    if (!task || task.status !== '冻结中' || !reason) return false;
+    task.status = '已释放';
+    task.releasedAt = releasedAt || formatLocalDateTime(new Date());
+    task.releaseReason = reason;
+    return true;
+  }
+
+  function syncFrozenTaskReleases() {
+    const releasedAt = formatLocalDateTime(new Date());
+    return getFrozenTasks().reduce((released, task) => {
+      const reason = getFrozenReleaseReason(task);
+      return releaseFrozenTask(task, reason, releasedAt) ? released + 1 : released;
+    }, 0);
+  }
+
+  function releaseFrozenTasksByScene(sceneName, taskStatus) {
+    const releasedAt = formatLocalDateTime(new Date());
+    let releasedCount = 0;
+    let releasedAmount = 0;
+
+    getFrozenTasks().forEach(task => {
+      if (task.sceneName !== sceneName || task.status !== '冻结中') return;
+      task.taskStatus = taskStatus;
+      const reason = getFrozenReleaseReason(task);
+      if (!releaseFrozenTask(task, reason, releasedAt)) return;
+      releasedCount += 1;
+      releasedAmount += Number(task.frozenMinutes || 0) * Number(task.unitPriceSnapshot || 0);
+    });
+
+    return { releasedCount, releasedAmount };
   }
 
   function latestValidTo(tenantName) {
@@ -202,7 +243,9 @@
   }
 
   function getTenantBillingSummary(tenantName) {
+    syncFrozenTaskReleases();
     const tenant = getTenantBaseRow(tenantName);
+
     const priceConfigs = getTenantAllPriceConfigs(tenantName);
     const largeConfigs = priceConfigs.filter(item => item.modelType === '大模型' && item.status === '启用');
     const smallConfigs = priceConfigs.filter(item => item.modelType === '小模型' && item.status === '启用');
@@ -239,8 +282,7 @@
     const balanceAmount = totalRechargeAmount - adjustmentOutAmount - consumedAmount;
     const frozenTasks = getFrozenTasks().filter(item =>
       item.status === '冻结中' &&
-      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
-      !isFrozenExpired(item.createdAt)
+      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName)
     );
     const totalFrozenAmount = frozenTasks.reduce((sum, item) => {
       return sum + Number(item.frozenMinutes || 0) * Number(item.unitPriceSnapshot || 0);
@@ -423,7 +465,7 @@
           <td>${row.name}</td>
           <td>${summary.validity}</td>
           <td>
-            <button class="tenant-billing-config-btn" onclick="window.Pages['sys-tenant'].showPricingConfigModal('${row.name}')">计费配置</button>
+            <button class="tenant-billing-config-btn"${row.name === '东风日产-燃油车' ? ' data-anno="tenant-pricing-config"' : ''} onclick="window.Pages['sys-tenant'].showPricingConfigModal('${row.name}')">计费配置</button>
           </td>
           <td class="tenant-minute-range">${summary.largeAvailableRange}</td>
           <td class="tenant-minute-range">${summary.smallAvailableRange}</td>
@@ -468,7 +510,7 @@
     return `
       <div class="tenant-balance-risk">
         <strong>当前无新增冻结额度</strong>
-        <span>当前资金余额 ${formatBalance(summary.balanceAmount)}，有效冻结金额 ${formatBalance(summary.totalFrozenAmount)}，可用金额按 0 计算。已有冻结任务不回退、不释放；后续导入按本次预计冻结金额单独校验。</span>
+        <span>当前资金余额 ${formatBalance(summary.balanceAmount)}，有效冻结金额 ${formatBalance(summary.totalFrozenAmount)}，可用金额按 0 计算。任务完成、终止或冻结超过 24 小时后将自动释放占用；后续导入按本次预计冻结金额单独校验。</span>
       </div>
     `;
   }
@@ -526,8 +568,11 @@
       sceneName: data.sceneName || '-',
       frozenMinutes: phoneCount * capacity.estimatedMinutesPerPhone,
       unitPriceSnapshot: capacity.unitPrice,
+      taskStatus: '待执行',
       status: '冻结中',
-      createdAt: formatLocalDateTime(now)
+      createdAt: formatLocalDateTime(now),
+      releasedAt: '',
+      releaseReason: ''
     });
 
     return Object.assign({}, capacity, { phoneCount, requiredFreezeAmount, allowed: true });
@@ -838,7 +883,7 @@
             <div class="tenant-billing-tabs" role="tablist">
               <button class="tenant-billing-tab active" role="tab" data-tab="pricing" onclick="window.Pages['sys-tenant'].switchBillingTab('pricing')">计费明细</button>
               <button class="tenant-billing-tab" role="tab" data-tab="recharge" onclick="window.Pages['sys-tenant'].switchBillingTab('recharge')">充值单管理</button>
-              <button class="tenant-billing-tab" role="tab" data-tab="adjustment" onclick="window.Pages['sys-tenant'].switchBillingTab('adjustment')">余额调整</button>
+              <button class="tenant-billing-tab" role="tab" data-tab="adjustment" data-anno="tenant-manual-adjustment" onclick="window.Pages['sys-tenant'].switchBillingTab('adjustment')">余额调整</button>
             </div>
 
             <div class="tenant-billing-tab-panel active" data-panel="pricing" role="tabpanel">
@@ -1220,6 +1265,8 @@
     toggleCallControl,
     getImportCapacity,
     createImportFreeze,
+    syncFrozenTaskReleases,
+    releaseFrozenTasksByScene,
     showPricingConfigModal,
     closePricingConfigModal,
     savePricingConfig

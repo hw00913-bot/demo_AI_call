@@ -664,6 +664,21 @@
 
   function onMenuAction(action, id) {
     closeMoreMenu();
+    const item = MockSceneList.find(scene => scene.id === id);
+    if (action === '终止' && item) {
+      item.status = 'terminated';
+      const billingPage = window.Pages && window.Pages['sys-tenant'];
+      const releaseResult = billingPage && billingPage.releaseFrozenTasksByScene
+        ? billingPage.releaseFrozenTasksByScene(item.name, '已终止')
+        : { releasedCount: 0, releasedAmount: 0 };
+      const container = document.getElementById('page-content');
+      if (container) container.innerHTML = render();
+      const releaseText = releaseResult.releasedCount
+        ? `，已释放 ${releaseResult.releasedCount} 笔冻结`
+        : '，当前无待释放冻结';
+      showToast(`任务已终止${releaseText}`, 'success');
+      return;
+    }
     showToast(`${action}功能开发中（场景ID: ${id}）`, 'info');
   }
 
