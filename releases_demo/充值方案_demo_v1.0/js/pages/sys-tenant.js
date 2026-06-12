@@ -38,6 +38,15 @@
     return window.MockTenantFrozenTasks || [];
   }
 
+  function getBalanceAdjustments() {
+    window.MockTenantBalanceAdjustments = window.MockTenantBalanceAdjustments || [];
+    return window.MockTenantBalanceAdjustments;
+  }
+
+  function getPriceRules() {
+    return window.MockTenantPriceRules || [];
+  }
+
   function getCallControlStates() {
     window.MockTenantCallControlStates = window.MockTenantCallControlStates || [];
     return window.MockTenantCallControlStates;
@@ -51,10 +60,12 @@
     return row.rechargeStatus === '已支付' && (row.billingType === '仅通话费' || row.billingType === '坐席费+通话费');
   }
 
-  function canActivateValidity(row) {
-    return row && canGenerateValidity(row) &&
-           row.rechargeStatus === '已支付' &&
-           !row.validityActivated;
+  function isRechargeActivated(row) {
+    return !!(row && (row.activated === true || row.validityActivated === true));
+  }
+
+  function canActivateRecharge(row) {
+    return row && row.status === '已支付' && !isRechargeActivated(row);
   }
 
   function packageDays(packageName) {
@@ -66,6 +77,21 @@
     return `¥${Number(value || 0).toFixed(2)}`;
   }
 
+  function formatMinutes(value) {
+    return `${Number(value || 0).toLocaleString('zh-CN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} 分钟`;
+  }
+
+  function formatUnitPrice(value) {
+    return `¥${Number(value || 0).toFixed(2)}/分钟`;
+  }
+
+  function adjustmentTypeText(type) {
+    return type === 'MANUAL_DEDUCT' ? '手工扣减' : type;
+  }
+
   function addDays(dateStr, days) {
     const date = new Date(dateStr.replace(/-/g, '/'));
     date.setDate(date.getDate() + Number(days || 0) - 1);
@@ -75,8 +101,22 @@
     return `${y}-${m}-${d}`;
   }
 
+  function formatLocalDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatLocalDateTime(date) {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${formatLocalDate(date)} ${hours}:${minutes}:${seconds}`;
+  }
+
   function currentBizDate() {
-    return '2026-06-03';
+    return formatLocalDate(new Date());
   }
 
   function isFrozenExpired(createdAt) {
@@ -89,56 +129,169 @@
 
   function latestValidTo(tenantName) {
     const validDates = getHistoryRows()
-      .filter(item => item.status === '已支付' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) && item.validTo && item.validTo !== '-')
+      .filter(item =>
+        item.status === '已支付' &&
+        isRechargeActivated(item) &&
+        normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
+        item.validTo &&
+        item.validTo !== '-'
+      )
       .map(item => item.validTo)
       .sort();
-    const current = findBillingByTenant(tenantName);
-    if (current && current.rechargeStatus === '已支付' && current.validTo && current.validTo !== '-') validDates.push(current.validTo);
     return validDates.sort().pop() || '';
   }
 
-  function getTenantBillingSummary(tenantName) {
-    const row = findBillingByTenant(tenantName);
-    const paidMap = new Map();
-    getHistoryRows()
-      .filter(item => item.status === '已支付' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName))
-      .forEach(item => paidMap.set(item.rechargeNo, item));
-    if (row && row.rechargeStatus === '已支付' && row.rechargeNo) {
-      paidMap.set(row.rechargeNo, row);
-    }
+  function getTenantPriceConfigs(tenantName, modelType) {
+    return getPriceRules()
+      .filter(item =>
+        normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
+        (!modelType || item.modelType === modelType) &&
+        item.pricingScope === 'MODEL_DEFAULT' &&
+        !item.providerCode &&
+        item.status === '启用'
+      )
+      .sort((a, b) => {
+        return a.modelType === b.modelType ? 0 : (a.modelType === '大模型' ? -1 : 1);
+      });
+  }
 
-    const paidRows = Array.from(paidMap.values());
-    const validityRow = paidRows
+  function resolveTenantUnitPrice(tenantName, modelType, providerCode) {
+    const rules = getPriceRules().filter(item =>
+      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
+      item.modelType === modelType &&
+      item.status === '启用'
+    );
+    const providerRule = providerCode
+      ? rules.find(item => item.pricingScope === 'PROVIDER_OVERRIDE' && item.providerCode === providerCode)
+      : null;
+    return providerRule || rules.find(item => item.pricingScope === 'MODEL_DEFAULT' && !item.providerCode) || null;
+  }
+
+  function getTenantAllPriceConfigs(tenantName) {
+    return getPriceRules()
+      .filter(item =>
+        normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
+        item.pricingScope === 'MODEL_DEFAULT' &&
+        !item.providerCode
+      )
+      .sort((a, b) => {
+        return a.modelType === b.modelType ? 0 : (a.modelType === '大模型' ? -1 : 1);
+      });
+  }
+
+  function amountToMinutes(amount, unitPrice) {
+    const price = Number(unitPrice || 0);
+    return price > 0 ? Number(amount || 0) / price : 0;
+  }
+
+  function formatMinuteRange(configs, amount) {
+    const values = configs
+      .map(item => amountToMinutes(amount, item.unitPrice))
+      .filter(value => Number.isFinite(value));
+    if (!values.length) return '未配置';
+    const min = Math.min.apply(null, values);
+    const max = Math.max.apply(null, values);
+    if (Math.abs(max - min) < 0.005) return formatMinutes(min);
+    return `${formatMinutes(min).replace(' 分钟', '')} ~ ${formatMinutes(max)}`;
+  }
+
+  function getTenantBaseRow(tenantName) {
+    return getTenantRows().find(item =>
+      normalizeTenantName(item.name) === normalizeTenantName(tenantName)
+    );
+  }
+
+  function getTenantBillingSummary(tenantName) {
+    const tenant = getTenantBaseRow(tenantName);
+    const priceConfigs = getTenantAllPriceConfigs(tenantName);
+    const largeConfigs = priceConfigs.filter(item => item.modelType === '大模型' && item.status === '启用');
+    const smallConfigs = priceConfigs.filter(item => item.modelType === '小模型' && item.status === '启用');
+    const paidRows = getHistoryRows().filter(item =>
+      item.status === '已支付' &&
+      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName)
+    );
+    const activatedRows = paidRows.filter(isRechargeActivated);
+    const validityRow = activatedRows
       .filter(item => item.validFrom && item.validFrom !== '-' && item.validTo && item.validTo !== '-')
       .sort((a, b) => String(b.validTo).localeCompare(String(a.validTo)))[0];
-    // 检测是否有待生效的有效期行
-    const pendingRow = paidRows.find(item =>
-      item.rechargeStatus === '已支付' &&
-      (item.billingType === '仅坐席费' || item.billingType === '坐席费+通话费') &&
-      !item.validityActivated
+    const pendingRow = paidRows.find(item => !isRechargeActivated(item));
+    const pendingValidityRow = paidRows.find(item =>
+      !isRechargeActivated(item) &&
+      canGenerateValidity({
+        rechargeStatus: item.status,
+        billingType: item.billingType
+      })
     );
-    const balance = paidRows.reduce((sum, item) => sum + Number(item.callBalance || 0), 0);
-    // 冻结任务超过24小时后自动释放，不再从可用余额中扣除
-    const frozen = getFrozenTasks()
-      .filter(item => item.status === '冻结中' && normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) && !isFrozenExpired(item.createdAt))
-      .reduce((sum, item) => sum + Number(item.frozenAmount || 0), 0);
-    const available = balance - frozen;
-    const baseCanCall = !!validityRow && validityRow.validFrom <= currentBizDate() && validityRow.validTo >= currentBizDate() && available > 0;
+    const totalRechargeAmount = activatedRows.reduce((sum, item) => {
+      return sum + (canAddCallBalance({
+        rechargeStatus: item.status,
+        billingType: item.billingType
+      }) ? Number(item.rechargeAmount || 0) : 0);
+    }, 0);
+    const adjustments = getBalanceAdjustments().filter(item =>
+      item.status === '已生效' &&
+      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName)
+    );
+    const adjustmentOutAmount = adjustments
+      .filter(item => item.direction === 'OUT')
+      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const consumedAmount = Number(tenant && tenant.consumedAmount || 0);
+    const balanceAmount = totalRechargeAmount - adjustmentOutAmount - consumedAmount;
+    const frozenTasks = getFrozenTasks().filter(item =>
+      item.status === '冻结中' &&
+      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
+      !isFrozenExpired(item.createdAt)
+    );
+    const totalFrozenAmount = frozenTasks.reduce((sum, item) => {
+      return sum + Number(item.frozenMinutes || 0) * Number(item.unitPriceSnapshot || 0);
+    }, 0);
+    const availableAmount = Math.max(balanceAmount - totalFrozenAmount, 0);
+    const displayBalanceAmount = Math.max(balanceAmount, 0);
+    const hasFrozenShortfall = totalFrozenAmount > 0 && balanceAmount < totalFrozenAmount;
+    const pricingRows = priceConfigs.map(config => {
+      const modelTasks = frozenTasks.filter(item => item.modelType === config.modelType);
+      const frozenMinutes = modelTasks.reduce((sum, item) => sum + Number(item.frozenMinutes || 0), 0);
+      const frozenAmount = modelTasks.reduce((sum, item) => {
+        return sum + Number(item.frozenMinutes || 0) * Number(item.unitPriceSnapshot || 0);
+      }, 0);
+      return {
+        modelType: config.modelType,
+        pricingScope: config.pricingScope,
+        unitPrice: Number(config.unitPrice || 0),
+        status: config.status,
+        frozenMinutes,
+        frozenAmount,
+        balanceMinutes: amountToMinutes(displayBalanceAmount, config.unitPrice),
+        availableMinutes: amountToMinutes(availableAmount, config.unitPrice)
+      };
+    });
+    const hasAvailableMinutes = availableAmount > 0 && (largeConfigs.length > 0 || smallConfigs.length > 0);
+    const baseCanCall = !!validityRow && validityRow.validFrom <= currentBizDate() &&
+      validityRow.validTo >= currentBizDate() && hasAvailableMinutes;
     const controlState = getCallControlStates().find(item => normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName));
     const manualEnabled = controlState ? controlState.enabled : true;
     const canCall = baseCanCall && manualEnabled;
 
     return {
       validity: validityRow ? `${validityRow.validFrom} ~ ${validityRow.validTo}`
-        : (pendingRow ? '待生效' : '未生成'),
-      balance: formatBalance(balance),
-      frozen: formatBalance(frozen),
-      available: formatBalance(available),
+        : (pendingValidityRow ? '待生效' : '未生成'),
+      totalRechargeAmount,
+      adjustmentOutAmount,
+      pricingRows,
+      largeBalanceRange: formatMinuteRange(largeConfigs, displayBalanceAmount),
+      largeAvailableRange: formatMinuteRange(largeConfigs, availableAmount),
+      smallBalanceRange: formatMinuteRange(smallConfigs, displayBalanceAmount),
+      smallAvailableRange: formatMinuteRange(smallConfigs, availableAmount),
+      balanceAmount,
+      totalFrozenAmount,
+      availableAmount,
+      hasFrozenShortfall,
+      canCall,
       callStatus: canCall ? '可发起' : '不可发起',
       callStatusCls: canCall ? 'tenant-call-status-ok' : 'tenant-call-status-disabled',
       callManageEnabled: baseCanCall,
       callManageText: manualEnabled ? '停用呼叫' : '启用呼叫',
-      hasPendingValidity: !!pendingRow
+      hasPendingRecharge: !!pendingRow
     };
   }
 
@@ -148,88 +301,91 @@
     row.billingType = order.billingType;
     row.seatFeePackage = order.seatFeePackage || '-';
     row.periodDays = packageDays(order.seatFeePackage) || order.periodDays || 0;
-    row.callBalance = canAddCallBalance(row) ? order.callBalance || 0 : 0;
-    row.localAddedAt = row.localAddedAt || '2026-06-03 10:00:00';
-
-    if (canGenerateValidity(row)) {
-      // 有效期不再自动生成，需用户手动点击"生效"
-      row.validFrom = '-';
-      row.validTo = '-';
-      row.enabled = false;
-      row.validityActivated = false;
-    } else {
-      row.validFrom = '-';
-      row.validTo = '-';
-      row.enabled = false;
-    }
+    row.rechargeAmount = canAddCallBalance(row) ? order.rechargeAmount || 0 : 0;
+    row.localAddedAt = row.localAddedAt || formatLocalDateTime(new Date());
+    row.validFrom = '-';
+    row.validTo = '-';
+    row.enabled = false;
+    row.activated = false;
+    row.validityActivated = false;
   }
 
-  function activateValidity(tenantName) {
-    const name = tenantName || document.getElementById('tenantName')?.value;
-    if (!name) {
-      showToast('租户名称无效', 'error');
+  function activateRecharge(rechargeNo) {
+    const historyRow = getHistoryRows().find(item => item.rechargeNo === rechargeNo);
+    if (!historyRow) {
+      showToast('未找到关联充值单', 'error');
+      return;
+    }
+    if (!canActivateRecharge(historyRow)) {
+      showToast(isRechargeActivated(historyRow) ? '该充值单已生效' : '充值单未支付，无法生效', 'warning');
       return;
     }
 
-    const row = findBillingByTenant(name);
-    if (!row) {
-      showToast('未找到租户计费信息', 'error');
-      return;
+    const tenantName = historyRow.tenantName;
+    if (canGenerateValidity({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    })) {
+      const baseDate = latestValidTo(tenantName);
+      const addedAt = String(historyRow.bindTime || currentBizDate()).slice(0, 10);
+      historyRow.validFrom = baseDate && baseDate >= addedAt ? addDays(baseDate, 2) : addedAt;
+      historyRow.validTo = addDays(historyRow.validFrom, historyRow.periodDays);
+    } else {
+      historyRow.validFrom = '-';
+      historyRow.validTo = '-';
     }
-    if (!canActivateValidity(row)) {
-      if (row.rechargeStatus !== '已支付') {
-        showToast('充值单未支付，无法生效', 'warning');
-      } else if (row.validityActivated) {
-        showToast('有效期已生效，无需重复操作', 'warning');
-      } else {
-        showToast('当前计费类型不适用有效期', 'warning');
-      }
-      return;
-    }
+    historyRow.activated = true;
+    historyRow.validityActivated = true;
+    historyRow.activatedAt = formatLocalDateTime(new Date());
 
-    // 使用原有的有效期计算逻辑
-    const baseDate = latestValidTo(name);
-    const addedAt = row.localAddedAt.slice(0, 10);
-    row.validFrom = baseDate && baseDate >= addedAt
-      ? addDays(baseDate, 2)
-      : addedAt;
-    row.validTo = addDays(row.validFrom, row.periodDays);
-    row.enabled = true;
-    row.validityActivated = true;
-
-    // 同步历史记录中的有效期
-    const historyRow = getHistoryRows().find(function(item) {
-      return item.rechargeNo === row.rechargeNo &&
-        item.status === '已支付' &&
-        normalizeTenantName(item.tenantName) === normalizeTenantName(name);
-    });
-    if (historyRow) {
-      historyRow.validFrom = row.validFrom;
-      historyRow.validTo = row.validTo;
+    const billingRow = findBillingByTenant(tenantName);
+    if (billingRow && billingRow.rechargeNo === rechargeNo) {
+      billingRow.validFrom = historyRow.validFrom;
+      billingRow.validTo = historyRow.validTo;
+      billingRow.enabled = true;
+      billingRow.activated = true;
+      billingRow.validityActivated = true;
     }
 
-    // 刷新列表
     var container = document.getElementById('page-content');
     if (container) container.innerHTML = render();
-
-    // 更新抽屉内字段
-    updateDrawerFieldsAfterActivation(name);
-
-    showToast('有效期已生效', 'success');
+    updateDrawerFieldsAfterActivation(tenantName);
+    const historyBody = document.getElementById('tenantHistoryBody');
+    if (historyBody) historyBody.innerHTML = renderHistoryRows(tenantName);
+    const currentOrderNo = document.getElementById('tenantRechargeNo')?.value;
+    if (currentOrderNo) renderCheckedOrder(getOrders().find(item => item.no === currentOrderNo) || null);
+    const changesValidity = canGenerateValidity({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+    const changesBalance = canAddCallBalance({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+    const resultText = changesValidity && changesBalance
+      ? '有效期和余额已更新'
+      : (changesValidity ? '有效期已更新' : '余额已更新');
+    showToast(`充值单已生效，${resultText}`, 'success');
   }
 
   function updateDrawerFieldsAfterActivation(tenantName) {
     var summary = getTenantBillingSummary(tenantName);
     var validityInput = document.getElementById('tenantValidity');
     if (validityInput) validityInput.value = summary.validity;
-    var balanceInput = document.getElementById('tenantCallBalance');
-    if (balanceInput) balanceInput.value = summary.balance;
-    var frozenInput = document.getElementById('tenantFrozenAmount');
-    if (frozenInput) frozenInput.value = summary.frozen;
-    var availableInput = document.getElementById('tenantAvailableBalance');
-    if (availableInput) availableInput.value = summary.available;
+    var totalRechargeInput = document.getElementById('tenantTotalRecharge');
+    if (totalRechargeInput) totalRechargeInput.value = formatBalance(summary.totalRechargeAmount);
+    var availableBalanceInput = document.getElementById('tenantAvailableBalance');
+    if (availableBalanceInput) availableBalanceInput.value = summary.availableAmount;
+    var pricingBody = document.getElementById('tenantPricingBody');
+    if (pricingBody) pricingBody.innerHTML = renderPricingRows(tenantName);
     var callStatusInput = document.getElementById('tenantCallStatus');
     if (callStatusInput) callStatusInput.value = summary.callStatus;
+    var riskNotice = document.getElementById('tenantBalanceRiskNotice');
+    if (riskNotice) riskNotice.innerHTML = renderBalanceRisk(summary);
+    var adjustmentBody = document.getElementById('tenantAdjustmentBody');
+    if (adjustmentBody) adjustmentBody.innerHTML = renderAdjustmentRows(tenantName);
+    var historyBody = document.getElementById('tenantHistoryBody');
+    if (historyBody) historyBody.innerHTML = renderHistoryRows(tenantName);
   }
 
   function findBillingByTenant(tenantName) {
@@ -248,9 +404,9 @@
       rechargeNo: '',
       rechargeStatus: '未支付',
       seatFeePackage: '-',
-      localAddedAt: '2026-06-03 10:00:00',
+      localAddedAt: formatLocalDateTime(new Date()),
       periodDays: 0,
-      callBalance: 0,
+      rechargeAmount: 0,
       validFrom: '-',
       validTo: '-',
       enabled: false,
@@ -259,22 +415,18 @@
   }
 
   function renderRows() {
-    var pendingAnnoAdded = false;
     return getTenantRows().map((row, idx) => {
       const summary = getTenantBillingSummary(row.name);
-      var activateAnno = '';
-      if (summary.hasPendingValidity && !pendingAnnoAdded) {
-        activateAnno = ' data-anno="tenant-activate-validity"';
-        pendingAnnoAdded = true;
-      }
       return `
         <tr>
           <td>${row.no}</td>
           <td>${row.name}</td>
           <td>${summary.validity}</td>
-          <td>${summary.balance}</td>
-          <td>${summary.frozen}</td>
-          <td>${summary.available}</td>
+          <td>
+            <button class="tenant-billing-config-btn" onclick="window.Pages['sys-tenant'].showPricingConfigModal('${row.name}')">计费配置</button>
+          </td>
+          <td class="tenant-minute-range">${summary.largeAvailableRange}</td>
+          <td class="tenant-minute-range">${summary.smallAvailableRange}</td>
           <td><span class="tenant-call-status ${summary.callStatusCls}">${summary.callStatus}</span></td>
           <td>${row.type}</td>
           <td>${row.tenantId}</td>
@@ -283,8 +435,7 @@
           <td>${row.updater}</td>
           <td>${row.updateTime}</td>
           <td>
-            <button class="tenant-op-btn primary"${idx === 0 ? ' data-anno="tenant-recharge-config"' : ''} onclick="window.Pages['sys-tenant'].showBillingDrawer('${row.name}')">充值单配置</button>
-            ${summary.hasPendingValidity ? '<button class="tenant-op-btn primary"' + activateAnno + ' onclick="window.Pages[\'sys-tenant\'].activateValidity(\'' + row.name + '\')">生效</button>' : ''}
+            <button class="tenant-op-btn primary"${row.name === '东风日产-燃油车' ? ' data-anno="tenant-recharge-config"' : ''} onclick="window.Pages['sys-tenant'].showBillingDrawer('${row.name}')">充值管理</button>
             <button class="tenant-op-btn control ${summary.callManageEnabled ? '' : 'disabled'}"${idx === 0 ? ' data-anno="tenant-call-control"' : ''} ${summary.callManageEnabled ? '' : 'disabled'} onclick="window.Pages['sys-tenant'].toggleCallControl('${row.name}')">${summary.callManageEnabled ? summary.callManageText : '管理呼叫'}</button>
             <button class="tenant-op-btn blue" onclick="showToast('编辑功能开发中','info')">编辑</button>
             <button class="tenant-op-btn red" onclick="showToast('删除功能开发中','info')">删除</button>
@@ -294,31 +445,161 @@
     }).join('');
   }
 
+  function renderPricingRows(tenantName) {
+    const rows = getTenantBillingSummary(tenantName).pricingRows;
+    if (!rows.length) {
+      return '<tr><td colspan="7"><div class="tenant-history-empty">暂无计费配置</div></td></tr>';
+    }
+    return rows.map(item => `
+      <tr>
+        <td><span class="tenant-model-tag ${item.modelType === '大模型' ? 'large' : 'small'}">${item.modelType}</span></td>
+        <td>${formatUnitPrice(item.unitPrice)}</td>
+        <td>${formatMinutes(item.frozenMinutes)}</td>
+        <td>${formatBalance(item.frozenAmount)}</td>
+        <td>${formatMinutes(item.balanceMinutes)}</td>
+        <td><strong>${formatMinutes(item.availableMinutes)}</strong></td>
+        <td><span class="tenant-price-status ${item.status === '停用' ? 'disabled' : ''}">${item.status}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  function renderBalanceRisk(summary) {
+    if (!summary.hasFrozenShortfall) return '';
+    return `
+      <div class="tenant-balance-risk">
+        <strong>当前无新增冻结额度</strong>
+        <span>当前资金余额 ${formatBalance(summary.balanceAmount)}，有效冻结金额 ${formatBalance(summary.totalFrozenAmount)}，可用金额按 0 计算。已有冻结任务不回退、不释放；后续导入按本次预计冻结金额单独校验。</span>
+      </div>
+    `;
+  }
+
+  function getImportCapacity(data) {
+    const tenantName = data && data.tenantName || '';
+    const modelType = data && data.modelType || '';
+    const providerCode = data && data.providerCode || '';
+    const estimatedMinutesPerPhone = Number(data && data.estimatedMinutesPerPhone || 0);
+    const summary = getTenantBillingSummary(tenantName);
+    const priceRule = resolveTenantUnitPrice(tenantName, modelType, providerCode);
+    const unitPrice = Number(priceRule && priceRule.unitPrice || 0);
+    const freezeAmountPerPhone = estimatedMinutesPerPhone * unitPrice;
+    const maxImportCount = freezeAmountPerPhone > 0
+      ? Math.floor(summary.availableAmount / freezeAmountPerPhone)
+      : 0;
+
+    return {
+      tenantName,
+      modelType,
+      providerCode,
+      estimatedMinutesPerPhone,
+      unitPrice,
+      pricingScope: priceRule ? priceRule.pricingScope : '',
+      availableAmount: summary.availableAmount,
+      freezeAmountPerPhone,
+      maxImportCount,
+      validity: summary.validity,
+      canCall: summary.canCall,
+      priceConfigured: unitPrice > 0
+    };
+  }
+
+  function createImportFreeze(data) {
+    const capacity = getImportCapacity(data);
+    const phoneCount = Math.floor(Number(data && data.phoneCount || 0));
+    const requiredFreezeAmount = phoneCount * capacity.freezeAmountPerPhone;
+    const allowed = phoneCount > 0 &&
+      capacity.priceConfigured &&
+      capacity.canCall &&
+      requiredFreezeAmount <= capacity.availableAmount;
+
+    if (!allowed) {
+      return Object.assign({}, capacity, { phoneCount, requiredFreezeAmount, allowed: false });
+    }
+
+    const now = new Date();
+    getFrozenTasks().push({
+      id: Date.now(),
+      tenantName: capacity.tenantName,
+      modelType: capacity.modelType,
+      vendorCode: capacity.providerCode,
+      vendorName: data.vendorName || capacity.providerCode || '-',
+      taskNo: `CALL${formatLocalDate(now).replace(/-/g, '')}${String(Date.now()).slice(-5)}`,
+      sceneName: data.sceneName || '-',
+      frozenMinutes: phoneCount * capacity.estimatedMinutesPerPhone,
+      unitPriceSnapshot: capacity.unitPrice,
+      status: '冻结中',
+      createdAt: formatLocalDateTime(now)
+    });
+
+    return Object.assign({}, capacity, { phoneCount, requiredFreezeAmount, allowed: true });
+  }
+
+  function renderAdjustmentRows(tenantName) {
+    const rows = getBalanceAdjustments()
+      .filter(item => normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName))
+      .sort((a, b) => String(b.effectiveAt).localeCompare(String(a.effectiveAt)));
+    if (!rows.length) {
+      return '<tr><td colspan="8"><div class="tenant-history-empty">暂无余额调整记录</div></td></tr>';
+    }
+    return rows.map((item, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${item.adjustmentNo}</td>
+        <td>${adjustmentTypeText(item.type)}</td>
+        <td><span class="tenant-adjustment-direction out">调减</span></td>
+        <td>${formatBalance(item.amount)}</td>
+        <td>${item.reason || '-'}</td>
+        <td>${item.operator}</td>
+        <td>${item.effectiveAt}</td>
+      </tr>
+    `).join('');
+  }
+
   function renderHistoryRows(tenantName) {
-    const rows = getHistoryRows().filter(item => item.status === '已支付');
+    const normalizedName = normalizeTenantName(tenantName);
+    const rows = getHistoryRows().filter(item =>
+      item.status === '已支付' &&
+      normalizeTenantName(item.tenantName) === normalizedName
+    );
     if (!rows.length) {
       return `
         <tr>
-          <td colspan="9">
+          <td colspan="12">
             <div class="tenant-history-empty">暂无历史关联充值单记录</div>
           </td>
         </tr>
       `;
     }
 
-    return rows.map((item, index) => `
+    var activateAnnoAdded = false;
+    return rows.map((item, index) => {
+      const activated = isRechargeActivated(item);
+      const activateAnno = !activated && !activateAnnoAdded
+        ? ' data-anno="tenant-activate-validity"'
+        : '';
+      if (!activated && !activateAnnoAdded) activateAnnoAdded = true;
+      const validity = item.validFrom && item.validFrom !== '-' && item.validTo && item.validTo !== '-'
+        ? `${item.validFrom} ~ ${item.validTo}`
+        : '-';
+      const operation = !activated
+        ? '<button class="tenant-history-activate-btn"' + activateAnno + ' onclick="window.Pages[\'sys-tenant\'].activateRecharge(\'' + item.rechargeNo + '\')">生效</button>'
+        : '<span class="tenant-muted">已生效</span>';
+      return `
       <tr>
         <td>${index + 1}</td>
         <td>${item.rechargeNo}</td>
         <td>${statusTag(item.status)}</td>
+        <td><span class="tenant-activation-status ${activated ? 'active' : 'pending'}">${activated ? '已生效' : '待生效'}</span></td>
         <td>${item.billingType}</td>
         <td>${item.seatFeePackage || '-'}</td>
         <td>${item.periodDays || 0} 天</td>
-        <td>${formatBalance(item.callBalance)}</td>
+        <td>${formatBalance(item.rechargeAmount)}</td>
+        <td>${validity}</td>
         <td>${item.operator}</td>
         <td>${item.bindTime}</td>
+        <td>${operation}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function render() {
@@ -326,7 +607,7 @@
       <div class="scene-list-page tenant-page">
         <div class="tenant-list-content">
           <div class="tenant-list-header">
-            <div class="tenant-list-title">租户管理</div>
+            <div class="tenant-list-title"><span data-anno="tenant-list">租户管理</span></div>
             <div class="tenant-list-desc">管理每个租户的信息。</div>
           </div>
 
@@ -348,21 +629,15 @@
               <span class="biz-icon-btn" onclick="showToast('设置功能开发中','info')" title="设置">&#x2699;</span>
             </div>
             <div class="table-container">
-              <table class="data-table tenant-native-table" data-anno="tenant-table">
+              <table class="data-table tenant-native-table">
                 <thead>
                   <tr>
                     <th>序号</th>
                     <th>租户名称</th>
                     <th>有效期</th>
-                    <th>话费余额</th>
-                    <th>
-                      <span class="tenant-th-help">
-                        冻结金额
-                        <button type="button" class="tenant-help-trigger" onclick="window.Pages['sys-tenant'].toggleFrozenTooltip(event)" aria-label="冻结金额说明">&#9432;</button>
-                        <span class="tenant-help-popover">冻结金额是指发起外呼时会根据外呼量预先冻结预计的金额，最终根据实际外呼结果扣减对应费用后，优先从冻结金额扣除实际产生的通话费用。冻结任务创建24小时后自动释放回可用余额。</span>
-                      </span>
-                    </th>
-                    <th>可用余额</th>
+                    <th>计费配置</th>
+                    <th>大模型可用分钟数</th>
+                    <th>小模型可用分钟数</th>
                     <th>呼叫控制状态</th>
                     <th>租户类型</th>
                     <th>租户 id</th>
@@ -397,7 +672,7 @@
   function toggleCallControl(tenantName) {
     const summary = getTenantBillingSummary(tenantName);
     if (!summary.callManageEnabled) {
-      showToast('当前租户已过期或可用余额为0，不能手动开启呼叫', 'warning');
+      showToast('当前租户已过期或可用分钟数为0，不能手动开启呼叫', 'warning');
       return;
     }
 
@@ -413,6 +688,119 @@
     showToast(state.enabled ? '已启用呼叫控制状态' : '已停用呼叫控制状态', 'success');
   }
 
+  function renderPricingConfigEditRows(tenantName) {
+    const configs = getTenantAllPriceConfigs(tenantName);
+    if (!configs.length) {
+      return '<tr><td colspan="4"><div class="tenant-history-empty">暂无计费配置</div></td></tr>';
+    }
+    return configs.map(item => `
+      <tr class="tenant-pricing-edit-row" data-model-type="${item.modelType}">
+        <td><span class="tenant-model-tag ${item.modelType === '大模型' ? 'large' : 'small'}">${item.modelType}</span></td>
+        <td>
+          <div class="tenant-price-input-wrap">
+            <span>¥</span>
+            <input class="tenant-price-input" type="number" min="0.01" step="0.01" value="${Number(item.unitPrice || 0).toFixed(2)}">
+            <span>/分钟</span>
+          </div>
+        </td>
+        <td>
+          <select class="tenant-price-status-select">
+            <option value="启用"${item.status === '启用' ? ' selected' : ''}>启用</option>
+            <option value="停用"${item.status === '停用' ? ' selected' : ''}>停用</option>
+          </select>
+        </td>
+        <td class="tenant-config-effect">当前作为该模型默认价，未来可被供应商专属价覆盖</td>
+      </tr>
+    `).join('');
+  }
+
+  function showPricingConfigModal(tenantName) {
+    closePricingConfigModal();
+    const html = `
+      <div class="tenant-pricing-modal-backdrop" id="tenantPricingConfigBackdrop" onclick="window.Pages['sys-tenant'].closePricingConfigModal(event)">
+        <div class="tenant-pricing-modal" id="tenantPricingConfigModal" data-tenant-name="${tenantName}" onclick="event.stopPropagation()">
+          <div class="tenant-pricing-modal-header">
+            <div>
+              <div class="tenant-pricing-modal-title">计费配置</div>
+              <div class="tenant-pricing-modal-subtitle">${tenantName}</div>
+            </div>
+            <button class="tenant-pricing-modal-close" onclick="window.Pages['sys-tenant'].closePricingConfigModal()">&#x2715;</button>
+          </div>
+          <div class="tenant-pricing-modal-body">
+            <div class="biz-modal-notice tenant-pricing-config-notice">
+              <span class="biz-notice-icon">&#x26A0;</span>
+              <div class="biz-notice-body">当前版本只配置大模型和小模型默认单价。供应商作为未来扩展维度暂不参与配置；价格调整不追溯已冻结任务。</div>
+            </div>
+            <div class="tenant-pricing-table-wrap">
+              <table class="tenant-pricing-table tenant-pricing-edit-table">
+                <thead>
+                  <tr>
+                    <th>模型</th>
+                    <th>通话单价</th>
+                    <th>状态</th>
+                    <th>生效规则</th>
+                  </tr>
+                </thead>
+                <tbody>${renderPricingConfigEditRows(tenantName)}</tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tenant-pricing-modal-footer">
+            <button class="btn btn-default" onclick="window.Pages['sys-tenant'].closePricingConfigModal()">取消</button>
+            <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].savePricingConfig()">保存配置</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function closePricingConfigModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('tenantPricingConfigBackdrop')?.remove();
+  }
+
+  function savePricingConfig() {
+    const modal = document.getElementById('tenantPricingConfigModal');
+    if (!modal) return;
+    const tenantName = modal.dataset.tenantName;
+    const rows = Array.from(modal.querySelectorAll('.tenant-pricing-edit-row'));
+    const updates = [];
+
+    for (const row of rows) {
+      const input = row.querySelector('.tenant-price-input');
+      const statusSelect = row.querySelector('.tenant-price-status-select');
+      const unitPrice = Number(input && input.value);
+      if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
+        input?.focus();
+        showToast('通话单价必须大于 0', 'warning');
+        return;
+      }
+      updates.push({
+        modelType: row.dataset.modelType,
+        unitPrice,
+        status: statusSelect ? statusSelect.value : '启用'
+      });
+    }
+
+    updates.forEach(update => {
+      const config = getPriceRules().find(item =>
+        normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName) &&
+        item.modelType === update.modelType &&
+        item.pricingScope === 'MODEL_DEFAULT' &&
+        !item.providerCode
+      );
+      if (!config) return;
+      config.unitPrice = update.unitPrice;
+      config.status = update.status;
+    });
+
+    const container = document.getElementById('page-content');
+    if (container) container.innerHTML = render();
+    closePricingConfigModal();
+    showToast('计费配置已保存', 'success');
+  }
+
   function showBillingDrawer(tenantName) {
     const existed = findBillingByTenant(tenantName);
     const row = existed || buildBillingSeed(tenantName);
@@ -422,7 +810,7 @@
       <div class="biz-drawer-backdrop" id="tenantBillingBackdrop" onclick="window.Pages['sys-tenant'].closeBillingDrawer(event)">
         <div class="biz-drawer tenant-drawer" id="tenantBillingDrawer" onclick="event.stopPropagation()" data-row-id="${row.id}" data-new="${existed ? '0' : '1'}">
           <div class="biz-drawer-header">
-            <span class="biz-drawer-title">充值单配置</span>
+            <span class="biz-drawer-title">充值管理</span>
             <span class="biz-drawer-close" onclick="window.Pages['sys-tenant'].closeBillingDrawer()">&#x2715;</span>
           </div>
           <div class="biz-drawer-body">
@@ -434,66 +822,118 @@
               </div>
               <div class="biz-form-row">
                 <label class="biz-form-label">有效期</label>
-                <div class="biz-form-field" style="display:flex;align-items:center;gap:8px;">
-                  <input class="biz-form-input readonly" id="tenantValidity" value="${summary.validity}" readonly style="flex:1;">
-                  ${summary.hasPendingValidity ? '<button class="btn btn-primary" onclick="window.Pages[\'sys-tenant\'].activateValidity()" style="height:36px;padding:0 14px;white-space:nowrap;">生效</button>' : ''}
-                </div>
+                <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantValidity" value="${summary.validity}" readonly></div>
               </div>
               <div class="biz-form-row">
-                <label class="biz-form-label">通话余额</label>
-                <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantCallBalance" value="${summary.balance}" readonly></div>
+                <label class="biz-form-label">历史充值总额</label>
+                <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantTotalRecharge" value="${formatBalance(summary.totalRechargeAmount)}" readonly></div>
               </div>
-              <div class="biz-form-row">
-                <label class="biz-form-label">冻结金额</label>
-                <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantFrozenAmount" value="${summary.frozen}" readonly></div>
-              </div>
-              <div class="biz-form-row">
-                <label class="biz-form-label">可用余额</label>
-                <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantAvailableBalance" value="${summary.available}" readonly></div>
-              </div>
+              <input type="hidden" id="tenantAvailableBalance" value="${summary.availableAmount}">
               <div class="biz-form-row">
                 <label class="biz-form-label">呼叫控制状态</label>
                 <div class="biz-form-field"><input class="biz-form-input readonly" id="tenantCallStatus" value="${summary.callStatus}" readonly></div>
               </div>
             </div>
 
-            <div class="tenant-drawer-section">
-              <div class="tenant-section-title">关联充值单</div>
-              <div class="biz-form-row">
-                <label class="biz-form-label required">充值单号</label>
-                <div class="biz-form-field">
-                  <div class="tenant-recharge-check">
-                    <input class="biz-form-input" id="tenantRechargeNo" value="${row.rechargeNo || ''}" placeholder="请输入充值单号" oninput="window.Pages['sys-tenant'].previewRechargeOrder()">
-                    <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].submitRechargeOrder()" style="height:36px;padding:0 14px;">提交</button>
-                  </div>
+            <div class="tenant-billing-tabs" role="tablist">
+              <button class="tenant-billing-tab active" role="tab" data-tab="pricing" onclick="window.Pages['sys-tenant'].switchBillingTab('pricing')">计费明细</button>
+              <button class="tenant-billing-tab" role="tab" data-tab="recharge" onclick="window.Pages['sys-tenant'].switchBillingTab('recharge')">充值单管理</button>
+              <button class="tenant-billing-tab" role="tab" data-tab="adjustment" onclick="window.Pages['sys-tenant'].switchBillingTab('adjustment')">余额调整</button>
+            </div>
+
+            <div class="tenant-billing-tab-panel active" data-panel="pricing" role="tabpanel">
+              <div class="tenant-drawer-section tenant-tab-section">
+                <div class="biz-modal-notice tenant-notice tenant-pricing-notice">
+                  <span class="biz-notice-icon">&#x26A0;</span>
+                  <div class="biz-notice-body">大模型和小模型余额均由同一资金余额按模型默认单价换算，两类分钟数是不同计价视图，不可相加。</div>
                 </div>
-              </div>
-              <div class="tenant-order-preview" id="tenantOrderPreview"></div>
-              <div class="biz-modal-notice tenant-notice">
-                <span class="biz-notice-icon">&#x26A0;</span>
-                <div class="biz-notice-body">仅坐席费生成有效期（需手动点击"生效"）；仅通话费增加套餐话费；坐席费+通话费同时生成有效期（需手动点击"生效"）并增加套餐话费。</div>
+                <div id="tenantBalanceRiskNotice">${renderBalanceRisk(summary)}</div>
+                <div class="tenant-pricing-table-wrap">
+                  <table class="tenant-pricing-table">
+                    <thead>
+                      <tr>
+                        <th>模型</th>
+                        <th>模型默认单价</th>
+                        <th>冻结分钟数</th>
+                        <th>冻结金额</th>
+                        <th>通话余额</th>
+                        <th>可用分钟数</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tenantPricingBody">${renderPricingRows(tenantLocked)}</tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            <div class="tenant-drawer-section">
-              <div class="tenant-section-title">历史关联充值单</div>
-              <div class="tenant-history-table-wrap">
-                <table class="tenant-history-table">
-                  <thead>
-                    <tr>
-                      <th>序号</th>
-                      <th>充值单号</th>
-                      <th>状态</th>
-                      <th>计费类型</th>
-                      <th>坐席费套餐</th>
-                      <th>周期</th>
-                      <th>套餐话费</th>
-                      <th>操作人</th>
-                      <th>关联时间</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tenantHistoryBody">${renderHistoryRows(tenantLocked)}</tbody>
-                </table>
+            <div class="tenant-billing-tab-panel" data-panel="recharge" role="tabpanel">
+              <div class="tenant-drawer-section">
+                <div class="tenant-section-title">关联充值单</div>
+                <div class="biz-form-row">
+                  <label class="biz-form-label required">充值单号</label>
+                  <div class="biz-form-field">
+                    <div class="tenant-recharge-check">
+                      <input class="biz-form-input" id="tenantRechargeNo" value="${row.rechargeNo || ''}" placeholder="请输入充值单号" oninput="window.Pages['sys-tenant'].previewRechargeOrder()">
+                      <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].submitRechargeOrder()" style="height:36px;padding:0 14px;">提交</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="tenant-order-preview" id="tenantOrderPreview"></div>
+                <div class="biz-modal-notice tenant-notice">
+                  <span class="biz-notice-icon">&#x26A0;</span>
+                  <div class="biz-notice-body">充值金额进入统一资金账户。大模型和小模型余额按各自默认单价换算，分钟数不可相加。</div>
+                </div>
+              </div>
+
+              <div class="tenant-drawer-section tenant-tab-section">
+                <div class="tenant-section-title">历史关联充值单</div>
+                <div class="tenant-history-table-wrap">
+                  <table class="tenant-history-table">
+                    <thead>
+                      <tr>
+                        <th>序号</th>
+                        <th>充值单号</th>
+                        <th>支付状态</th>
+                        <th>生效状态</th>
+                        <th>计费类型</th>
+                        <th>坐席费套餐</th>
+                        <th>周期</th>
+                        <th>充值金额</th>
+                        <th>有效期</th>
+                        <th>操作人</th>
+                        <th>关联时间</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tenantHistoryBody">${renderHistoryRows(tenantLocked)}</tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="tenant-billing-tab-panel" data-panel="adjustment" role="tabpanel">
+              <div class="tenant-drawer-section tenant-tab-section tenant-adjustment-section">
+                <div class="tenant-list-tools" style="margin-bottom:12px;">
+                  <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].showAdjustmentModal()" style="height:34px;padding:0 16px;">+ 手工调整</button>
+                </div>
+                <div class="tenant-history-table-wrap tenant-adjustment-table-wrap">
+                  <table class="tenant-history-table tenant-adjustment-table">
+                    <thead>
+                      <tr>
+                        <th>序号</th>
+                        <th>调整单号</th>
+                        <th>调整类型</th>
+                        <th>方向</th>
+                        <th>金额</th>
+                        <th>原因</th>
+                        <th>操作人</th>
+                        <th>生效时间</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tenantAdjustmentBody">${renderAdjustmentRows(tenantLocked)}</tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -521,6 +961,17 @@
     setTimeout(() => backdrop.remove(), 280);
   }
 
+  function switchBillingTab(tabName) {
+    const drawer = document.getElementById('tenantBillingDrawer');
+    if (!drawer) return;
+    drawer.querySelectorAll('.tenant-billing-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+    drawer.querySelectorAll('.tenant-billing-tab-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.dataset.panel === tabName);
+    });
+  }
+
   function renderCheckedOrder(order) {
     const drawer = document.getElementById('tenantBillingDrawer');
     if (drawer) {
@@ -536,20 +987,34 @@
       return;
     }
     const preview = buildSubmitPreview(order);
-    // 检查是否已提交且待生效
     var billingTenantName = document.getElementById('tenantName')?.value || '';
-    var billingRow = findBillingByTenant(billingTenantName);
-    var isSubmitted = billingRow && billingRow.rechargeNo === order.no;
-    var validityDisplay = (!isSubmitted || !canGenerateValidity(billingRow) || billingRow.validityActivated)
-      ? preview.validity
-      : preview.validity + '（待生效）';
+    var historyRow = getHistoryRows().find(item =>
+      item.rechargeNo === order.no &&
+      normalizeTenantName(item.tenantName) === normalizeTenantName(billingTenantName)
+    );
+    var isSubmitted = !!historyRow;
+    var validityDisplay = preview.validity;
+    if (isSubmitted && historyRow.validFrom && historyRow.validFrom !== '-' && historyRow.validTo && historyRow.validTo !== '-') {
+      validityDisplay = `${historyRow.validFrom} ~ ${historyRow.validTo}`;
+    } else if (isSubmitted && !isRechargeActivated(historyRow) && canGenerateValidity({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    })) {
+      validityDisplay = '待生效';
+    }
+    const tenantName = document.getElementById('tenantName')?.value || '';
+    const largeConfigs = getTenantPriceConfigs(tenantName, '大模型');
+    const smallConfigs = getTenantPriceConfigs(tenantName, '小模型');
+    const rechargeAmount = order.status === '已支付' ? order.rechargeAmount : 0;
     box.innerHTML = `
       <div class="tenant-preview-grid">
         <div><span>充值单状态</span>${statusTag(order.status)}</div>
         <div><span>计费类型</span><strong>${order.billingType}</strong></div>
         <div><span>坐席费套餐</span><strong>${order.seatFeePackage || '-'}</strong></div>
         <div><span>租户有效期</span><strong>${validityDisplay}</strong></div>
-        <div><span>套餐话费</span><strong>${formatBalance(order.status === '已支付' ? order.callBalance : 0)}</strong></div>
+        <div><span>充值金额</span><strong>${formatBalance(rechargeAmount)}${isSubmitted && !isRechargeActivated(historyRow) ? '（待生效）' : ''}</strong></div>
+        <div><span>大模型等价分钟数</span><strong>${formatMinuteRange(largeConfigs, rechargeAmount)}</strong></div>
+        <div><span>小模型等价分钟数</span><strong>${formatMinuteRange(smallConfigs, rechargeAmount)}</strong></div>
       </div>
     `;
   }
@@ -585,7 +1050,7 @@
       periodDays: 0,
       billingType: '仅坐席费',
       seatFeePackage: '-',
-      callBalance: 0
+      rechargeAmount: 0
     };
     renderCheckedOrder(order);
 
@@ -595,7 +1060,7 @@
     const isNew = drawer.dataset.new === '1';
     const row = isNew ? { id: rowId } : getBillingRows().find(item => item.id === rowId);
     row.tenantName = document.getElementById('tenantName')?.value || row.tenantName;
-    row.localAddedAt = row.localAddedAt || '2026-06-03 10:00:00';
+    row.localAddedAt = formatLocalDateTime(new Date());
 
     if (order.status === '已支付' && getHistoryRows().some(item => item.rechargeNo === order.no)) {
       showToast('该充值单号已关联，请勿重复提交', 'warning');
@@ -614,9 +1079,11 @@
         billingType: row.billingType,
         seatFeePackage: row.seatFeePackage,
         periodDays: row.periodDays,
-        callBalance: row.callBalance,
+        rechargeAmount: row.rechargeAmount,
         validFrom: row.validFrom,
         validTo: row.validTo,
+        validityActivated: row.validityActivated,
+        activated: false,
         operator: 'xtadmin',
         bindTime: row.localAddedAt
       });
@@ -625,10 +1092,115 @@
     const historyBody = document.getElementById('tenantHistoryBody');
     if (historyBody) historyBody.innerHTML = renderHistoryRows(row.tenantName);
     updateDrawerFieldsAfterActivation(row.tenantName);
-    const successMsg = canGenerateValidity(row)
-      ? '充值单已提交，请手动点击"生效"生成有效期'
-      : (canAddCallBalance(row) ? '充值单已提交，通话余额已更新' : `充值单未关联，当前状态：${row.rechargeStatus}`);
-    showToast(successMsg, canGenerateValidity(row) || canAddCallBalance(row) ? 'success' : 'warning');
+    const successMsg = row.rechargeStatus === '已支付'
+      ? '充值单已关联，请在历史记录中点击“生效”后更新有效期和余额'
+      : `充值单未关联，当前状态：${row.rechargeStatus}`;
+    showToast(successMsg, row.rechargeStatus === '已支付' ? 'success' : 'warning');
+  }
+
+  function createBalanceAdjustment(data) {
+    const now = new Date();
+    getBalanceAdjustments().unshift({
+      id: Date.now(),
+      adjustmentNo: `ADJ${formatLocalDate(now).replace(/-/g, '')}${String(Date.now()).slice(-5)}`,
+      tenantName: data.tenantName,
+      type: 'MANUAL_DEDUCT',
+      direction: 'OUT',
+      amount: data.amount,
+      reason: data.reason,
+      operator: 'xtadmin',
+      status: '已生效',
+      effectiveAt: formatLocalDateTime(now)
+    });
+  }
+
+  function refreshAfterBalanceAdjustment(tenantName, successText) {
+    updateDrawerFieldsAfterActivation(tenantName);
+    const container = document.getElementById('page-content');
+    if (container) container.innerHTML = render();
+    const updatedSummary = getTenantBillingSummary(tenantName);
+    showToast(
+      updatedSummary.availableAmount <= 0
+        ? `${successText}，当前已无新增冻结额度`
+        : successText,
+      updatedSummary.availableAmount <= 0 ? 'warning' : 'success'
+    );
+  }
+
+  function showAdjustmentModal() {
+    closeAdjustmentModal();
+    const tenantName = document.getElementById('tenantName')?.value || '';
+    const summary = getTenantBillingSummary(tenantName);
+    const html = `
+      <div class="tenant-pricing-modal-backdrop" id="tenantAdjustmentBackdrop" onclick="window.Pages['sys-tenant'].closeAdjustmentModal(event)">
+        <div class="tenant-pricing-modal tenant-refund-modal" id="tenantAdjustmentModal" onclick="event.stopPropagation()">
+          <div class="tenant-pricing-modal-header">
+            <div>
+              <div class="tenant-pricing-modal-title">手工调整</div>
+              <div class="tenant-pricing-modal-subtitle">${tenantName}</div>
+            </div>
+            <button class="tenant-pricing-modal-close" onclick="window.Pages['sys-tenant'].closeAdjustmentModal()">&#x2715;</button>
+          </div>
+          <div class="tenant-pricing-modal-body">
+            <div class="tenant-refund-summary">
+              <div><span>当前资金余额</span><strong>${formatBalance(summary.balanceAmount)}</strong></div>
+            </div>
+            <div class="biz-modal-notice tenant-pricing-config-notice">
+              <span class="biz-notice-icon">&#x26A0;</span>
+              <div class="biz-notice-body">手工扣减金额不能超过当前资金余额，不占用冻结金额。</div>
+            </div>
+            <div class="tenant-refund-form">
+              <div class="tenant-adjustment-field">
+                <label>金额</label>
+                <input id="tenantAdjustmentModalAmount" type="number" min="0.01" step="0.01" placeholder="请输入金额">
+              </div>
+              <div class="tenant-adjustment-field">
+                <label>原因</label>
+                <input id="tenantAdjustmentModalReason" type="text" maxlength="100" placeholder="请输入原因">
+              </div>
+            </div>
+          </div>
+          <div class="tenant-pricing-modal-footer">
+            <button class="btn btn-default" onclick="window.Pages['sys-tenant'].closeAdjustmentModal()">取消</button>
+            <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].submitAdjustmentFromModal()">确认调整</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function closeAdjustmentModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('tenantAdjustmentBackdrop')?.remove();
+  }
+
+  function submitAdjustmentFromModal() {
+    const tenantName = document.getElementById('tenantName')?.value || '';
+    const amountInput = document.getElementById('tenantAdjustmentModalAmount');
+    const amount = Number(amountInput && amountInput.value);
+    const reasonInput = document.getElementById('tenantAdjustmentModalReason');
+    const reason = String(reasonInput && reasonInput.value || '').trim();
+    const summary = getTenantBillingSummary(tenantName);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      amountInput?.focus();
+      showToast('金额必须大于 0', 'warning');
+      return;
+    }
+    if (!reason) {
+      reasonInput?.focus();
+      showToast('请输入原因', 'warning');
+      return;
+    }
+    if (amount > summary.balanceAmount) {
+      showToast(`金额不能超过当前资金余额 ${formatBalance(summary.balanceAmount)}`, 'warning');
+      return;
+    }
+
+    createBalanceAdjustment({ tenantName, amount, reason });
+    closeAdjustmentModal();
+    refreshAfterBalanceAdjustment(tenantName, '手工扣减已生效');
   }
 
   window.Pages = window.Pages || {};
@@ -637,11 +1209,20 @@
     init,
     showBillingDrawer,
     closeBillingDrawer,
+    switchBillingTab,
     previewRechargeOrder,
     submitRechargeOrder,
-    activateValidity,
+    showAdjustmentModal,
+    closeAdjustmentModal,
+    submitAdjustmentFromModal,
+    activateRecharge,
     toggleFrozenTooltip,
-    toggleCallControl
+    toggleCallControl,
+    getImportCapacity,
+    createImportFreeze,
+    showPricingConfigModal,
+    closePricingConfigModal,
+    savePricingConfig
   };
 
   document.addEventListener('click', function () {

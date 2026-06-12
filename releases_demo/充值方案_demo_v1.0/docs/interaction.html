@@ -22,12 +22,12 @@
     .jump-btn { display: inline-block; padding: 8px 20px; background: #1677ff; color: #fff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; }
     .jump-btn:hover { background: #4096ff; text-decoration: none; }
   </style>
-  <link rel="stylesheet" href="annotations-tool/annotation.css">
+  <link rel="stylesheet" href="../annotations/annotation.css?v=2">
 </head>
 <body>
   <div class="container">
     <div style="text-align: right; margin-bottom: 24px;">
-      <a href="index.html" class="jump-btn">跳转演示页面 →</a>
+      <a href="../index.html" class="jump-btn">跳转演示页面 →</a>
     </div>
     <h1>功能说明文档</h1>
 
@@ -51,7 +51,7 @@
         <tr><td>智能外呼系统</td><td>外呼列表</td><td>任务详情</td><td>一知</td></tr>
         <tr><td>智能外呼系统</td><td>外呼列表</td><td>手工导入</td><td>科大、一知、冰兰</td></tr>
         <tr><td>智能外呼系统</td><td>业务场景</td><td>大小模型关联账号</td><td>一知</td></tr>
-        <tr><td>智能外呼系统</td><td>租户管理</td><td>充值单配置-手动生效</td><td>--</td></tr>
+        <tr><td>智能外呼系统</td><td>租户管理</td><td>充值管理-手动生效</td><td>--</td></tr>
       </tbody>
     </table>
     <h2>三. 逻辑说明</h2>
@@ -202,8 +202,8 @@
       </tbody>
     </table>
     <hr class="section-divider">
-    <h3>7. 系统管理-租户管理-充值单配置-手动生效</h3>
-    <p><strong>1）功能名称：</strong> 充值单配置-手动生效</p>
+    <h3>7. 系统管理-租户管理-充值管理-手动生效</h3>
+    <p><strong>1）功能名称：</strong> 充值管理-手动生效</p>
     <p><strong>2）交互说明：</strong> 如图。</p>
     <p><strong>3）数据来源：</strong> 前端Mock数据。</p>
     <p><strong>4）逻辑说明：</strong> 关联充值单后有效期不再自动生成，需用户手动点击"生效"按钮触发有效期计算和激活。激活后同步更新历史充值记录中的有效期字段。</p>
@@ -213,11 +213,10 @@
         <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
       </thead>
       <tbody>
-        <tr><td>有效期待生效状态</td><td>充值单已支付但有效期尚未激活时，有效期列显示"待生效"</td><td>前端Mock</td><td>充值单状态=已支付 且 计费类型支持有效期（仅坐席费/坐席费+通话费）且 validityActivated=false</td><td>文本</td><td>未生成</td><td>--</td></tr>
-        <tr><td>生效按钮-租户列表</td><td>待生效状态下，租户列表操作列显示"生效"按钮</td><td>前端行为</td><td>hasPendingValidity=true 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
-        <tr><td>生效按钮-充值单抽屉</td><td>待生效状态下，充值单配置抽屉的有效期字段旁显示"生效"按钮</td><td>前端行为</td><td>hasPendingValidity=true 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
-        <tr><td>手动生效触发</td><td>点击"生效"按钮后自动计算并激活有效期</td><td>前端JS</td><td>validFrom：若存在历史有效期且未过期，从历史截止日期次日开始（无缝续期）；否则从关联日期开始。validTo = validFrom + 套餐天数 - 1天。套餐天数：半年套餐=180天，全年套餐=365天</td><td>日期范围</td><td>--</td><td>充值单未支付提示"充值单未支付，无法生效"；已激活提示"有效期已生效，无需重复操作"</td></tr>
-        <tr><td>激活后状态更新</td><td>激活成功后有效期从"待生效"变为计算后的日期范围，按钮消失，租户变为可呼叫状态</td><td>前端JS</td><td>设置 validityActivated=true、enabled=true，同步更新历史记录</td><td>状态变更</td><td>--</td><td>--</td></tr>
+        <tr><td>充值单待生效状态</td><td>已支付充值单关联后在历史记录显示"待生效"，不立即更新有效期和余额</td><td>前端Mock</td><td>status=已支付 且 activated=false</td><td>状态标签</td><td>待生效</td><td>--</td></tr>
+        <tr><td>逐单生效按钮</td><td>每条待生效历史充值单在操作列显示"生效"按钮</td><td>前端行为</td><td>activated=false 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
+        <tr><td>手动生效触发</td><td>点击指定充值单的"生效"按钮后，按计费类型更新有效期、余额或两者</td><td>前端JS</td><td>仅坐席费更新有效期；仅通话费更新余额；组合单同时更新。新有效期在已有有效期后顺延</td><td>状态与金额</td><td>--</td><td>已生效记录不可重复操作</td></tr>
+        <tr><td>生效后状态更新</td><td>成功后该记录变为"已生效"，操作按钮消失，并刷新租户列表和计费明细</td><td>前端JS</td><td>设置 activated=true 并重新计算汇总</td><td>状态变更</td><td>--</td><td>--</td></tr>
         <tr><td>计费类型区分</td><td>仅坐席费生成有效期；仅通话费增加话费不涉及有效期；坐席费+通话费同时支持</td><td>前端Mock</td><td>根据计费类型和套餐计算</td><td>逻辑分支</td><td>--</td><td>仅通话费类型不显示"生效"按钮</td></tr>
       </tbody>
     </table>
@@ -236,10 +235,12 @@
   </div>
 <script>
   window.AnnotationConfig = {
+    projectId: 'ai-call-recharge-v1',
+    dataVersion: '2',
     page: 'interaction'
   };
 </script>
-<script src="data/annotations.js"></script>
-<script src="annotations-tool/annotation-runtime.js"></script>
+<script src="../annotations/annotations.js?v=2"></script>
+<script src="../annotations/annotation-runtime.js?v=3"></script>
 </body>
 </html>

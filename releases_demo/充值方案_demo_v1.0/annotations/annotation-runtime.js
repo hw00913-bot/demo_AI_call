@@ -45,7 +45,10 @@
   }
 
   function storageKey() {
-    return 'prototype_annotations_' + getPageKey();
+    var cfg = getConfig();
+    var projectId = cfg.projectId || window.location.pathname || 'default-project';
+    var dataVersion = cfg.dataVersion || '1';
+    return ['prototype_annotations', projectId, dataVersion, getPageKey()].join('_');
   }
 
   function loadCached() {
@@ -69,10 +72,13 @@
     var source = getRawAnnotations();
     if (!source.length) return [];
     var cached = loadCached();
-    var map = {};
-    source.forEach(function (item) { map[item.id] = clone(item); });
-    cached.forEach(function (item) { map[item.id] = clone(item); });
-    return Object.keys(map).map(function (id) { return map[id]; }).sort(function (a, b) {
+    var cachedMap = {};
+    cached.forEach(function (item) {
+      if (item && item.id != null) cachedMap[item.id] = item;
+    });
+    return source.map(function (item) {
+      return clone(cachedMap[item.id] || item);
+    }).sort(function (a, b) {
       return Number(a.id) - Number(b.id);
     });
   }
@@ -171,6 +177,7 @@
   function openPopup(anno, marker) {
     closePopup();
     currentAnno = clone(anno);
+    currentAnno.desc = currentAnno.desc || generateDesc(currentAnno.sections);
     activePopup = document.createElement('div');
     activePopup.className = 'anno-popup';
     activePopup.innerHTML = buildViewHTML(currentAnno);
@@ -182,12 +189,26 @@
 
   function positionPopup(popup, marker) {
     var rect = marker.getBoundingClientRect();
+    var popupWidth = popup.offsetWidth;
+    var popupHeight = popup.offsetHeight;
     var left = rect.right + 12;
     var top = rect.top;
-    if (left + 560 > window.innerWidth - 16) left = window.innerWidth - 576;
-    if (top + 360 > window.innerHeight - 16) top = window.innerHeight - 376;
-    popup.style.left = Math.max(16, left) + 'px';
-    popup.style.top = Math.max(16, top) + 'px';
+    if (left + popupWidth > window.innerWidth - 16) {
+      left = rect.left - popupWidth - 12;
+    }
+    left = Math.max(16, Math.min(left, window.innerWidth - popupWidth - 16));
+    top = Math.max(16, Math.min(top, window.innerHeight - popupHeight - 16));
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  }
+
+  function fitPopupToViewport(popup) {
+    if (!popup) return;
+    var rect = popup.getBoundingClientRect();
+    var left = Math.max(16, Math.min(rect.left, window.innerWidth - rect.width - 16));
+    var top = Math.max(16, Math.min(rect.top, window.innerHeight - rect.height - 16));
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
   }
 
   function buildViewHTML(anno) {
@@ -238,6 +259,7 @@
       activePopup.innerHTML = buildEditHTML(currentAnno);
       bindEditEvents();
       bindDrag();
+      fitPopupToViewport(activePopup);
     });
   }
 
@@ -247,6 +269,7 @@
       activePopup.innerHTML = buildViewHTML(currentAnno);
       bindViewEvents();
       bindDrag();
+      fitPopupToViewport(activePopup);
     });
     activePopup.querySelector('.anno-copy').addEventListener('click', copyCurrent);
     activePopup.querySelector('.anno-save').addEventListener('click', saveEdit);
@@ -276,6 +299,7 @@
     activePopup.innerHTML = buildViewHTML(currentAnno);
     bindViewEvents();
     bindDrag();
+    fitPopupToViewport(activePopup);
     showToast('已保存到浏览器缓存');
   }
 
@@ -353,9 +377,13 @@
 
   document.addEventListener('mouseup', function () {
     dragState = null;
+    fitPopupToViewport(activePopup);
   });
 
-  window.addEventListener('resize', render);
+  window.addEventListener('resize', function () {
+    render();
+    fitPopupToViewport(activePopup);
+  });
   window.addEventListener('scroll', render, true);
 
   function observeChanges() {

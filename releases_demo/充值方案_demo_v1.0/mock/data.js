@@ -1,10 +1,10 @@
 /**
- * data/mock.js — 全站 Mock 数据
+ * mock/data.js - 全站 Mock 数据
  */
 
 /* ===== 外呼列表 Mock 数据 ===== */
 var MockSceneList = [
-  { id: 1, name: '渝兴店售后-临保邀约', status: 'not_started', source: '手动导入', assigned: 0, pending: 0, called: 0 },
+  { id: 1, name: '渝兴店售后-临保邀约', status: 'not_started', source: '手动导入', assigned: 0, pending: 0, called: 0, tenantName: '东风日产-燃油车', modelType: '大模型', vendorCode: 'IFLYTEK', vendorName: '科大讯飞', estimatedMinutesPerPhone: 1 },
   { id: 2, name: '渝兴店售后-流失招揽', status: 'not_started', source: '手动导入', assigned: 0, pending: 0, called: 4 },
   { id: 3, name: '渝发店售前-冷线索激活', status: 'terminated', source: '手动导入', assigned: 0, pending: 0, called: 2785 },
   { id: 4, name: '渝兴店售前-冷线索激活', status: 'terminated', source: '手动导入', assigned: 0, pending: 0, called: 2705 },
@@ -85,11 +85,10 @@ var MockTenantBillingRows = [
     billingType: '坐席费+通话费',
     rechargeNo: 'RC20260601001',
     rechargeStatus: '已支付',
-    modelType: '大模型',
     localAddedAt: '2026-06-01 09:30:00',
     seatFeePackage: '全年套餐',
     periodDays: 365,
-    callBalance: 2000,
+    rechargeAmount: 2000,
     validFrom: '2026-06-01',
     validTo: '2027-05-31',
     enabled: true,
@@ -102,11 +101,10 @@ var MockTenantBillingRows = [
     billingType: '仅坐席费',
     rechargeNo: 'RC20260602002',
     rechargeStatus: '未支付',
-    modelType: '小模型',
     localAddedAt: '2026-06-02 10:10:00',
     seatFeePackage: '半年套餐',
     periodDays: 180,
-    callBalance: 0,
+    rechargeAmount: 0,
     validFrom: '-',
     validTo: '-',
     enabled: false,
@@ -119,11 +117,10 @@ var MockTenantBillingRows = [
     billingType: '其他',
     rechargeNo: 'RC20260501003',
     rechargeStatus: '已取消',
-    modelType: '大模型',
     localAddedAt: '2026-05-01 14:20:00',
     seatFeePackage: '-',
     periodDays: 0,
-    callBalance: 0,
+    rechargeAmount: 0,
     validFrom: '-',
     validTo: '-',
     enabled: false,
@@ -136,11 +133,10 @@ var MockTenantBillingRows = [
     billingType: '仅坐席费',
     rechargeNo: 'RC20260605005',
     rechargeStatus: '已支付',
-    modelType: '小模型',
     localAddedAt: '2026-06-05 09:00:00',
     seatFeePackage: '半年套餐',
     periodDays: 180,
-    callBalance: 0,
+    rechargeAmount: 0,
     validFrom: '-',
     validTo: '-',
     enabled: false,
@@ -149,14 +145,15 @@ var MockTenantBillingRows = [
 ];
 
 var MockRechargeOrders = [
-  { no: 'RC20260601001', tenantName: '东风日产-燃油车', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', callBalance: 2000 },
-  { no: 'RC20260602002', tenantName: '重庆东南方渝兴', status: '未支付', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', callBalance: 0 },
-  { no: 'RC20260603003', tenantName: '重庆东南方渝发', status: '查询失败', seatFeePackage: '半年套餐', periodDays: 180, billingType: '坐席费+通话费', callBalance: 1000 },
-  { no: 'RC20260604004', tenantName: '东风日产-点检', status: '不存在', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', callBalance: 0 },
-  { no: 'RC20260605005', tenantName: '超级管理组', status: '已取消', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', callBalance: 3000 },
-  { no: 'RC20260606006', tenantName: '重庆东南方渝发', status: '已支付', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', callBalance: 0 },
-  { no: 'RC20260607007', tenantName: '重庆东南方渝兴', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', callBalance: 1500 },
-  { no: 'RC20260608008', tenantName: '重庆东南方渝兴', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', callBalance: 2500 }
+  { no: 'RC20260601001', tenantName: '东风日产-燃油车', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 2000 },
+  { no: 'RC20260602002', tenantName: '重庆东南方渝兴', status: '未支付', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC20260603003', tenantName: '重庆东南方渝发', status: '查询失败', seatFeePackage: '半年套餐', periodDays: 180, billingType: '坐席费+通话费', rechargeAmount: 1000 },
+  { no: 'RC20260604004', tenantName: '东风日产-点检', status: '不存在', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC20260605005', tenantName: '超级管理组', status: '已取消', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 3000 },
+  { no: 'RC20260606006', tenantName: '重庆东南方渝发', status: '已支付', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC20260607007', tenantName: '重庆东南方渝兴', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 1500 },
+  { no: 'RC20260608008', tenantName: '重庆东南方渝兴', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 2500 },
+  { no: 'RC20260609009', tenantName: '东风日产-燃油车', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 520 }
 ];
 
 var MockTenantAccounts = [
@@ -167,24 +164,52 @@ var MockTenantAccounts = [
 ];
 
 var MockTenantRows = [
-  { no: 1, name: '重庆东风南方渝兴', type: '门店', tenantId: '2054080803329462274', desc: '-', status: '启用', updater: 'xtadmin', updateTime: '2026-05-12 14:06:41' },
-  { no: 2, name: '重庆东风南方渝发', type: '门店', tenantId: '2054073731284819970', desc: '-', status: '启用', updater: 'xtadmin', updateTime: '2026-05-12 13:38:35' },
-  { no: 3, name: '东风日产-点检', type: '总部', tenantId: '2016181907299717121', desc: '-', status: '启用', updater: 'xtadmin', updateTime: '2026-01-28 00:10:00' },
-  { no: 4, name: '东风日产-燃油车', type: '总部', tenantId: '2016155108954767361', desc: '请勿删除', status: '启用', updater: 'xtadmin', updateTime: '2026-01-28 00:09:27' },
-  { no: 5, name: '超级管理组', type: '总部', tenantId: '1958770839827107842', desc: '系统默认组别，不可删除与修改', status: '启用', updater: 'xtadmin', updateTime: '2026-01-11 09:00:43' }
+  { no: 1, name: '重庆东风南方渝兴', consumedAmount: 120, type: '门店', tenantId: '2054080803329462274', desc: '-', status: '启用', updater: 'xtadmin', updateTime: '2026-05-12 14:06:41' },
+  { no: 2, name: '重庆东风南方渝发', consumedAmount: 260, type: '门店', tenantId: '2054073731284819970', desc: '-', status: '启用', updater: 'xtadmin', updateTime: '2026-05-12 13:38:35' },
+  { no: 3, name: '东风日产-点检', consumedAmount: 0, type: '总部', tenantId: '2016181907299717121', desc: '-', status: '启用', updater: 'xtadmin', updateTime: '2026-01-28 00:10:00' },
+  { no: 4, name: '东风日产-燃油车', consumedAmount: 180, type: '总部', tenantId: '2016155108954767361', desc: '请勿删除', status: '启用', updater: 'xtadmin', updateTime: '2026-01-28 00:09:27' },
+  { no: 5, name: '超级管理组', consumedAmount: 0, type: '总部', tenantId: '1958770839827107842', desc: '系统默认组别，不可删除与修改', status: '启用', updater: 'xtadmin', updateTime: '2026-01-11 09:00:43' }
+];
+
+/* 当前版本只配置模型默认价；providerCode 为空表示适用于该模型的所有供应商。 */
+var MockTenantPriceRules = [
+  { tenantName: '重庆东风南方渝兴', modelType: '大模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.42, status: '启用' },
+  { tenantName: '重庆东风南方渝兴', modelType: '小模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.28, status: '启用' },
+  { tenantName: '重庆东风南方渝发', modelType: '大模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.32, status: '启用' },
+  { tenantName: '重庆东风南方渝发', modelType: '小模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.24, status: '启用' },
+  { tenantName: '东风日产-点检', modelType: '大模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.48, status: '启用' },
+  { tenantName: '东风日产-点检', modelType: '小模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.35, status: '启用' },
+  { tenantName: '东风日产-燃油车', modelType: '大模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.40, status: '启用' },
+  { tenantName: '东风日产-燃油车', modelType: '小模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.26, status: '启用' },
+  { tenantName: '超级管理组', modelType: '大模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.45, status: '启用' },
+  { tenantName: '超级管理组', modelType: '小模型', providerCode: null, pricingScope: 'MODEL_DEFAULT', unitPrice: 0.30, status: '启用' }
+];
+
+/* 供应商目录暂不参与当前计价，未来可通过 PROVIDER_OVERRIDE 规则覆盖模型默认价。 */
+var MockBillingVendors = [
+  { providerCode: 'IFLYTEK', providerName: '科大讯飞', status: '启用' },
+  { providerCode: 'YIZHI', providerName: '一知科技', status: '启用' },
+  { providerCode: 'ZKJ', providerName: '中科金', status: '启用' },
+  { providerCode: 'BINGLAN', providerName: '冰兰', status: '启用' }
 ];
 
 var MockTenantRechargeHistory = [
-  { id: 1, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20250512001', status: '已支付', billingType: '仅坐席费', seatFeePackage: '全年套餐', periodDays: 365, callBalance: 0, validFrom: '2025-05-12', validTo: '2026-05-11', operator: 'xtadmin', bindTime: '2025-05-12 14:12:08', validityActivated: true },
-  { id: 2, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20260412001', status: '已取消', billingType: '仅坐席费', seatFeePackage: '-', periodDays: 0, callBalance: 0, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-04-12 10:22:31', validityActivated: false },
-  { id: 3, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20250512002', status: '未支付', billingType: '坐席费+通话费', seatFeePackage: '半年套餐', periodDays: 180, callBalance: 1000, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2025-05-12 13:45:20', validityActivated: false },
-  { id: 4, tenantName: '东风日产-燃油车', rechargeNo: 'RC20260601001', status: '已支付', billingType: '坐席费+通话费', seatFeePackage: '全年套餐', periodDays: 365, callBalance: 2000, validFrom: '2026-06-01', validTo: '2027-05-31', operator: 'xtadmin', bindTime: '2026-06-01 09:30:00', validityActivated: true },
-  { id: 5, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20260607007', status: '已支付', billingType: '仅通话费', seatFeePackage: '-', periodDays: 0, callBalance: 1500, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-07 10:15:00', validityActivated: false }
+  { id: 1, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20250512001', status: '已支付', billingType: '仅坐席费', seatFeePackage: '全年套餐', periodDays: 365, rechargeAmount: 0, validFrom: '2025-05-12', validTo: '2026-05-11', operator: 'xtadmin', bindTime: '2025-05-12 14:12:08', activated: true, validityActivated: true },
+  { id: 2, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20260412001', status: '已取消', billingType: '仅坐席费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 0, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-04-12 10:22:31', activated: false, validityActivated: false },
+  { id: 3, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20250512002', status: '未支付', billingType: '坐席费+通话费', seatFeePackage: '半年套餐', periodDays: 180, rechargeAmount: 1000, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2025-05-12 13:45:20', activated: false, validityActivated: false },
+  { id: 4, tenantName: '东风日产-燃油车', rechargeNo: 'RC20260601001', status: '已支付', billingType: '坐席费+通话费', seatFeePackage: '全年套餐', periodDays: 365, rechargeAmount: 2000, validFrom: '2026-06-01', validTo: '2027-05-31', operator: 'xtadmin', bindTime: '2026-06-01 09:30:00', activated: true, validityActivated: true },
+  { id: 5, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20260607007', status: '已支付', billingType: '仅通话费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 1500, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-07 10:15:00', activated: false, validityActivated: false },
+  { id: 6, tenantName: '东风日产-燃油车', rechargeNo: 'RC20260609009', status: '已支付', billingType: '仅通话费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 520, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-09 11:20:00', activated: false, validityActivated: false }
+];
+
+/* 手工扣减只形成租户资金调整流水，不关联充值单，不修改冻结任务。 */
+var MockTenantBalanceAdjustments = [
+  { id: 1, adjustmentNo: 'ADJ20260610001', tenantName: '东风日产-燃油车', type: 'MANUAL_DEDUCT', direction: 'OUT', amount: 100, reason: '线下业务处理后同步扣减余额', operator: 'xtadmin', status: '已生效', effectiveAt: '2026-06-10 16:20:00' }
 ];
 
 var MockTenantFrozenTasks = [
-  { id: 1, tenantName: '重庆东风南方渝发', taskNo: 'CALL20260605001', sceneName: '渝发店售前-冷线索激活', phoneCount: 1200, unitPrice: 0.25, frozenAmount: 300, status: '冻结中', createdAt: '2026-06-05 08:00:00' },
-  { id: 2, tenantName: '东风日产-燃油车', taskNo: 'CALL20260603002', sceneName: '燃油车-冷线索', phoneCount: 1800, unitPrice: 0.40, frozenAmount: 720, status: '冻结中', createdAt: '2026-06-03 10:05:00' },
-  { id: 3, tenantName: '重庆东风南方渝兴', taskNo: 'CALL20260602001', sceneName: '渝兴店售后-流失招揽', phoneCount: 800, unitPrice: 0.25, frozenAmount: 0, status: '已释放', createdAt: '2026-06-02 15:12:00' },
-  { id: 4, tenantName: '重庆东风南方渝发', taskNo: 'CALL20260601003', sceneName: '渝发店售后-临保邀约', phoneCount: 300, unitPrice: 0.25, frozenAmount: 0, status: '已扣费', createdAt: '2026-06-01 11:30:00' }
+  { id: 1, tenantName: '重庆东风南方渝发', modelType: '小模型', vendorCode: 'YIZHI', vendorName: '一知科技', taskNo: 'CALL20260605001', sceneName: '渝发店售前-冷线索激活', frozenMinutes: 1250, unitPriceSnapshot: 0.26, status: '冻结中', createdAt: '2026-06-12 08:00:00' },
+  { id: 2, tenantName: '东风日产-燃油车', modelType: '大模型', vendorCode: 'IFLYTEK', vendorName: '科大讯飞', taskNo: 'CALL20260603002', sceneName: '燃油车-冷线索', frozenMinutes: 1800, unitPriceSnapshot: 0.40, status: '冻结中', createdAt: '2026-06-12 10:05:00' },
+  { id: 3, tenantName: '重庆东风南方渝兴', modelType: '小模型', vendorCode: 'ZKJ', vendorName: '中科金', taskNo: 'CALL20260602001', sceneName: '渝兴店售后-流失招揽', frozenMinutes: 800, unitPriceSnapshot: 0.32, status: '已释放', createdAt: '2026-06-02 15:12:00' },
+  { id: 4, tenantName: '重庆东风南方渝发', modelType: '大模型', vendorCode: 'YIZHI', vendorName: '一知科技', taskNo: 'CALL20260601003', sceneName: '渝发店售后-临保邀约', frozenMinutes: 300, unitPriceSnapshot: 0.35, status: '已扣费', createdAt: '2026-06-01 11:30:00' }
 ];

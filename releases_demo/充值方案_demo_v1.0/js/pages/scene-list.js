@@ -3,6 +3,7 @@
  */
 
 (function () {
+  let currentSceneId = null;
   const StatusMap = {
     not_started: { text: '未开始',   color: '#999999', dot: '#999999' },
     running:     { text: '进行中',   color: '#52c41a', dot: '#52c41a' },
@@ -287,8 +288,10 @@
   function showDetail(id) {
     const item = MockSceneList.find(d => d.id === id);
     if (!item) return;
+    currentSceneId = id;
     const s = StatusMap[item.status] || StatusMap.not_started;
     const tag = SourceTag[item.source] || SourceTag['手动导入'];
+    const billingContext = getSceneBillingContext(item);
 
     const html = `
       <div class="scene-detail-backdrop" id="sceneDetailBackdrop" onclick="window.Pages['scene-list'].closeDetail(event)">
@@ -310,7 +313,8 @@
                 </div>
               </div>
               <div class="scene-detail-tags">
-                <span class="scene-detail-tag" style="background:${tag.bg};color:${tag.color};border:1px solid ${tag.border}">一知科技</span>
+                <span class="scene-detail-tag" style="background:${tag.bg};color:${tag.color};border:1px solid ${tag.border}">${billingContext.vendorName}</span>
+                <span class="scene-detail-tag">${billingContext.modelType}</span>
                 <span class="scene-detail-tag" style="background:${tag.bg};color:${tag.color};border:1px solid ${tag.border}">${item.source}</span>
               </div>
             </div>
@@ -664,7 +668,64 @@
   }
 
   /* ===== 手动导入弹窗 ===== */
+  function getSceneBillingContext(item) {
+    return {
+      tenantName: item && item.tenantName || '东风日产-燃油车',
+      modelType: item && item.modelType || '大模型',
+      vendorCode: item && item.vendorCode || 'IFLYTEK',
+      vendorName: item && item.vendorName || '科大讯飞',
+      estimatedMinutesPerPhone: Number(item && item.estimatedMinutesPerPhone || 1)
+    };
+  }
+
+  function getCurrentImportContext() {
+    const item = MockSceneList.find(scene => scene.id === currentSceneId) || MockSceneList[0];
+    return { item, billing: getSceneBillingContext(item) };
+  }
+
+  function getImportCapacity(context) {
+    const billingPage = window.Pages && window.Pages['sys-tenant'];
+    return billingPage && billingPage.getImportCapacity
+      ? billingPage.getImportCapacity(context.billing)
+      : null;
+  }
+
+  function formatImportAmount(value) {
+    return `¥${Number(value || 0).toFixed(2)}`;
+  }
+
+  function renderImportEstimate(context, phoneCount) {
+    const capacity = getImportCapacity(context);
+    if (!capacity) {
+      return '<div class="import-billing-warning">计费模块未加载，暂时无法校验导入额度。</div>';
+    }
+    const requiredFreezeAmount = Number(phoneCount || 0) * capacity.freezeAmountPerPhone;
+    const allowed = Number(phoneCount || 0) > 0 &&
+      capacity.canCall &&
+      capacity.priceConfigured &&
+      requiredFreezeAmount <= capacity.availableAmount;
+    const priceSource = capacity.pricingScope === 'PROVIDER_OVERRIDE' ? '供应商专属价' : '模型默认价';
+    const resultText = !capacity.priceConfigured
+      ? '未配置有效单价'
+      : (!capacity.canCall
+        ? '租户当前不可发起呼叫'
+        : (allowed ? '本次导入额度充足' : `超出额度，最多可导入 ${capacity.maxImportCount.toLocaleString()} 条`));
+    return `
+      <div class="import-billing-grid">
+        <div><span>租户</span><strong>${context.billing.tenantName}</strong></div>
+        <div><span>模型 / 供应商</span><strong>${context.billing.modelType} / ${context.billing.vendorName}</strong></div>
+        <div><span>计费单价</span><strong>${formatImportAmount(capacity.unitPrice)}/分钟</strong><small>${priceSource}</small></div>
+        <div><span>单号码预计分钟</span><strong>${capacity.estimatedMinutesPerPhone.toFixed(2)} 分钟</strong></div>
+        <div><span>最大可导入数</span><strong>${capacity.maxImportCount.toLocaleString()} 条</strong></div>
+        <div><span>本次预计冻结</span><strong>${formatImportAmount(requiredFreezeAmount)}</strong></div>
+        <div class="${allowed ? 'import-estimate-ok' : 'import-estimate-error'}"><span>校验结果</span><strong>${resultText}</strong></div>
+      </div>
+    `;
+  }
+
   function renderImportUploadContent() {
+    const context = getCurrentImportContext();
+    const defaultPhoneCount = 2000;
     return `
       <div class="import-upload-area" onclick="showToast('上传功能开发中','info')">
         <div class="upload-icon">&#128228;</div>
@@ -674,6 +735,13 @@
           您可以选择重新上传，但重新上传会覆盖原有上传的号码
         </div>
       </div>
+      <div class="import-phone-count-row">
+        <label for="importPhoneCount">解析号码数</label>
+        <input id="importPhoneCount" type="number" min="1" max="300000" step="1" value="${defaultPhoneCount}" oninput="window.Pages['scene-list'].updateImportEstimate()">
+        <span>原型中用于模拟文件解析后的有效号码数量</span>
+      </div>
+      <div class="import-billing-title">本次冻结校验</div>
+      <div id="importBillingEstimate">${renderImportEstimate(context, defaultPhoneCount)}</div>
     `;
   }
 
@@ -765,8 +833,36 @@
   }
 
   function doStartUpload() {
+    const context = getCurrentImportContext();
+    const phoneCount = Math.floor(Number(document.getElementById('importPhoneCount')?.value || 0));
+    const billingPage = window.Pages && window.Pages['sys-tenant'];
+    if (!billingPage || !billingPage.createImportFreeze) {
+      showToast('计费模块未加载，无法执行冻结校验', 'warning');
+      return;
+    }
+    const result = billingPage.createImportFreeze(Object.assign({}, context.billing, {
+      phoneCount,
+      sceneName: context.item.name
+    }));
+    if (!result.allowed) {
+      const message = !result.priceConfigured
+        ? '未配置有效计费单价，不能导入'
+        : (!result.canCall
+          ? '租户当前不可发起呼叫'
+          : `本次最多可导入 ${result.maxImportCount.toLocaleString()} 条`);
+      showToast(message, 'warning');
+      updateImportEstimate();
+      return;
+    }
     closeImportModal();
-    showToast('上传已开始，请稍后查看导入记录', 'success');
+    showToast(`已冻结 ${formatImportAmount(result.requiredFreezeAmount)}，${phoneCount.toLocaleString()} 条号码开始导入`, 'success');
+  }
+
+  function updateImportEstimate() {
+    const container = document.getElementById('importBillingEstimate');
+    if (!container) return;
+    const phoneCount = Math.max(0, Math.floor(Number(document.getElementById('importPhoneCount')?.value || 0)));
+    container.innerHTML = renderImportEstimate(getCurrentImportContext(), phoneCount);
   }
 
   function exportImportResult(failCount) {
@@ -999,5 +1095,5 @@
   function init() {}
 
   window.Pages = window.Pages || {};
-  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, switchImportTab, exportImportResult, showFocusRankModal, closeFocusRankModal, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption };
+  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, updateImportEstimate, switchImportTab, exportImportResult, showFocusRankModal, closeFocusRankModal, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption };
 })();

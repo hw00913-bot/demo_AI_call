@@ -1,5 +1,5 @@
 /* ============================================
-   智能外呼中台 - style.css
+   智能外呼中台 - assets/css/app.css
    ============================================ */
 
 /* ===== 基础重置 ===== */
@@ -1202,6 +1202,46 @@ p { margin-bottom: 8px; }
 .upload-icon { font-size: 48px; color: #ccc; margin-bottom: 12px; }
 .upload-text { font-size: 14px; color: #333; margin-bottom: 8px; }
 .upload-hint { font-size: 12px; color: #999; line-height: 1.8; }
+.import-phone-count-row {
+  display: grid;
+  grid-template-columns: auto 140px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+.import-phone-count-row label { color: #333; font-size: 13px; }
+.import-phone-count-row input {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.import-phone-count-row span { color: #999; font-size: 12px; }
+.import-billing-title { margin: 20px 0 10px; color: #222; font-size: 14px; font-weight: 600; }
+.import-billing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.import-billing-grid > div {
+  min-height: 56px;
+  padding: 9px 11px;
+  border-radius: 6px;
+  background: #fff;
+}
+.import-billing-grid span { display: block; margin-bottom: 5px; color: #888; font-size: 12px; }
+.import-billing-grid strong { color: #222; font-size: 13px; }
+.import-billing-grid small { margin-left: 6px; color: #999; font-size: 11px; }
+.import-billing-grid .import-estimate-ok { background: #f6ffed; border: 1px solid #b7eb8f; }
+.import-billing-grid .import-estimate-ok strong { color: #389e0d; }
+.import-billing-grid .import-estimate-error { background: #fff2f0; border: 1px solid #ffccc7; }
+.import-billing-grid .import-estimate-error strong { color: #cf1322; }
+.import-billing-warning { padding: 12px; border: 1px solid #ffe58f; border-radius: 6px; color: #ad6800; background: #fffbe6; }
 .import-record-summary { font-size: 13px; color: #666; padding: 0 4px; margin-bottom: 12px; }
 .scene-detail-table-wrap { overflow-x: auto; }
 .scene-detail-table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -1676,6 +1716,7 @@ p { margin-bottom: 8px; }
   .scene-card-grid { grid-template-columns: 1fr; padding: 0 12px 16px; }
   .biz-modal { width: 95vw; max-height: 90vh; }
   .import-modal { width: 95vw; }
+  .import-phone-count-row, .import-billing-grid { grid-template-columns: 1fr; }
   .filter-bar { padding: 12px 16px; }
 }
 
@@ -1689,10 +1730,25 @@ p { margin-bottom: 8px; }
 .tenant-filter-actions { margin-left: auto; }
 .tenant-list-card { background: #fff; border-radius: 8px; padding: 16px 24px 20px; }
 .tenant-list-tools { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 16px; }
-.tenant-native-table { min-width: 1700px; }
+.tenant-native-table { min-width: 1540px; }
 .tenant-native-table th, .tenant-native-table td { padding: 14px 12px; }
 .tenant-native-table th { color: #1f1f1f; font-size: 14px; }
 .tenant-native-table td { color: #1f1f1f; font-size: 14px; }
+.tenant-config-count,
+.tenant-minute-range { white-space: nowrap; }
+.tenant-config-count { color: #595959; }
+.tenant-minute-range { color: #1677ff; font-weight: 500; }
+.tenant-billing-config-btn {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid #1677ff;
+  border-radius: 6px;
+  background: #fff;
+  color: #1677ff;
+  font-size: 13px;
+  cursor: pointer;
+}
+.tenant-billing-config-btn:hover { color: #4096ff; border-color: #4096ff; background: #f5f8ff; }
 .tenant-th-help { position: relative; display: inline-flex; align-items: center; gap: 4px; }
 .tenant-help-trigger {
   display: inline-flex;
@@ -1756,6 +1812,7 @@ p { margin-bottom: 8px; }
 }
 .tenant-call-status-ok { color: #389e0d; background: #f6ffed; border: 1px solid #b7eb8f; }
 .tenant-call-status-disabled { color: #cf1322; background: #fff1f0; border: 1px solid #ffa39e; }
+.tenant-call-status-risk { color: #ad4e00; background: #fff7e6; border: 1px solid #ffd591; }
 .tenant-native-table th:last-child,
 .tenant-native-table td:last-child {
   position: sticky;
@@ -1816,10 +1873,154 @@ p { margin-bottom: 8px; }
 .tenant-result strong { flex-shrink: 0; font-size: 14px; }
 .tenant-result-success { color: #135200; background: #f6ffed; border: 1px solid #b7eb8f; }
 .tenant-result-warning { color: #ad4e00; background: #fff7e6; border: 1px solid #ffd591; }
-.tenant-drawer { width: 760px; }
+.tenant-drawer { width: 1300px; }
 .tenant-drawer-section { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid #f0f0f0; }
 .tenant-drawer-section:last-child { border-bottom: none; margin-bottom: 0; }
+.tenant-billing-tabs {
+  display: flex;
+  gap: 28px;
+  margin: -4px 0 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tenant-billing-tab {
+  position: relative;
+  height: 44px;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+}
+.tenant-billing-tab:hover { color: #1677ff; }
+.tenant-billing-tab.active { color: #1677ff; font-weight: 600; }
+.tenant-billing-tab.active::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: #1677ff;
+}
+.tenant-billing-tab-panel { display: none; }
+.tenant-billing-tab-panel.active { display: block; }
+.tenant-tab-section { padding-bottom: 0; margin-bottom: 0; border-bottom: none; }
 .tenant-notice { margin: 12px 0 0; }
+.tenant-pricing-notice { margin: 10px 0 12px; }
+.tenant-balance-risk {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid #ffa39e;
+  border-radius: 8px;
+  background: #fff1f0;
+  color: #a8071a;
+  font-size: 13px;
+}
+.tenant-balance-risk strong { flex: none; }
+.tenant-pricing-table-wrap { overflow-x: auto; border: 1px solid #f0f0f0; border-radius: 8px; }
+.tenant-pricing-table { width: 100%; min-width: 860px; border-collapse: collapse; font-size: 13px; }
+.tenant-pricing-table th,
+.tenant-pricing-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+.tenant-pricing-table th { background: #fafafa; color: #666; font-weight: 600; }
+.tenant-pricing-table tr:last-child td { border-bottom: none; }
+.tenant-model-tag,
+.tenant-price-status {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.tenant-model-tag.large { color: #1d39c4; background: #f0f5ff; border: 1px solid #adc6ff; }
+.tenant-model-tag.small { color: #531dab; background: #f9f0ff; border: 1px solid #d3adf7; }
+.tenant-price-status { color: #389e0d; background: #f6ffed; border: 1px solid #b7eb8f; }
+.tenant-price-status.disabled { color: #666; background: #f5f5f5; border-color: #d9d9d9; }
+.tenant-pricing-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0,0,0,0.45);
+}
+.tenant-pricing-modal {
+  width: 860px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  animation: modalIn 0.2s ease-out;
+}
+.tenant-pricing-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tenant-pricing-modal-title { color: #1f1f1f; font-size: 16px; font-weight: 600; }
+.tenant-pricing-modal-subtitle { margin-top: 5px; color: #999; font-size: 13px; }
+.tenant-pricing-modal-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #999;
+  font-size: 18px;
+  cursor: pointer;
+}
+.tenant-pricing-modal-close:hover { color: #333; background: #f5f5f5; }
+.tenant-pricing-modal-body { flex: 1; min-height: 0; overflow-y: auto; padding: 24px; }
+.tenant-pricing-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+}
+.tenant-pricing-config-notice { margin: 0 0 14px; }
+.tenant-pricing-edit-table { min-width: 720px; }
+.tenant-price-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+}
+.tenant-price-input {
+  width: 88px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  color: #1f1f1f;
+  font-size: 13px;
+  outline: none;
+}
+.tenant-price-input:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+.tenant-price-status-select {
+  width: 88px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f1f1f;
+  font-size: 13px;
+}
+.tenant-config-effect { color: #999; font-size: 12px; }
 .tenant-recharge-check { display: flex; align-items: center; gap: 8px; }
 .tenant-recharge-check .biz-form-input { flex: 1; }
 .tenant-order-preview { margin-left: 115px; min-height: 54px; }
@@ -1830,12 +2031,111 @@ p { margin-bottom: 8px; }
 .tenant-preview-grid strong { color: #333; font-weight: 500; }
 .tenant-estimate-line { background: #f5f8ff; border: 1px solid #d6e4ff; border-radius: 8px; color: #1d39c4; padding: 12px 14px; font-size: 13px; }
 .tenant-history-table-wrap { overflow-x: auto; border: 1px solid #f0f0f0; border-radius: 8px; }
-.tenant-history-table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 13px; }
+.tenant-history-table { width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 13px; }
 .tenant-history-table th,
 .tenant-history-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
 .tenant-history-table th { background: #fafafa; color: #666; font-weight: 600; }
 .tenant-history-table tr:last-child td { border-bottom: none; }
 .tenant-history-empty { padding: 18px 0; text-align: center; color: #999; }
+.tenant-activation-status {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.tenant-activation-status.active { color: #389e0d; background: #f6ffed; border: 1px solid #b7eb8f; }
+.tenant-activation-status.pending { color: #d48806; background: #fff7e6; border: 1px solid #ffd591; }
+.tenant-history-activate-btn {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #1677ff;
+  border-radius: 6px;
+  background: #1677ff;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+.tenant-history-activate-btn:hover { background: #4096ff; border-color: #4096ff; }
+.tenant-history-actions { display: flex; align-items: center; gap: 8px; }
+.tenant-history-refund-btn {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #ff7875;
+  border-radius: 6px;
+  background: #fff;
+  color: #cf1322;
+  font-size: 12px;
+  cursor: pointer;
+}
+.tenant-history-refund-btn:hover { border-color: #ff4d4f; background: #fff1f0; }
+.tenant-adjustment-section { margin-top: 22px; }
+.tenant-adjustment-summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid #d6e4ff;
+  border-radius: 8px;
+  background: #f5f8ff;
+}
+.tenant-adjustment-summary div { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.tenant-adjustment-summary span { color: #666; font-size: 13px; }
+.tenant-adjustment-summary strong { color: #1677ff; font-size: 18px; }
+.tenant-adjustment-summary p { margin: 0; color: #597ef7; font-size: 12px; }
+.tenant-adjustment-form {
+  display: grid;
+  grid-template-columns: 180px 180px minmax(320px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.tenant-adjustment-field { min-width: 0; }
+.tenant-adjustment-field label { display: block; margin-bottom: 6px; color: #666; font-size: 12px; }
+.tenant-adjustment-field input,
+.tenant-adjustment-field select {
+  width: 100%;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f1f1f;
+  outline: none;
+}
+.tenant-adjustment-field input:focus,
+.tenant-adjustment-field select:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+.tenant-adjustment-submit { height: 36px; padding: 0 16px; white-space: nowrap; }
+.tenant-adjustment-table { min-width: 1080px; }
+.tenant-adjustment-direction {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.tenant-adjustment-direction.out { color: #cf1322; background: #fff1f0; border: 1px solid #ffa39e; }
+.tenant-refund-modal { width: 720px; }
+.tenant-refund-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tenant-refund-summary > div {
+  padding: 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+.tenant-refund-summary span { display: block; margin-bottom: 6px; color: #999; font-size: 12px; }
+.tenant-refund-summary strong { color: #1f1f1f; font-size: 14px; }
+.tenant-refund-form { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px; }
 
 @media (max-width: 1100px) {
   .tenant-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1846,4 +2146,10 @@ p { margin-bottom: 8px; }
   .tenant-drawer { width: 92vw; }
   .tenant-order-preview { margin-left: 0; }
   .tenant-preview-grid { grid-template-columns: 1fr; }
+  .tenant-adjustment-summary { align-items: flex-start; flex-direction: column; }
+  .tenant-adjustment-form { grid-template-columns: 1fr; }
+  .tenant-refund-summary,
+  .tenant-refund-form { grid-template-columns: 1fr; }
+  .tenant-pricing-modal-backdrop { padding: 12px; }
+  .tenant-pricing-modal { max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); }
 }
