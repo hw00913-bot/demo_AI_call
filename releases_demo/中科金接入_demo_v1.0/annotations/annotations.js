@@ -192,12 +192,12 @@ window.AnnotationData = {
         dataSource: "中科金 API 通话记录回调+录音下载+录音文本推送",
         valueLogic: "1.通话记录回调recordId+recordDate+callid；\n2.通过通话录音文件下载_V2接口callRoomId=callId+mediaRecordingId=recordId下载录音文件；\n3.通过查询录音转译文本callRoomId=callId+mediaRecordingId=recordId下载录音文件文本；\n4.如果当天查询没有返回，第二天通过\nwebhook录音转译推送返回",
         fieldDesc: "1.用户号码：对应接口文档 cellphone\n2.通话开始时间：对应接口文档callStartTime\n3.通话结束时间：对应接口文档callEndTime\n4.通话时长：对应接口文档callDurationSec\n5.场景名称：本地字段\n6.通话状态：对应接口文档callStatus\n7.外呼总结：百炼智能体返回的通话小结\n8.智能平台：取本地字段\n9.最后通话节点：仅科大显示",
-        interactionDesc: "表格列表，支持按用户号码、场景名称、通话状态、智能平台筛选。点击「详情」打开通话详情弹窗，展示外呼小结、会话对话记录、标签合集、意向等级等。",
+        interactionDesc: "表格列表，支持按用户号码、场景名称、通话状态、智能平台筛选。点击「详情」打开通话详情弹窗，展示外呼小结、会话对话记录、意向等级等。",
         judgeRule: "",
         exceptionRule: "",
         otherDesc: "中科金通话状态码 → 本地状态映射：4:等待重呼→等待重呼；5:未接听→无应答；6:拨打失败→外呼失败；7:已接听→已接听；8:限制拨打→呼叫受限；9:占线→忙线中；11:来电提醒→无应答；12:无法接通→无法接通；13:空号→空号；14:停机→停机；15:关机→关机；17:号码故障→号码故障；18:线路故障→线路故障"
       },
-      desc: "1. 功能名称：通话记录列表<br>2. 功能说明：查看每一通外呼的结果，包括通话时间、时长、通话状态、外呼总结、最后通话节点等信息。<br>3. 权限范围：超级管理员、租户管理员、租户运营可见。超级管理员读取全部通话记录，租户仅读取本租户数据。<br>4. 数据来源：中科金 API 通话记录回调+录音下载+录音文本推送<br>5. 取值逻辑：1.通话记录回调recordId+recordDate+callid；\n2.通过通话录音文件下载_V2接口callRoomId=callId+mediaRecordingId=recordId下载录音文件；\n3.通过查询录音转译文本callRoomId=callId+mediaRecordingId=recordId下载录音文件文本；\n4.如果当天查询没有返回，第二天通过\nwebhook录音转译推送返回<br>6. 字段说明：1.用户号码：对应接口文档 cellphone\n2.通话开始时间：对应接口文档callStartTime\n3.通话结束时间：对应接口文档callEndTime\n4.通话时长：对应接口文档callDurationSec\n5.场景名称：本地字段\n6.通话状态：对应接口文档callStatus\n7.外呼总结：百炼智能体返回的通话小结\n8.智能平台：取本地字段\n9.最后通话节点：仅科大显示<br>7. 交互说明：表格列表，支持按用户号码、场景名称、通话状态、智能平台筛选。点击「详情」打开通话详情弹窗，展示外呼小结、会话对话记录、标签合集、意向等级等。<br>8. 判断规则：待确认<br>9. 异常规则：待确认<br>10. 其他说明：中科金通话状态码与本地状态映射关系：4:等待重呼→等待重呼；5:未接听→无应答；6:拨打失败→外呼失败；7:已接听→已接听；8:限制拨打→呼叫受限；9:占线→忙线中；11:来电提醒→无应答；12:无法接通→无法接通；13:空号→空号；14:停机→停机；15:关机→关机；17:号码故障→号码故障；18:线路故障→线路故障"
+      desc: "1. 功能名称：通话记录列表<br>2. 功能说明：查看每一通外呼的结果，包括通话时间、时长、通话状态、外呼总结、最后通话节点等信息。<br>3. 权限范围：超级管理员、租户管理员、租户运营可见。超级管理员读取全部通话记录，租户仅读取本租户数据。<br>4. 数据来源：中科金 API 通话记录回调+录音下载+录音文本推送<br>5. 取值逻辑：1.通话记录回调recordId+recordDate+callid；\n2.通过通话录音文件下载_V2接口callRoomId=callId+mediaRecordingId=recordId下载录音文件；\n3.通过查询录音转译文本callRoomId=callId+mediaRecordingId=recordId下载录音文件文本；\n4.如果当天查询没有返回，第二天通过\nwebhook录音转译推送返回<br>6. 字段说明：1.用户号码：对应接口文档 cellphone\n2.通话开始时间：对应接口文档callStartTime\n3.通话结束时间：对应接口文档callEndTime\n4.通话时长：对应接口文档callDurationSec\n5.场景名称：本地字段\n6.通话状态：对应接口文档callStatus\n7.外呼总结：百炼智能体返回的通话小结\n8.智能平台：取本地字段\n9.最后通话节点：仅科大显示<br>7. 交互说明：表格列表，支持按用户号码、场景名称、通话状态、智能平台筛选。点击「详情」打开通话详情弹窗，展示外呼小结、会话对话记录、意向等级等。<br>8. 判断规则：待确认<br>9. 异常规则：待确认<br>10. 其他说明：中科金通话状态码与本地状态映射关系：4:等待重呼→等待重呼；5:未接听→无应答；6:拨打失败→外呼失败；7:已接听→已接听；8:限制拨打→呼叫受限；9:占线→忙线中；11:来电提醒→无应答；12:无法接通→无法接通；13:空号→空号；14:停机→停机；15:关机→关机；17:号码故障→号码故障；18:线路故障→线路故障"
     },
     {
       id: "9",
@@ -211,17 +211,17 @@ window.AnnotationData = {
       title: "外呼结果",
       sections: {
         functionName: "外呼结果",
-        functionDesc: "展示通对话的外呼总结，由百炼智能体对通话内容进行分析后生成。",
+        functionDesc: "展示通对话的外呼总结，由中科金对通话内容进行分析后生成。",
         permissionScope: "",
-        dataSource: "百炼智能体返回。",
-        valueLogic: "从通话记录回调接口获取 summary 字段直接展示。",
-        fieldDesc: "从百炼获取小结和标签 json 字符",
+        dataSource: "回调接口。",
+        valueLogic: "从通话记录回调接口获取通话总结和意向标签字段直接展示。",
+        fieldDesc: "外呼小结、意向标签、计划到店时间、预计购车时间、意向品牌中文名、意向车系中文名。",
         interactionDesc: "在通话详情弹窗右侧面板顶部展示。",
         judgeRule: "未接通或通话异常的记录可能无小结，展示「暂无小结」。",
         exceptionRule: "summary 为空时展示「暂无小结」。",
         otherDesc: ""
       },
-      desc: "1. 功能名称：外呼结果<br>2. 功能说明：展示通对话的外呼总结，由百炼智能体对通话内容进行分析后生成。<br>3. 权限范围：待确认<br>4. 数据来源：百炼智能体返回。<br>5. 取值逻辑：从通话记录回调接口获取 summary 字段直接展示。<br>6. 字段说明：从百炼获取小结和标签 json 字符<br>7. 交互说明：在通话详情弹窗右侧面板顶部展示。<br>8. 判断规则：未接通或通话异常的记录可能无小结，展示「暂无小结」。<br>9. 异常规则：summary 为空时展示「暂无小结」。<br>10. 其他说明：待确认"
+      desc: "1. 功能名称：外呼结果<br>2. 功能说明：展示通对话的外呼总结，由中科金对通话内容进行分析后生成。<br>3. 权限范围：待确认<br>4. 数据来源：回调接口。<br>5. 取值逻辑：从通话记录回调接口获取通话总结和意向标签字段直接展示。<br>6. 字段说明：外呼小结、意向标签、计划到店时间、预计购车时间、意向品牌中文名、意向车系中文名。<br>7. 交互说明：在通话详情弹窗右侧面板顶部展示。<br>8. 判断规则：未接通或通话异常的记录可能无小结，展示「暂无小结」。<br>9. 异常规则：summary 为空时展示「暂无小结」。<br>10. 其他说明：待确认"
     },
     {
       id: "10",
@@ -238,14 +238,14 @@ window.AnnotationData = {
         functionDesc: "展示单条通话记录的详细信息，包含会话标识、通话时间、主被叫号码、归属地、意向标签等。",
         permissionScope: "",
         dataSource: "中科金 API 外呼记录详情 / 回调接口返回。",
-        valueLogic: "会话id 对应 API sessionId；通话状态对应 callStatus；通话开始/结束时间对应 callStartTime/callEndTime；主叫号码对应 callerNumber；通话时长对应 callDurationSec；被叫号码对应 cellphone；意向标签对应 aiTagName；提取标签对应 extendInfos 或回调标签；主叫号码归属对应 callerProvince/callerCity；被叫号码省份城市对应 numberAttribute。",
-        fieldDesc: "1.会话 id：中科金回调 sessionId\n2.通话状态：对应 callStatus\n3.通话开始时间：callStartTime\n4.通话结束时间：callEndTime\n5.主叫号码：系统外呼号码\n6.通话时长：callDurationSec\n7.被叫号码：客户手机号 cellphone\n8.主叫号码归属：callerProvince/callerCity\n9.被叫号码省份城市：numberAttribute\n10.意向标签：aiTagName\n11.提取标签：extendInfos 解析或标签回调",
+        valueLogic: "会话id 对应 API sessionId；通话状态对应 callStatus；通话开始/结束时间对应 callStartTime/callEndTime；主叫号码对应 callerNumber；通话时长对应 callDurationSec；被叫号码对应 cellphone；意向标签对应 aiTagName；主叫号码归属对应 callerProvince/callerCity；被叫号码省份城市对应 numberAttribute。",
+        fieldDesc: "1.会话 id：中科金回调 sessionId\n2.通话状态：对应 callStatus\n3.通话开始时间：callStartTime\n4.通话结束时间：callEndTime\n5.主叫号码：系统外呼号码\n6.通话时长：callDurationSec\n7.被叫号码：客户手机号 cellphone\n8.主叫号码归属：callerProvince/callerCity\n9.被叫号码省份城市：numberAttribute",
         interactionDesc: "在通话详情弹窗右侧面板，位于外呼小结下方以行列形式展示。",
         judgeRule: "",
         exceptionRule: "字段无数据时展示「-」。",
         otherDesc: "当前原型映射：MockCallRecordRows。字段按中科金 API AudioCallbackResponse 结构映射。"
       },
-      desc: "1. 功能名称：通话详情信息字段<br>2. 功能说明：展示单条通话记录的详细信息，包含会话标识、通话时间、主被叫号码、归属地、意向标签等。<br>3. 权限范围：待确认<br>4. 数据来源：中科金 API 外呼记录详情 / 回调接口返回。<br>5. 取值逻辑：会话id 对应 API sessionId；通话状态对应 callStatus；通话开始/结束时间对应 callStartTime/callEndTime；主叫号码对应 callerNumber；通话时长对应 callDurationSec；被叫号码对应 cellphone；意向标签对应 aiTagName；提取标签对应 extendInfos 或回调标签；主叫号码归属对应 callerProvince/callerCity；被叫号码省份城市对应 numberAttribute。<br>6. 字段说明：1.会话 id：中科金回调 sessionId\n2.通话状态：对应 callStatus\n3.通话开始时间：callStartTime\n4.通话结束时间：callEndTime\n5.主叫号码：系统外呼号码\n6.通话时长：callDurationSec\n7.被叫号码：客户手机号 cellphone\n8.主叫号码归属：callerProvince/callerCity\n9.被叫号码省份城市：numberAttribute\n10.意向标签：aiTagName\n11.提取标签：extendInfos 解析或标签回调<br>7. 交互说明：在通话详情弹窗右侧面板，位于外呼小结下方以行列形式展示。<br>8. 判断规则：待确认<br>9. 异常规则：字段无数据时展示「-」。<br>10. 其他说明：当前原型映射：MockCallRecordRows。字段按中科金 API AudioCallbackResponse 结构映射。"
+      desc: "1. 功能名称：通话详情信息字段<br>2. 功能说明：展示单条通话记录的详细信息，包含会话标识、通话时间、主被叫号码、归属地、意向标签等。<br>3. 权限范围：待确认<br>4. 数据来源：中科金 API 外呼记录详情 / 回调接口返回。<br>5. 取值逻辑：会话id 对应 API sessionId；通话状态对应 callStatus；通话开始/结束时间对应 callStartTime/callEndTime；主叫号码对应 callerNumber；通话时长对应 callDurationSec；被叫号码对应 cellphone；意向标签对应 aiTagName；主叫号码归属对应 callerProvince/callerCity；被叫号码省份城市对应 numberAttribute。<br>6. 字段说明：1.会话 id：中科金回调 sessionId\n2.通话状态：对应 callStatus\n3.通话开始时间：callStartTime\n4.通话结束时间：callEndTime\n5.主叫号码：系统外呼号码\n6.通话时长：callDurationSec\n7.被叫号码：客户手机号 cellphone\n8.主叫号码归属：callerProvince/callerCity\n9.被叫号码省份城市：numberAttribute<br>7. 交互说明：在通话详情弹窗右侧面板，位于外呼小结下方以行列形式展示。<br>8. 判断规则：待确认<br>9. 异常规则：字段无数据时展示「-」。<br>10. 其他说明：当前原型映射：MockCallRecordRows。字段按中科金 API AudioCallbackResponse 结构映射。"
     },
     {
       id: "11",

@@ -44,8 +44,8 @@
     }).join('');
   }
 
-  function renderOutboundResult() {
-    return '\n      <div class="record-detail-fields">\n        <div class="record-detail-section-title">外呼小结</div>\n        <div class="record-detail-summary" data-anno="result-records-summary" style="margin-bottom:16px;">-</div>\n        <div><span class="record-info-label">标签合集：</span><span class="record-info-value">call_coll_tag_031:开着车忙</span></div>\n        <div><span class="record-info-label">购车意向：</span><span class="record-info-value">little_intention</span></div>\n        <div><span class="record-info-label">计划到店时间：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">预计购车时间：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">意向品牌中文名：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">意向车系中文名：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">意向等级编码(A-E)：</span><span class="record-info-value">C</span></div>\n      </div>\n    ';
+  function renderOutboundResult(item) {
+    return '\n      <div class="record-detail-fields">\n        <div class="record-detail-section-title">外呼小结</div>\n        <div class="record-detail-summary" data-anno="result-records-summary" style="margin-bottom:16px;">-</div>\n        <div><span class="record-info-label">意向标签：</span><span class="record-info-value">' + (item.aiTagName || '-') + '</span></div>\n        <div><span class="record-info-label">计划到店时间：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">预计购车时间：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">意向品牌中文名：</span><span class="record-info-value">-</span></div>\n        <div><span class="record-info-label">意向车系中文名：</span><span class="record-info-value">-</span></div>\n      </div>\n    ';
   }
 
   function renderDetailInfo(item) {
@@ -58,9 +58,7 @@
       ['通话时长', item.duration || '-'],
       ['被叫号码', item.phone || '-'],
       ['主叫号码归属', item.callerLocation || '-'],
-      ['被叫号码省份城市', item.calleeLocation || '-'],
-      ['意向标签', item.aiTagName || '-'],
-      ['提取标签', item.extractTags || '-']
+      ['被叫号码省份城市', item.calleeLocation || '-']
     ];
     var infoRows = fields.map(function (f) {
       return '<div class="record-info-row"><span class="record-info-label">' + f[0] + ':</span><span class="record-info-value">' + f[1] + '</span></div>';
@@ -69,7 +67,7 @@
   }
 
   function renderRightPanel(item) {
-    return '\n      <div class="record-detail-right-tabs">\n        <div class="record-tab active" onclick="window.Pages[\'result-records\'].switchDetailTab(this,\'outbound\')">外呼结果</div>\n        <div class="record-tab" onclick="window.Pages[\'result-records\'].switchDetailTab(this,\'info\')">详细信息</div>\n      </div>\n      <div class="record-detail-tab-content" id="recordDetailTabContent">\n        ' + renderOutboundResult() + '\n      </div>\n    ';
+    return '\n      <div class="record-detail-right-tabs">\n        <div class="record-tab active" onclick="window.Pages[\'result-records\'].switchDetailTab(this,\'outbound\')">外呼结果</div>\n        <div class="record-tab" onclick="window.Pages[\'result-records\'].switchDetailTab(this,\'info\')">详细信息</div>\n      </div>\n      <div class="record-detail-tab-content" id="recordDetailTabContent">\n        ' + renderOutboundResult(item) + '\n      </div>\n    ';
   }
 
   function renderDetailModal(item) {
@@ -124,7 +122,9 @@
     el.parentElement.querySelectorAll('.record-tab').forEach(function (t) { t.classList.remove('active'); });
     el.classList.add('active');
     if (tab === 'outbound') {
-      container.innerHTML = renderOutboundResult();
+      var outboundIndexEl = el.closest('.record-detail-backdrop');
+      var outboundIndex = outboundIndexEl ? outboundIndexEl._detailIndex : 0;
+      container.innerHTML = renderOutboundResult(rows[outboundIndex] || {});
     } else {
       // 找到当前详情弹窗对应的 item
       var indexEl = el.closest('.record-detail-backdrop');
