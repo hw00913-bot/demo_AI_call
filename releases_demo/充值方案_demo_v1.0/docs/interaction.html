@@ -41,6 +41,9 @@
         <tr><td>v1.0</td><td>2026-05-20</td><td>1.新增数据概览模块；2.新增任务详情模块；3.手工导入新增异步导入逻辑；4.一知大小模型模型选项新增关联账号功能。</td></tr>
         <tr><td>v1.1</td><td>2026-06-05</td><td>1.租户管理-充值单配置新增手动生效逻辑，有效期由自动生成改为手动点击"生效"按钮触发。</td></tr>
         <tr><td>v1.2</td><td>2026-06-12</td><td>1.租户管理-充值管理新增计费明细、充值单管理、余额调整三个分页及独立计费配置弹窗；2.余额调整支持手工扣减，不关联充值单只校验资金余额；3.手动导入新增本次冻结校验，超出可用金额时展示最大可导入数；4.冻结任务支持自动释放（任务完成/终止/超24小时）及场景终止联动释放。</td></tr>
+        <tr><td>v1.3</td><td>2026-06-15</td><td>1.充值单关联调整为先读取、再确认；2.读取后反显门店编码、门店名称和所属租户；3.仅门店匹配且二次确认后生成历史关联记录。</td></tr>
+        <tr><td>v1.4</td><td>2026-06-15</td><td>1.含坐席费充值单生效时新增有效时长确认；2.半年套餐默认183日、全年套餐默认365日；3.支持调整添加天数并预览有效期。</td></tr>
+        <tr><td>v1.5</td><td>2026-06-15</td><td>1.关联充值新增试用单、付费单类型；2.试用单支持选择1/2/3个月并填写通话费用；3.试用单按30/60/90日生成待生效组合单。</td></tr>
       </tbody>
     </table>
     <h2>二. 项目范围</h2>
@@ -49,7 +52,7 @@
         <tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th><th>对接系统范围</th></tr>
       </thead>
       <tbody>
-        <tr><td>智能外呼系统</td><td>租户管理</td><td>充值管理（三Tab抽屉+充值单关联+逐单生效）</td><td>--</td></tr>
+        <tr><td>智能外呼系统</td><td>租户管理</td><td>充值管理（三Tab抽屉+充值单读取反显+二次确认关联+逐单生效）</td><td>--</td></tr>
         <tr><td>智能外呼系统</td><td>租户管理</td><td>计费配置弹窗-模型默认单价</td><td>--</td></tr>
         <tr><td>智能外呼系统</td><td>租户管理</td><td>余额调整-手工扣减</td><td>--</td></tr>
         <tr><td>智能外呼系统</td><td>租户管理</td><td>导入冻结校验（外呼列表导入时调用）</td><td>--</td></tr>
@@ -73,7 +76,7 @@
     <hr class="section-divider">
     <h3>1. 系统管理-租户管理-充值管理</h3>
     <p><strong>1）功能名称：</strong> 充值管理抽屉（三Tab：计费明细 / 充值单管理 / 余额调整）</p>
-    <p><strong>2）交互说明：</strong> 点击租户列表"充值管理"按钮打开右侧抽屉。租户信息区展示租户名称、有效期、历史充值总额和呼叫控制状态（可用余额为内部隐藏字段，不对外展示）。三个 Tab 共用租户信息区。</p>
+    <p><strong>2）交互说明：</strong> 点击租户列表"充值管理"按钮打开右侧抽屉。租户信息区展示租户名称、有效期、历史充值总额和呼叫控制状态（可用余额为内部隐藏字段，不对外展示）。充值单管理先选择关联类型：付费单输入单号后读取并反显门店信息，核对后确认关联；试用单选择1/2/3个月有效时间并填写通话费用后确认关联。三个 Tab 共用租户信息区。</p>
     <p><strong>3）数据来源：</strong> 前端Mock数据（MockTenantBillingRows、MockTenantRechargeHistory、MockTenantPriceRules、MockTenantFrozenTasks、MockTenantBalanceAdjustments）。</p>
     <p><strong>4）逻辑说明：</strong> 资金余额 = 已生效通话充值总额 - 手工扣减金额 - 已消费金额。冻结总额 = 有效冻结任务的冻结分钟数 × 单价快照。可用余额 = max(资金余额 - 冻结总额, 0)。每分钟数按对应模型默认单价换算。总部类型租户无特殊代码逻辑，通过配置超大额充值单实现几乎无限的可用分钟数。</p>
     <p><strong>5）功能明细</strong></p>
@@ -85,10 +88,12 @@
         <tr><td>租户信息区</td><td>展示租户名称、有效期、历史充值总额和呼叫控制状态，可用余额仅内部计算不对外展示</td><td>前端JS</td><td>getTenantBillingSummary 汇总计算</td><td>只读表单</td><td>--</td><td>--</td></tr>
         <tr><td>计费明细Tab</td><td>按大模型/小模型展示默认单价、冻结分钟数、冻结金额、通话余额分钟数和可用分钟数</td><td>前端Mock + JS计算</td><td>从MockTenantPriceRules取单价，按余额换算分钟数</td><td>只读表格</td><td>未配置</td><td>--</td></tr>
         <tr><td>计费配置弹窗</td><td>点击租户列表"计费配置"按钮打开，编辑大模型、小模型默认单价和启停状态，单价必须大于0</td><td>前端Mock</td><td>修改MockTenantPriceRules中对应租户的MODEL_DEFAULT规则</td><td>弹窗表单</td><td>--</td><td>单价≤0时拒绝保存</td></tr>
-        <tr><td>充值单管理Tab</td><td>充值单号输入关联、充值预览、历史关联充值单列表</td><td>前端Mock</td><td>关联后写入MockTenantRechargeHistory，关联前校验重复和状态</td><td>表单+表格</td><td>--</td><td>重复关联提示</td></tr>
-        <tr><td>充值单逐单生效</td><td>待生效充值单操作列"生效"按钮，按计费类型更新有效期/余额/两者，新有效期在已有有效期后顺延</td><td>前端JS</td><td>仅坐席费更新有效期；仅通话费更新余额；组合单同时更新</td><td>按钮+状态变更</td><td>待生效</td><td>已生效不可重复操作</td></tr>
+        <tr><td>充值单管理Tab</td><td>选择试用单或付费单，并展示对应关联表单及历史记录</td><td>前端Mock</td><td>付费单读取后确认；试用单手工填写有效月份和通话费用后确认</td><td>单选+表单+预览+表格</td><td>付费单</td><td>按类型执行字段校验</td></tr>
+        <tr><td>试用单关联</td><td>选择1个月、2个月或3个月有效时间，填写通话费用并确认关联</td><td>用户输入</td><td>月份按30日换算，生成坐席费+通话费待生效记录</td><td>下拉框+金额输入+按钮</td><td>1个月</td><td>通话费用≤0时拒绝</td></tr>
+        <tr><td>充值单逐单生效</td><td>待生效充值单操作列"生效"按钮；含坐席费时弹窗反显并允许调整添加有效时长，确认后再生效</td><td>前端JS</td><td>半年套餐默认183日、全年套餐默认365日；仅坐席费更新有效期，仅通话费直接更新余额，组合单确认时长后同时更新</td><td>按钮+弹窗+状态变更</td><td>待生效</td><td>时长非正整数或已生效时拒绝</td></tr>
         <tr><td>余额调整Tab</td><td>"手工调整"按钮弹窗输入金额和原因，扣减金额≤资金余额，不关联充值单、不占用冻结金额</td><td>前端Mock</td><td>写入MockTenantBalanceAdjustments（type=MANUAL_DEDUCT, direction=OUT）</td><td>弹窗表单+历史表格</td><td>--</td><td>金额≤0或超余额时拒绝</td></tr>
-        <tr><td>历史充值单操作</td><td>待生效显示"生效"按钮，已生效显示"已生效"文案</td><td>前端JS</td><td>根据activated状态切换按钮/文案</td><td>按钮/状态标签</td><td>--</td><td>--</td></tr>
+        <tr><td>充值单读取与确认</td><td>读取后反显门店编码、门店名称、所属租户及计费信息；确认关联后才生成历史记录</td><td>前端Mock + JS</td><td>门店所属租户与当前租户匹配、已支付且未重复关联时允许确认</td><td>预览卡片/按钮</td><td>请输入充值单号并点击读取</td><td>门店不匹配、非已支付或重复关联时禁止确认</td></tr>
+        <tr><td>历史充值单操作</td><td>历史表展示关联类型、门店编码和门店名称；待生效显示"生效"按钮，已生效显示"已生效"文案</td><td>前端JS</td><td>根据activated状态切换按钮/文案</td><td>表格/按钮/状态标签</td><td>--</td><td>--</td></tr>
       </tbody>
     </table>
     <hr class="section-divider">
@@ -157,11 +162,11 @@
 <script>
   window.AnnotationConfig = {
     projectId: 'ai-call-recharge-v1',
-    dataVersion: '2',
+    dataVersion: '5',
     page: 'interaction'
   };
 </script>
-<script src="../annotations/annotations.js?v=2"></script>
+<script src="../annotations/annotations.js?v=5"></script>
 <script src="../annotations/annotation-runtime.js?v=3"></script>
 </body>
 </html>

@@ -29,6 +29,12 @@
     return `<span class="tenant-status ${meta.cls}">${meta.text}</span>`;
   }
 
+  function historyPaymentTag(item) {
+    return item.orderType === '试用单'
+      ? '<span class="tenant-status tenant-status-paid">无需支付</span>'
+      : statusTag(item.status);
+  }
+
   function getHistoryRows() {
     window.MockTenantRechargeHistory = window.MockTenantRechargeHistory || [];
     return window.MockTenantRechargeHistory;
@@ -69,7 +75,7 @@
   }
 
   function packageDays(packageName) {
-    const map = { '半年套餐': 180, '全年套餐': 365 };
+    const map = { '半年套餐': 183, '全年套餐': 365 };
     return map[packageName] || 0;
   }
 
@@ -339,6 +345,8 @@
 
   function applyOrderToRow(row, order) {
     row.rechargeNo = order.no;
+    row.storeCode = order.storeCode || '-';
+    row.storeName = order.storeName || '-';
     row.rechargeStatus = order.status;
     row.billingType = order.billingType;
     row.seatFeePackage = order.seatFeePackage || '-';
@@ -363,15 +371,39 @@
       return;
     }
 
-    const tenantName = historyRow.tenantName;
     if (canGenerateValidity({
       rechargeStatus: historyRow.status,
       billingType: historyRow.billingType
     })) {
-      const baseDate = latestValidTo(tenantName);
-      const addedAt = String(historyRow.bindTime || currentBizDate()).slice(0, 10);
-      historyRow.validFrom = baseDate && baseDate >= addedAt ? addDays(baseDate, 2) : addedAt;
-      historyRow.validTo = addDays(historyRow.validFrom, historyRow.periodDays);
+      showActivationDurationModal(historyRow);
+      return;
+    }
+    finalizeRechargeActivation(historyRow);
+  }
+
+  function getActivationValidity(historyRow, durationDays) {
+    const tenantName = historyRow.tenantName;
+    const baseDate = latestValidTo(tenantName);
+    const addedAt = String(historyRow.bindTime || currentBizDate()).slice(0, 10);
+    const validFrom = baseDate && baseDate >= addedAt ? addDays(baseDate, 2) : addedAt;
+    return {
+      baseDate: baseDate || '-',
+      validFrom,
+      validTo: addDays(validFrom, durationDays)
+    };
+  }
+
+  function finalizeRechargeActivation(historyRow, durationDays) {
+    const tenantName = historyRow.tenantName;
+    const changesValidity = canGenerateValidity({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+    if (changesValidity) {
+      const validity = getActivationValidity(historyRow, durationDays);
+      historyRow.periodDays = durationDays;
+      historyRow.validFrom = validity.validFrom;
+      historyRow.validTo = validity.validTo;
     } else {
       historyRow.validFrom = '-';
       historyRow.validTo = '-';
@@ -381,7 +413,7 @@
     historyRow.activatedAt = formatLocalDateTime(new Date());
 
     const billingRow = findBillingByTenant(tenantName);
-    if (billingRow && billingRow.rechargeNo === rechargeNo) {
+    if (billingRow && billingRow.rechargeNo === historyRow.rechargeNo) {
       billingRow.validFrom = historyRow.validFrom;
       billingRow.validTo = historyRow.validTo;
       billingRow.enabled = true;
@@ -396,10 +428,6 @@
     if (historyBody) historyBody.innerHTML = renderHistoryRows(tenantName);
     const currentOrderNo = document.getElementById('tenantRechargeNo')?.value;
     if (currentOrderNo) renderCheckedOrder(getOrders().find(item => item.no === currentOrderNo) || null);
-    const changesValidity = canGenerateValidity({
-      rechargeStatus: historyRow.status,
-      billingType: historyRow.billingType
-    });
     const changesBalance = canAddCallBalance({
       rechargeStatus: historyRow.status,
       billingType: historyRow.billingType
@@ -408,6 +436,85 @@
       ? '有效期和余额已更新'
       : (changesValidity ? '有效期已更新' : '余额已更新');
     showToast(`充值单已生效，${resultText}`, 'success');
+  }
+
+  function showActivationDurationModal(historyRow) {
+    closeActivationDurationModal();
+    const defaultDays = packageDays(historyRow.seatFeePackage) || Number(historyRow.periodDays || 0);
+    const validity = getActivationValidity(historyRow, defaultDays);
+    const html = `
+      <div class="tenant-pricing-modal-backdrop" id="tenantActivationDurationBackdrop" onclick="window.Pages['sys-tenant'].closeActivationDurationModal(event)">
+        <div class="tenant-pricing-modal tenant-activation-duration-modal" id="tenantActivationDurationModal" data-recharge-no="${historyRow.rechargeNo}" onclick="event.stopPropagation()">
+          <div class="tenant-pricing-modal-header">
+            <div>
+              <div class="tenant-pricing-modal-title">确认添加有效时长</div>
+              <div class="tenant-pricing-modal-subtitle">${historyRow.rechargeNo} · ${historyRow.seatFeePackage || '-'}</div>
+            </div>
+            <button class="tenant-pricing-modal-close" onclick="window.Pages['sys-tenant'].closeActivationDurationModal()">&#x2715;</button>
+          </div>
+          <div class="tenant-pricing-modal-body">
+            <div class="tenant-activation-duration-summary">
+              <div><span>当前有效期至</span><strong>${validity.baseDate}</strong></div>
+              <div><span>新增有效期起始</span><strong id="tenantActivationValidFrom">${validity.validFrom}</strong></div>
+              <div><span>预计有效期至</span><strong id="tenantActivationValidTo">${validity.validTo}</strong></div>
+            </div>
+            <div class="tenant-adjustment-field tenant-activation-duration-field">
+              <label>添加有效时长</label>
+              <div class="tenant-duration-input-wrap">
+                <input id="tenantActivationDurationDays" type="number" min="1" step="1" value="${defaultDays}" oninput="window.Pages['sys-tenant'].updateActivationDurationPreview()">
+                <span>日</span>
+              </div>
+            </div>
+            <div class="biz-modal-notice tenant-pricing-config-notice">
+              <span class="biz-notice-icon">&#x26A0;</span>
+              <div class="biz-notice-body">系统已按套餐反显默认时长，可在生效前调整。确认后将按调整后的天数顺延租户有效期。</div>
+            </div>
+          </div>
+          <div class="tenant-pricing-modal-footer">
+            <button class="btn btn-default" onclick="window.Pages['sys-tenant'].closeActivationDurationModal()">取消</button>
+            <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].confirmActivationDuration()">确认生效</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function closeActivationDurationModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('tenantActivationDurationBackdrop')?.remove();
+  }
+
+  function updateActivationDurationPreview() {
+    const modal = document.getElementById('tenantActivationDurationModal');
+    if (!modal) return;
+    const historyRow = getHistoryRows().find(item => item.rechargeNo === modal.dataset.rechargeNo);
+    const durationDays = Number(document.getElementById('tenantActivationDurationDays')?.value);
+    const validTo = document.getElementById('tenantActivationValidTo');
+    if (!historyRow || !validTo) return;
+    validTo.textContent = Number.isInteger(durationDays) && durationDays > 0
+      ? getActivationValidity(historyRow, durationDays).validTo
+      : '-';
+  }
+
+  function confirmActivationDuration() {
+    const modal = document.getElementById('tenantActivationDurationModal');
+    if (!modal) return;
+    const historyRow = getHistoryRows().find(item => item.rechargeNo === modal.dataset.rechargeNo);
+    const input = document.getElementById('tenantActivationDurationDays');
+    const durationDays = Number(input && input.value);
+    if (!historyRow || !canActivateRecharge(historyRow)) {
+      closeActivationDurationModal();
+      showToast('充值单状态已变化，请刷新后重试', 'warning');
+      return;
+    }
+    if (!Number.isInteger(durationDays) || durationDays <= 0) {
+      input?.focus();
+      showToast('添加有效时长必须为大于 0 的整数', 'warning');
+      return;
+    }
+    closeActivationDurationModal();
+    finalizeRechargeActivation(historyRow, durationDays);
   }
 
   function updateDrawerFieldsAfterActivation(tenantName) {
@@ -608,7 +715,7 @@
     if (!rows.length) {
       return `
         <tr>
-          <td colspan="12">
+          <td colspan="15">
             <div class="tenant-history-empty">暂无历史关联充值单记录</div>
           </td>
         </tr>
@@ -618,6 +725,9 @@
     var activateAnnoAdded = false;
     return rows.map((item, index) => {
       const activated = isRechargeActivated(item);
+      const order = getOrders().find(orderItem => orderItem.no === item.rechargeNo);
+      const storeCode = item.storeCode || (order && order.storeCode) || '-';
+      const storeName = item.storeName || (order && order.storeName) || '-';
       const activateAnno = !activated && !activateAnnoAdded
         ? ' data-anno="tenant-activate-validity"'
         : '';
@@ -632,7 +742,10 @@
       <tr>
         <td>${index + 1}</td>
         <td>${item.rechargeNo}</td>
-        <td>${statusTag(item.status)}</td>
+        <td>${item.orderType || '付费单'}</td>
+        <td>${storeCode}</td>
+        <td>${storeName}</td>
+        <td>${historyPaymentTag(item)}</td>
         <td><span class="tenant-activation-status ${activated ? 'active' : 'pending'}">${activated ? '已生效' : '待生效'}</span></td>
         <td>${item.billingType}</td>
         <td>${item.seatFeePackage || '-'}</td>
@@ -916,11 +1029,27 @@
               <div class="tenant-drawer-section">
                 <div class="tenant-section-title">关联充值单</div>
                 <div class="biz-form-row">
+                  <label class="biz-form-label required">关联类型</label>
+                  <div class="biz-form-field">
+                    <div class="biz-radio-group tenant-association-type">
+                      <label class="biz-radio">
+                        <input type="radio" name="tenantRechargeAssociationType" value="PAID" checked onchange="window.Pages['sys-tenant'].switchRechargeAssociationType(this.value)">
+                        <span>付费单</span>
+                      </label>
+                      <label class="biz-radio">
+                        <input type="radio" name="tenantRechargeAssociationType" value="TRIAL" onchange="window.Pages['sys-tenant'].switchRechargeAssociationType(this.value)">
+                        <span>试用单</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div id="tenantPaidRechargeFields">
+                <div class="biz-form-row">
                   <label class="biz-form-label required">充值单号</label>
                   <div class="biz-form-field">
                     <div class="tenant-recharge-check">
                       <input class="biz-form-input" id="tenantRechargeNo" value="${row.rechargeNo || ''}" placeholder="请输入充值单号" oninput="window.Pages['sys-tenant'].previewRechargeOrder()">
-                      <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].submitRechargeOrder()" style="height:36px;padding:0 14px;">提交</button>
+                      <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].readRechargeOrder()" style="height:36px;padding:0 14px;">读取</button>
                     </div>
                   </div>
                 </div>
@@ -928,6 +1057,33 @@
                 <div class="biz-modal-notice tenant-notice">
                   <span class="biz-notice-icon">&#x26A0;</span>
                   <div class="biz-notice-body">充值金额进入统一资金账户。大模型和小模型余额按各自默认单价换算，分钟数不可相加。</div>
+                </div>
+                </div>
+                <div id="tenantTrialRechargeFields" class="tenant-trial-form" style="display:none;">
+                  <div class="biz-form-row">
+                    <label class="biz-form-label required">有效时间</label>
+                    <div class="biz-form-field">
+                      <select class="biz-form-select" id="tenantTrialValidityMonths">
+                        <option value="1">1 个月</option>
+                        <option value="2">2 个月</option>
+                        <option value="3">3 个月</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="biz-form-row">
+                    <label class="biz-form-label required">通话费用</label>
+                    <div class="biz-form-field">
+                      <input class="biz-form-input" id="tenantTrialCallFee" type="number" min="0.01" step="0.01" placeholder="请输入通话费用（元）">
+                    </div>
+                  </div>
+                  <div class="tenant-recharge-confirm">
+                    <span>确认后生成待生效的试用单记录</span>
+                    <button class="btn btn-primary" onclick="window.Pages['sys-tenant'].confirmTrialOrder()">确认关联</button>
+                  </div>
+                  <div class="biz-modal-notice tenant-notice">
+                    <span class="biz-notice-icon">&#x26A0;</span>
+                    <div class="biz-notice-body">试用有效时间按每月 30 日换算；生效时可再次调整添加时长，通话费用在生效后计入资金余额。</div>
+                  </div>
                 </div>
               </div>
 
@@ -939,6 +1095,9 @@
                       <tr>
                         <th>序号</th>
                         <th>充值单号</th>
+                        <th>关联类型</th>
+                        <th>门店编码</th>
+                        <th>门店名称</th>
                         <th>支付状态</th>
                         <th>生效状态</th>
                         <th>计费类型</th>
@@ -1017,6 +1176,76 @@
     });
   }
 
+  function switchRechargeAssociationType(type) {
+    const paidPanel = document.getElementById('tenantPaidRechargeFields');
+    const trialPanel = document.getElementById('tenantTrialRechargeFields');
+    const isTrial = type === 'TRIAL';
+    if (paidPanel) paidPanel.style.display = isTrial ? 'none' : 'block';
+    if (trialPanel) trialPanel.style.display = isTrial ? 'block' : 'none';
+  }
+
+  function getTenantStoreInfo(tenantName) {
+    const order = getOrders().find(item =>
+      normalizeTenantName(item.tenantName) === normalizeTenantName(tenantName)
+    );
+    const tenant = getTenantRows().find(item =>
+      normalizeTenantName(item.name) === normalizeTenantName(tenantName)
+    );
+    return {
+      storeCode: (order && order.storeCode) || (tenant && tenant.tenantId) || '-',
+      storeName: (order && order.storeName) || tenantName || '-'
+    };
+  }
+
+  function confirmTrialOrder() {
+    const tenantName = document.getElementById('tenantName')?.value || '';
+    const months = Number(document.getElementById('tenantTrialValidityMonths')?.value);
+    const callFeeInput = document.getElementById('tenantTrialCallFee');
+    const callFee = Number(callFeeInput?.value);
+
+    if (![1, 2, 3].includes(months)) {
+      showToast('请选择有效时间', 'warning');
+      return;
+    }
+    if (!Number.isFinite(callFee) || callFee <= 0) {
+      callFeeInput?.focus();
+      showToast('通话费用必须大于 0', 'warning');
+      return;
+    }
+
+    const now = new Date();
+    const store = getTenantStoreInfo(tenantName);
+    const rechargeNo = `TRY${formatLocalDate(now).replace(/-/g, '')}${String(now.getTime()).slice(-6)}`;
+    getHistoryRows().unshift({
+      id: now.getTime(),
+      orderType: '试用单',
+      tenantName,
+      rechargeNo,
+      storeCode: store.storeCode,
+      storeName: store.storeName,
+      status: '已支付',
+      billingType: '坐席费+通话费',
+      seatFeePackage: `试用${months}个月`,
+      trialMonths: months,
+      periodDays: months * 30,
+      rechargeAmount: callFee,
+      validFrom: '-',
+      validTo: '-',
+      validityActivated: false,
+      activated: false,
+      operator: 'xtadmin',
+      bindTime: formatLocalDateTime(now)
+    });
+
+    if (callFeeInput) callFeeInput.value = '';
+    const monthsSelect = document.getElementById('tenantTrialValidityMonths');
+    if (monthsSelect) monthsSelect.value = '1';
+    const historyBody = document.getElementById('tenantHistoryBody');
+    if (historyBody) historyBody.innerHTML = renderHistoryRows(tenantName);
+    updateDrawerFieldsAfterActivation(tenantName);
+    showToast('试用单已关联，请在历史记录中点击“生效”', 'success');
+  }
+
   function renderCheckedOrder(order) {
     const drawer = document.getElementById('tenantBillingDrawer');
     if (drawer) {
@@ -1027,8 +1256,8 @@
     if (!box) return;
     if (!order) {
       box.innerHTML = no
-        ? '<div class="tenant-empty-preview">请点击“提交”关联充值单</div>'
-        : '<div class="tenant-empty-preview">请输入充值单号并点击“提交”</div>';
+        ? '<div class="tenant-empty-preview">充值单号已变更，请重新读取</div>'
+        : '<div class="tenant-empty-preview">请输入充值单号并点击“读取”</div>';
       return;
     }
     const preview = buildSubmitPreview(order);
@@ -1051,15 +1280,28 @@
     const largeConfigs = getTenantPriceConfigs(tenantName, '大模型');
     const smallConfigs = getTenantPriceConfigs(tenantName, '小模型');
     const rechargeAmount = order.status === '已支付' ? order.rechargeAmount : 0;
+    const tenantMatched = normalizeTenantName(order.tenantName) === normalizeTenantName(tenantName);
+    const duplicated = getHistoryRows().some(item => item.rechargeNo === order.no);
+    const canConfirm = order.status === '已支付' && tenantMatched && !duplicated;
+    const confirmText = duplicated
+      ? '该充值单已关联'
+      : (!tenantMatched ? '门店与当前租户不匹配' : (order.status === '已支付' ? '请核对门店信息后确认关联' : `当前状态为${order.status}，不可关联`));
     box.innerHTML = `
       <div class="tenant-preview-grid">
         <div><span>充值单状态</span>${statusTag(order.status)}</div>
+        <div><span>门店编码</span><strong>${order.storeCode || '-'}</strong></div>
+        <div><span>门店名称</span><strong>${order.storeName || '-'}</strong></div>
+        <div><span>所属租户</span><strong>${order.tenantName || '-'}</strong></div>
         <div><span>计费类型</span><strong>${order.billingType}</strong></div>
         <div><span>坐席费套餐</span><strong>${order.seatFeePackage || '-'}</strong></div>
         <div><span>租户有效期</span><strong>${validityDisplay}</strong></div>
         <div><span>充值金额</span><strong>${formatBalance(rechargeAmount)}${isSubmitted && !isRechargeActivated(historyRow) ? '（待生效）' : ''}</strong></div>
         <div><span>大模型等价分钟数</span><strong>${formatMinuteRange(largeConfigs, rechargeAmount)}</strong></div>
         <div><span>小模型等价分钟数</span><strong>${formatMinuteRange(smallConfigs, rechargeAmount)}</strong></div>
+      </div>
+      <div class="tenant-recharge-confirm ${canConfirm ? '' : 'disabled'}">
+        <span>${confirmText}</span>
+        <button class="btn btn-primary" ${canConfirm ? '' : 'disabled'} onclick="window.Pages['sys-tenant'].confirmRechargeOrder()">确认关联</button>
       </div>
     `;
   }
@@ -1080,7 +1322,7 @@
     return { validity: `${validFrom} ~ ${addDays(validFrom, days)}` };
   }
 
-  function submitRechargeOrder() {
+  function readRechargeOrder() {
     const no = document.getElementById('tenantRechargeNo')?.value.trim();
     if (!no) {
       showToast('请输入充值单号', 'warning');
@@ -1092,6 +1334,8 @@
       no,
       tenantName: document.getElementById('tenantName')?.value || '',
       status: '不存在',
+      storeCode: '-',
+      storeName: '-',
       periodDays: 0,
       billingType: '仅坐席费',
       seatFeePackage: '-',
@@ -1101,16 +1345,52 @@
 
     const drawer = document.getElementById('tenantBillingDrawer');
     if (!drawer) return;
+    if (order.status !== '已支付') {
+      showToast(`充值单读取完成，当前状态：${order.status}`, 'warning');
+      return;
+    }
+    const tenantName = document.getElementById('tenantName')?.value || '';
+    if (normalizeTenantName(order.tenantName) !== normalizeTenantName(tenantName)) {
+      showToast('充值单门店与当前租户不匹配，请核对后重试', 'warning');
+      return;
+    }
+    if (getHistoryRows().some(item => item.rechargeNo === order.no)) {
+      showToast('该充值单号已关联，请勿重复关联', 'warning');
+      return;
+    }
+    showToast('充值单读取成功，请核对门店信息后确认关联', 'success');
+  }
+
+  function confirmRechargeOrder() {
+    const drawer = document.getElementById('tenantBillingDrawer');
+    if (!drawer) return;
+    const order = drawer._checkedOrder;
+    const no = document.getElementById('tenantRechargeNo')?.value.trim();
+    if (!order || order.no !== no) {
+      showToast('请先读取当前充值单号', 'warning');
+      renderCheckedOrder(null);
+      return;
+    }
+    if (order.status !== '已支付') {
+      showToast(`当前充值单状态为${order.status}，不能关联`, 'warning');
+      return;
+    }
+    const tenantName = document.getElementById('tenantName')?.value || '';
+    if (normalizeTenantName(order.tenantName) !== normalizeTenantName(tenantName)) {
+      showToast('充值单门店与当前租户不匹配，不能关联', 'warning');
+      return;
+    }
+    if (getHistoryRows().some(item => item.rechargeNo === order.no)) {
+      showToast('该充值单号已关联，请勿重复关联', 'warning');
+      renderCheckedOrder(order);
+      return;
+    }
+
     const rowId = Number(drawer.dataset.rowId);
     const isNew = drawer.dataset.new === '1';
     const row = isNew ? { id: rowId } : getBillingRows().find(item => item.id === rowId);
-    row.tenantName = document.getElementById('tenantName')?.value || row.tenantName;
+    row.tenantName = tenantName || row.tenantName;
     row.localAddedAt = formatLocalDateTime(new Date());
-
-    if (order.status === '已支付' && getHistoryRows().some(item => item.rechargeNo === order.no)) {
-      showToast('该充值单号已关联，请勿重复提交', 'warning');
-      return;
-    }
 
     applyOrderToRow(row, order);
     if (isNew) getBillingRows().push(row);
@@ -1118,8 +1398,11 @@
     if (row.rechargeStatus === '已支付') {
       getHistoryRows().unshift({
         id: Date.now(),
+        orderType: '付费单',
         tenantName: row.tenantName,
         rechargeNo: row.rechargeNo,
+        storeCode: row.storeCode,
+        storeName: row.storeName,
         status: row.rechargeStatus,
         billingType: row.billingType,
         seatFeePackage: row.seatFeePackage,
@@ -1137,10 +1420,8 @@
     const historyBody = document.getElementById('tenantHistoryBody');
     if (historyBody) historyBody.innerHTML = renderHistoryRows(row.tenantName);
     updateDrawerFieldsAfterActivation(row.tenantName);
-    const successMsg = row.rechargeStatus === '已支付'
-      ? '充值单已关联，请在历史记录中点击“生效”后更新有效期和余额'
-      : `充值单未关联，当前状态：${row.rechargeStatus}`;
-    showToast(successMsg, row.rechargeStatus === '已支付' ? 'success' : 'warning');
+    renderCheckedOrder(order);
+    showToast('充值单已关联，请在历史记录中点击“生效”后更新有效期和余额', 'success');
   }
 
   function createBalanceAdjustment(data) {
@@ -1255,12 +1536,18 @@
     showBillingDrawer,
     closeBillingDrawer,
     switchBillingTab,
+    switchRechargeAssociationType,
     previewRechargeOrder,
-    submitRechargeOrder,
+    readRechargeOrder,
+    confirmRechargeOrder,
+    confirmTrialOrder,
     showAdjustmentModal,
     closeAdjustmentModal,
     submitAdjustmentFromModal,
     activateRecharge,
+    closeActivationDurationModal,
+    updateActivationDurationPreview,
+    confirmActivationDuration,
     toggleFrozenTooltip,
     toggleCallControl,
     getImportCapacity,

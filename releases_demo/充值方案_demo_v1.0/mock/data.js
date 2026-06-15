@@ -103,7 +103,7 @@ var MockTenantBillingRows = [
     rechargeStatus: '未支付',
     localAddedAt: '2026-06-02 10:10:00',
     seatFeePackage: '半年套餐',
-    periodDays: 180,
+    periodDays: 183,
     rechargeAmount: 0,
     validFrom: '-',
     validTo: '-',
@@ -135,7 +135,7 @@ var MockTenantBillingRows = [
     rechargeStatus: '已支付',
     localAddedAt: '2026-06-05 09:00:00',
     seatFeePackage: '半年套餐',
-    periodDays: 180,
+    periodDays: 183,
     rechargeAmount: 0,
     validFrom: '-',
     validTo: '-',
@@ -145,18 +145,20 @@ var MockTenantBillingRows = [
 ];
 
 var MockRechargeOrders = [
-  { no: 'RC20260601001', tenantName: '东风日产-燃油车', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 2000 },
-  { no: 'RC20260602002', tenantName: '重庆东南方渝兴', status: '未支付', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', rechargeAmount: 0 },
-  { no: 'RC20260603003', tenantName: '重庆东南方渝发', status: '查询失败', seatFeePackage: '半年套餐', periodDays: 180, billingType: '坐席费+通话费', rechargeAmount: 1000 },
-  { no: 'RC20260604004', tenantName: '东风日产-点检', status: '不存在', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', rechargeAmount: 0 },
-  { no: 'RC20260605005', tenantName: '超级管理组', status: '已取消', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 3000 },
-  { no: 'RC20260606006', tenantName: '重庆东南方渝发', status: '已支付', seatFeePackage: '半年套餐', periodDays: 180, billingType: '仅坐席费', rechargeAmount: 0 },
-  { no: 'RC20260607007', tenantName: '重庆东南方渝兴', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 1500 },
-  { no: 'RC20260608008', tenantName: '重庆东南方渝兴', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 2500 },
-  { no: 'RC20260609009', tenantName: '东风日产-燃油车', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 520 },
-  { no: 'RC-HQ-001', tenantName: '东风日产-燃油车', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 999999999 },
-  { no: 'RC-HQ-002', tenantName: '东风日产-点检', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 999999999 },
-  { no: 'RC-HQ-003', tenantName: '超级管理组', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 999999999 }
+  { no: 'RC20260601001', tenantName: '东风日产-燃油车', storeCode: 'HQ-RY-001', storeName: '东风日产燃油车总部', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 2000 },
+  { no: 'RC20260602002', tenantName: '重庆东南方渝兴', storeCode: 'CQ-YX-001', storeName: '重庆东风南方渝兴店', status: '未支付', seatFeePackage: '半年套餐', periodDays: 183, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC20260603003', tenantName: '重庆东南方渝发', storeCode: 'CQ-YF-001', storeName: '重庆东风南方渝发店', status: '查询失败', seatFeePackage: '半年套餐', periodDays: 183, billingType: '坐席费+通话费', rechargeAmount: 1000 },
+  { no: 'RC20260604004', tenantName: '东风日产-点检', storeCode: 'HQ-DJ-001', storeName: '东风日产点检总部', status: '不存在', seatFeePackage: '半年套餐', periodDays: 183, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC20260605005', tenantName: '超级管理组', storeCode: 'HQ-SYS-001', storeName: '超级管理组', status: '已取消', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 3000 },
+  { no: 'RC20260606006', tenantName: '重庆东南方渝发', storeCode: 'CQ-YF-001', storeName: '重庆东风南方渝发店', status: '已支付', seatFeePackage: '半年套餐', periodDays: 183, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC20260607007', tenantName: '重庆东南方渝兴', storeCode: 'CQ-YX-001', storeName: '重庆东风南方渝兴店', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 1500 },
+  { no: 'RC20260608008', tenantName: '重庆东南方渝兴', storeCode: 'CQ-YX-001', storeName: '重庆东风南方渝兴店', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 2500 },
+  { no: 'RC20260609009', tenantName: '东风日产-燃油车', storeCode: 'HQ-RY-001', storeName: '东风日产燃油车总部', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 520 },
+  { no: 'RC20260610010', tenantName: '重庆东南方渝发', storeCode: 'CQ-YF-001', storeName: '重庆东风南方渝发店', status: '已支付', seatFeePackage: '-', periodDays: 0, billingType: '仅通话费', rechargeAmount: 800 },
+  { no: 'RC20260615011', tenantName: '重庆东南方渝兴', storeCode: 'CQ-YX-001', storeName: '重庆东风南方渝兴店', status: '已支付', seatFeePackage: '半年套餐', periodDays: 183, billingType: '仅坐席费', rechargeAmount: 0 },
+  { no: 'RC-HQ-001', tenantName: '东风日产-燃油车', storeCode: 'HQ-RY-001', storeName: '东风日产燃油车总部', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 999999999 },
+  { no: 'RC-HQ-002', tenantName: '东风日产-点检', storeCode: 'HQ-DJ-001', storeName: '东风日产点检总部', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 999999999 },
+  { no: 'RC-HQ-003', tenantName: '超级管理组', storeCode: 'HQ-SYS-001', storeName: '超级管理组', status: '已支付', seatFeePackage: '全年套餐', periodDays: 365, billingType: '坐席费+通话费', rechargeAmount: 999999999 }
 ];
 
 var MockTenantAccounts = [
@@ -201,9 +203,10 @@ var MockTenantRechargeHistory = [
   { id: 2, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20260412001', status: '已取消', billingType: '仅坐席费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 0, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-04-12 10:22:31', activated: false, validityActivated: false },
   { id: 7, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20260608008', status: '已支付', billingType: '坐席费+通话费', seatFeePackage: '全年套餐', periodDays: 365, rechargeAmount: 2500, validFrom: '2026-06-12', validTo: '2027-06-11', operator: 'xtadmin', bindTime: '2026-06-12 08:00:00', activated: true, validityActivated: true },
   { id: 8, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20260607007', status: '已支付', billingType: '仅通话费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 1500, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-07 10:15:00', activated: true, validityActivated: true },
-  { id: 3, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20250512002', status: '未支付', billingType: '坐席费+通话费', seatFeePackage: '半年套餐', periodDays: 180, rechargeAmount: 1000, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2025-05-12 13:45:20', activated: false, validityActivated: false },
+  { id: 12, tenantName: '重庆东风南方渝兴', rechargeNo: 'RC20260615011', storeCode: 'CQ-YX-001', storeName: '重庆东风南方渝兴店', status: '已支付', billingType: '仅坐席费', seatFeePackage: '半年套餐', periodDays: 183, rechargeAmount: 0, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-15 15:30:00', activated: false, validityActivated: false },
+  { id: 3, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20250512002', status: '未支付', billingType: '坐席费+通话费', seatFeePackage: '半年套餐', periodDays: 183, rechargeAmount: 1000, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2025-05-12 13:45:20', activated: false, validityActivated: false },
   { id: 4, tenantName: '东风日产-燃油车', rechargeNo: 'RC20260601001', status: '已支付', billingType: '坐席费+通话费', seatFeePackage: '全年套餐', periodDays: 365, rechargeAmount: 2000, validFrom: '2026-06-01', validTo: '2027-05-31', operator: 'xtadmin', bindTime: '2026-06-01 09:30:00', activated: true, validityActivated: true },
-  { id: 5, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20260607007', status: '已支付', billingType: '仅通话费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 1500, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-07 10:15:00', activated: false, validityActivated: false },
+  { id: 5, tenantName: '重庆东风南方渝发', rechargeNo: 'RC20260606006', storeCode: 'CQ-YF-001', storeName: '重庆东风南方渝发店', status: '已支付', billingType: '仅坐席费', seatFeePackage: '半年套餐', periodDays: 183, rechargeAmount: 0, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-06 10:15:00', activated: false, validityActivated: false },
   { id: 6, tenantName: '东风日产-燃油车', rechargeNo: 'RC20260609009', status: '已支付', billingType: '仅通话费', seatFeePackage: '-', periodDays: 0, rechargeAmount: 520, validFrom: '-', validTo: '-', operator: 'xtadmin', bindTime: '2026-06-09 11:20:00', activated: false, validityActivated: false },
   { id: 9, tenantName: '东风日产-燃油车', rechargeNo: 'RC-HQ-001', status: '已支付', billingType: '坐席费+通话费', seatFeePackage: '全年套餐', periodDays: 365, rechargeAmount: 999999999, validFrom: '2026-01-01', validTo: '2099-12-31', operator: 'xtadmin', bindTime: '2026-01-01 00:00:00', activated: true, validityActivated: true },
   { id: 10, tenantName: '东风日产-点检', rechargeNo: 'RC-HQ-002', status: '已支付', billingType: '坐席费+通话费', seatFeePackage: '全年套餐', periodDays: 365, rechargeAmount: 999999999, validFrom: '2026-01-01', validTo: '2099-12-31', operator: 'xtadmin', bindTime: '2026-01-01 00:00:00', activated: true, validityActivated: true },
