@@ -285,6 +285,7 @@
       .filter(item => item.direction === 'OUT')
       .reduce((sum, item) => sum + Number(item.amount || 0), 0);
     const consumedAmount = Number(tenant && tenant.consumedAmount || 0);
+    const totalDeductionAmount = adjustmentOutAmount + consumedAmount;
     const balanceAmount = totalRechargeAmount - adjustmentOutAmount - consumedAmount;
     const frozenTasks = getFrozenTasks().filter(item =>
       item.status === '冻结中' &&
@@ -325,6 +326,8 @@
         : (pendingValidityRow ? '待生效' : '未生成'),
       totalRechargeAmount,
       adjustmentOutAmount,
+      consumedAmount,
+      totalDeductionAmount,
       pricingRows,
       largeBalanceRange: formatMinuteRange(largeConfigs, displayBalanceAmount),
       largeAvailableRange: formatMinuteRange(largeConfigs, availableAmount),
@@ -371,10 +374,16 @@
       return;
     }
 
-    if (canGenerateValidity({
+    const changesValidity = canGenerateValidity({
       rechargeStatus: historyRow.status,
       billingType: historyRow.billingType
-    })) {
+    });
+    const changesBalance = canAddCallBalance({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+
+    if (changesValidity || changesBalance) {
       showActivationDurationModal(historyRow);
       return;
     }
@@ -393,9 +402,13 @@
     };
   }
 
-  function finalizeRechargeActivation(historyRow, durationDays) {
+  function finalizeRechargeActivation(historyRow, durationDays, balanceAmount) {
     const tenantName = historyRow.tenantName;
     const changesValidity = canGenerateValidity({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+    const changesBalance = canAddCallBalance({
       rechargeStatus: historyRow.status,
       billingType: historyRow.billingType
     });
@@ -407,6 +420,9 @@
     } else {
       historyRow.validFrom = '-';
       historyRow.validTo = '-';
+    }
+    if (changesBalance && balanceAmount !== undefined) {
+      historyRow.rechargeAmount = balanceAmount;
     }
     historyRow.activated = true;
     historyRow.validityActivated = true;
@@ -428,10 +444,6 @@
     if (historyBody) historyBody.innerHTML = renderHistoryRows(tenantName);
     const currentOrderNo = document.getElementById('tenantRechargeNo')?.value;
     if (currentOrderNo) renderCheckedOrder(getOrders().find(item => item.no === currentOrderNo) || null);
-    const changesBalance = canAddCallBalance({
-      rechargeStatus: historyRow.status,
-      billingType: historyRow.billingType
-    });
     const resultText = changesValidity && changesBalance
       ? '有效期和余额已更新'
       : (changesValidity ? '有效期已更新' : '余额已更新');
@@ -440,19 +452,22 @@
 
   function showActivationDurationModal(historyRow) {
     closeActivationDurationModal();
+    const changesValidity = canGenerateValidity({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+    const changesBalance = canAddCallBalance({
+      rechargeStatus: historyRow.status,
+      billingType: historyRow.billingType
+    });
+    const summary = getTenantBillingSummary(historyRow.tenantName);
     const defaultDays = packageDays(historyRow.seatFeePackage) || Number(historyRow.periodDays || 0);
-    const validity = getActivationValidity(historyRow, defaultDays);
-    const html = `
-      <div class="tenant-pricing-modal-backdrop" id="tenantActivationDurationBackdrop" onclick="window.Pages['sys-tenant'].closeActivationDurationModal(event)">
-        <div class="tenant-pricing-modal tenant-activation-duration-modal" id="tenantActivationDurationModal" data-recharge-no="${historyRow.rechargeNo}" onclick="event.stopPropagation()">
-          <div class="tenant-pricing-modal-header">
-            <div>
-              <div class="tenant-pricing-modal-title">确认添加有效时长</div>
-              <div class="tenant-pricing-modal-subtitle">${historyRow.rechargeNo} · ${historyRow.seatFeePackage || '-'}</div>
-            </div>
-            <button class="tenant-pricing-modal-close" onclick="window.Pages['sys-tenant'].closeActivationDurationModal()">&#x2715;</button>
-          </div>
-          <div class="tenant-pricing-modal-body">
+    const validity = changesValidity ? getActivationValidity(historyRow, defaultDays) : null;
+    const defaultBalanceAmount = Number(historyRow.rechargeAmount || 0);
+    const title = changesValidity && changesBalance
+      ? '确认添加有效时长和余额'
+      : (changesValidity ? '确认添加有效时长' : '确认添加通话余额');
+    const validityHtml = changesValidity ? `
             <div class="tenant-activation-duration-summary">
               <div><span>当前有效期至</span><strong>${validity.baseDate}</strong></div>
               <div><span>新增有效期起始</span><strong id="tenantActivationValidFrom">${validity.validFrom}</strong></div>
@@ -465,9 +480,45 @@
                 <span>日</span>
               </div>
             </div>
+    ` : '';
+    const balanceAfter = summary.balanceAmount + defaultBalanceAmount;
+    const availableAfter = Math.max(balanceAfter - summary.totalFrozenAmount, 0);
+    const balanceHtml = changesBalance ? `
+            <div class="tenant-activation-duration-summary tenant-activation-balance-summary">
+              <div><span>当前资金余额</span><strong>${formatBalance(summary.balanceAmount)}</strong></div>
+              <div><span>当前冻结总和</span><strong>${formatBalance(summary.totalFrozenAmount)}</strong></div>
+              <div><span>预计可用余额</span><strong id="tenantActivationAvailableAfter">${formatBalance(availableAfter)}</strong></div>
+            </div>
+            <div class="tenant-adjustment-field tenant-activation-balance-field">
+              <label>添加通话余额</label>
+              <div class="tenant-duration-input-wrap">
+                <input id="tenantActivationBalanceAmount" type="number" min="0.01" step="0.01" value="${defaultBalanceAmount.toFixed(2)}" oninput="window.Pages['sys-tenant'].updateActivationDurationPreview()">
+                <span>元</span>
+              </div>
+              <div class="tenant-activation-balance-after">生效后资金余额：<strong id="tenantActivationBalanceAfter">${formatBalance(balanceAfter)}</strong></div>
+            </div>
+    ` : '';
+    const noticeText = changesValidity && changesBalance
+      ? '系统已按套餐反显默认时长，并按充值单反显通话余额。确认前可调整天数和添加余额，确认后同时更新租户有效期和资金余额。'
+      : (changesValidity
+        ? '系统已按套餐反显默认时长，可在生效前调整。确认后将按调整后的天数顺延租户有效期。'
+        : '系统已按充值单反显添加余额，可在生效前调整。确认后将按调整后的金额计入租户统一资金账户。');
+    const html = `
+      <div class="tenant-pricing-modal-backdrop" id="tenantActivationDurationBackdrop" onclick="window.Pages['sys-tenant'].closeActivationDurationModal(event)">
+        <div class="tenant-pricing-modal tenant-activation-duration-modal" id="tenantActivationDurationModal" data-recharge-no="${historyRow.rechargeNo}" onclick="event.stopPropagation()">
+          <div class="tenant-pricing-modal-header">
+            <div>
+              <div class="tenant-pricing-modal-title">${title}</div>
+              <div class="tenant-pricing-modal-subtitle">${historyRow.rechargeNo} · ${historyRow.billingType}</div>
+            </div>
+            <button class="tenant-pricing-modal-close" onclick="window.Pages['sys-tenant'].closeActivationDurationModal()">&#x2715;</button>
+          </div>
+          <div class="tenant-pricing-modal-body">
+            ${validityHtml}
+            ${balanceHtml}
             <div class="biz-modal-notice tenant-pricing-config-notice">
               <span class="biz-notice-icon">&#x26A0;</span>
-              <div class="biz-notice-body">系统已按套餐反显默认时长，可在生效前调整。确认后将按调整后的天数顺延租户有效期。</div>
+              <div class="biz-notice-body">${noticeText}</div>
             </div>
           </div>
           <div class="tenant-pricing-modal-footer">
@@ -489,32 +540,62 @@
     const modal = document.getElementById('tenantActivationDurationModal');
     if (!modal) return;
     const historyRow = getHistoryRows().find(item => item.rechargeNo === modal.dataset.rechargeNo);
-    const durationDays = Number(document.getElementById('tenantActivationDurationDays')?.value);
+    if (!historyRow) return;
+    const durationInput = document.getElementById('tenantActivationDurationDays');
+    const durationDays = Number(durationInput && durationInput.value);
     const validTo = document.getElementById('tenantActivationValidTo');
-    if (!historyRow || !validTo) return;
-    validTo.textContent = Number.isInteger(durationDays) && durationDays > 0
-      ? getActivationValidity(historyRow, durationDays).validTo
-      : '-';
+    if (validTo) {
+      validTo.textContent = Number.isInteger(durationDays) && durationDays > 0
+        ? getActivationValidity(historyRow, durationDays).validTo
+        : '-';
+    }
+
+    const balanceInput = document.getElementById('tenantActivationBalanceAmount');
+    const balanceAfterText = document.getElementById('tenantActivationBalanceAfter');
+    const availableAfterText = document.getElementById('tenantActivationAvailableAfter');
+    if (balanceInput && balanceAfterText && availableAfterText) {
+      const balanceAmount = Number(balanceInput.value);
+      const summary = getTenantBillingSummary(historyRow.tenantName);
+      if (Number.isFinite(balanceAmount) && balanceAmount > 0) {
+        const balanceAfter = summary.balanceAmount + balanceAmount;
+        balanceAfterText.textContent = formatBalance(balanceAfter);
+        availableAfterText.textContent = formatBalance(Math.max(balanceAfter - summary.totalFrozenAmount, 0));
+      } else {
+        balanceAfterText.textContent = '-';
+        availableAfterText.textContent = '-';
+      }
+    }
   }
 
   function confirmActivationDuration() {
     const modal = document.getElementById('tenantActivationDurationModal');
     if (!modal) return;
     const historyRow = getHistoryRows().find(item => item.rechargeNo === modal.dataset.rechargeNo);
-    const input = document.getElementById('tenantActivationDurationDays');
-    const durationDays = Number(input && input.value);
+    const durationInput = document.getElementById('tenantActivationDurationDays');
+    const balanceInput = document.getElementById('tenantActivationBalanceAmount');
+    const durationDays = Number(durationInput && durationInput.value);
+    const balanceAmount = Number(balanceInput && balanceInput.value);
     if (!historyRow || !canActivateRecharge(historyRow)) {
       closeActivationDurationModal();
       showToast('充值单状态已变化，请刷新后重试', 'warning');
       return;
     }
-    if (!Number.isInteger(durationDays) || durationDays <= 0) {
-      input?.focus();
+    if (durationInput && (!Number.isInteger(durationDays) || durationDays <= 0)) {
+      durationInput.focus();
       showToast('添加有效时长必须为大于 0 的整数', 'warning');
       return;
     }
+    if (balanceInput && (!Number.isFinite(balanceAmount) || balanceAmount <= 0)) {
+      balanceInput.focus();
+      showToast('添加通话余额必须大于 0', 'warning');
+      return;
+    }
     closeActivationDurationModal();
-    finalizeRechargeActivation(historyRow, durationDays);
+    finalizeRechargeActivation(
+      historyRow,
+      durationInput ? durationDays : undefined,
+      balanceInput ? balanceAmount : undefined
+    );
   }
 
   function updateDrawerFieldsAfterActivation(tenantName) {
@@ -592,6 +673,64 @@
         </tr>
       `;
     }).join('');
+  }
+
+  function formatExportNumber(value) {
+    return Number(value || 0).toFixed(2);
+  }
+
+  function getExportAvailableMinutes(summary, modelType) {
+    const pricing = summary.pricingRows.find(item => item.modelType === modelType && item.status === '启用');
+    return pricing ? formatExportNumber(pricing.availableMinutes) : '未配置';
+  }
+
+  function escapeCsvCell(value) {
+    return `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+  }
+
+  function exportTenantBilling() {
+    const headers = [
+      '租户名称',
+      '租户ID',
+      '租户类型',
+      '历史充值总额（元）',
+      '扣费总额（元）',
+      '冻结总和（元）',
+      '可用余额（元）',
+      '大模型可用分钟数',
+      '小模型可用分钟数',
+      '有效期',
+      '呼叫控制状态'
+    ];
+    const rows = getTenantRows().map(tenant => {
+      const summary = getTenantBillingSummary(tenant.name);
+      return [
+        tenant.name,
+        tenant.tenantId,
+        tenant.type,
+        formatExportNumber(summary.totalRechargeAmount),
+        formatExportNumber(summary.totalDeductionAmount),
+        formatExportNumber(summary.totalFrozenAmount),
+        formatExportNumber(summary.availableAmount),
+        getExportAvailableMinutes(summary, '大模型'),
+        getExportAvailableMinutes(summary, '小模型'),
+        summary.validity,
+        summary.callStatus
+      ];
+    });
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(escapeCsvCell).join(','))
+      .join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const downloadUrl = URL.createObjectURL(blob);
+    link.href = downloadUrl;
+    link.download = `租户计费汇总_${formatLocalDate(new Date())}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+    showToast(`导出成功，共 ${rows.length} 条租户数据`, 'success');
   }
 
   function renderPricingRows(tenantName) {
@@ -782,6 +921,7 @@
 
           <div class="tenant-list-card">
             <div class="tenant-list-tools">
+              <button class="btn btn-default" data-anno="tenant-billing-export" onclick="window.Pages['sys-tenant'].exportTenantBilling()" style="height:34px;padding:0 16px;">导出</button>
               <button class="btn btn-primary" onclick="showToast('新建租户功能开发中','info')" style="height:34px;padding:0 16px;">+ 新建</button>
               <span class="biz-icon-btn" onclick="doRefresh()" title="刷新">&#x21bb;</span>
               <span class="biz-icon-btn" onclick="showToast('设置功能开发中','info')" title="设置">&#x2699;</span>
@@ -1536,6 +1676,7 @@
     showBillingDrawer,
     closeBillingDrawer,
     switchBillingTab,
+    exportTenantBilling,
     switchRechargeAssociationType,
     previewRechargeOrder,
     readRechargeOrder,

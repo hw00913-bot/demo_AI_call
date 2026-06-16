@@ -2175,6 +2175,10 @@ p { margin-bottom: 8px; }
 .tenant-activation-duration-summary span { display: block; margin-bottom: 6px; color: #999; font-size: 12px; }
 .tenant-activation-duration-summary strong { color: #1f1f1f; font-size: 14px; }
 .tenant-activation-duration-field { margin-bottom: 16px; }
+.tenant-activation-balance-summary { margin-top: 2px; }
+.tenant-activation-balance-field { margin-bottom: 16px; }
+.tenant-activation-balance-after { margin-top: 8px; color: #666; font-size: 12px; }
+.tenant-activation-balance-after strong { color: #1677ff; }
 .tenant-duration-input-wrap { display: flex; align-items: center; gap: 8px; }
 .tenant-duration-input-wrap input {
   width: 180px;
