@@ -19,3 +19,19 @@
 ## D-005 业务变更控制
 
 目录调整不得改变租户计费计算和页面交互。新增需求优先在现有页面模块内增量实现，非必要不修改其他模块。
+
+## D-006 排序移位机制
+
+标签排序编辑采用移位策略（非交换或全量重排）。修改标签排序时，同标签池/标签集内排序值在 (oldSort, newSort] 或 [newSort, oldSort) 区间内的其他标签自动 ±1，保持排序连续不重复。`shiftSortValues()` 为通用函数，供应商模式和中台模式共用。
+
+## D-007 PromptModal 回调安全
+
+`confirmPromptModal` 中必须在调用 `closePromptModal()` 之前保存 `promptCallback` 引用，因为 `closePromptModal()` 内部会将 `promptCallback` 置为 null。使用局部变量 `var cb = promptCallback` 保存后再关闭弹窗。
+
+## D-008 跨模块数据依赖
+
+业务场景管理（sys-scene）的新增业务场景表单中，「智能平台」和「场景类型」字段的数据来源为标签管理模块的供应商列表和场景列表。当前两处均为硬编码，未来应改为从 MockTagSuppliers / MockTagScenes 动态读取。新增供应商或场景时需同步更新业务场景的选项。
+
+## D-009 标注系统页面覆盖
+
+标注数据按页面 key 分组存储在 `annotations/annotations.js` 中。当前覆盖 sys-tags（17条）和 sys-scene（3条）两个页面。`AnnotationConfig.page` 使用函数动态获取当前激活的导航项 ID 作为 page key。新增页面标注时需确保目标页面存在对应的 `data-anno` 锚点。
