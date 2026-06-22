@@ -26,3 +26,15 @@
 - 提取 `shiftSortValues()` 通用排序移位函数
 - 新增 CLAUDE.md 中文项目文档
 - 新增 sys-scene 页面标注（智能平台、场景类型、新增业务场景），记录跨模块数据依赖规则
+
+## 2026-06-22 — 线索记录页面新建（Codex）
+
+- 新建 `js/pages/result-clue.js`（357 行），实现线索记录页面
+- 页面包含：筛选卡片（可折叠）、数据表格（13列）、客户标签弹窗（6字段）、回访详情弹窗、通话详情抽屉
+- 筛选联动：场景名称 → 动态加载意向级别选项
+- 9 条 Mock 数据（燃油车新线索-一知）
+- `assets/css/app.css` 新增线索记录完整样式（~637 行）
+- `index.html` 添加 `result-clue.js` 脚本引用
+- 修复 `confirmPromptModal` 中 `promptCallback` 被提前置空导致新增标签/场景/供应商回调失效的 bug
+- 弹窗宽度调整：场景配置 600px、供应商管理 580px
+- 标注总数更新：sys-tags 17条 + sys-scene 3条 = 20条
