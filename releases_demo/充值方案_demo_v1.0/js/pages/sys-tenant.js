@@ -1431,10 +1431,10 @@
         <div><span>充值单状态</span>${statusTag(order.status)}</div>
         <div><span>门店编码</span><strong>${order.storeCode || '-'}</strong></div>
         <div><span>门店名称</span><strong>${order.storeName || '-'}</strong></div>
-        <div><span>所属租户</span><strong>${order.tenantName || '-'}</strong></div>
+
         <div><span>计费类型</span><strong>${order.billingType}</strong></div>
         <div><span>坐席费套餐</span><strong>${order.seatFeePackage || '-'}</strong></div>
-        <div><span>租户有效期</span><strong>${validityDisplay}</strong></div>
+
         <div><span>充值金额</span><strong>${formatBalance(rechargeAmount)}${isSubmitted && !isRechargeActivated(historyRow) ? '（待生效）' : ''}</strong></div>
         <div><span>大模型等价分钟数</span><strong>${formatMinuteRange(largeConfigs, rechargeAmount)}</strong></div>
         <div><span>小模型等价分钟数</span><strong>${formatMinuteRange(smallConfigs, rechargeAmount)}</strong></div>
