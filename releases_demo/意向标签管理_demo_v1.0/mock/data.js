@@ -417,11 +417,11 @@ var ZkjCallStatusLabels = {
 
 /* 供应商列表 */
 var MockTagSuppliers = [
-  { id: 'kdxf',    name: '科大讯飞', status: 'enabled' },
-  { id: 'blvcp',   name: '冰兰-vcp', status: 'enabled' },
-  { id: 'bl',      name: '冰兰',     status: 'enabled' },
-  { id: 'yzzh',    name: '一知科技', status: 'enabled' },
-  { id: 'zkj',     name: '中科金',   status: 'enabled' }
+  { id: 'kdxf',    localCode: 'SUP-KDXF',  name: '科大讯飞', status: 'enabled' },
+  { id: 'blvcp',   localCode: 'SUP-BLVCP', name: '冰兰-vcp', status: 'enabled' },
+  { id: 'bl',      localCode: 'SUP-BL',    name: '冰兰',     status: 'enabled' },
+  { id: 'yzzh',    localCode: 'SUP-YZZH',  name: '一知科技', status: 'enabled' },
+  { id: 'zkj',     localCode: 'SUP-ZKJ',   name: '中科金',   status: 'enabled' }
 ];
 
 /* 租户类型常量 */
@@ -432,69 +432,69 @@ var MockTenantTypes = [
 
 /* 场景列表 */
 var MockTagScenes = [
-  { id: 'db',  name: '督办',   status: 'enabled' },
-  { id: 'fw',  name: '服务',   status: 'enabled' },
-  { id: 'hf',  name: '回访',   status: 'enabled' },
-  { id: 'xxs', name: '新线索', status: 'enabled' },
-  { id: 'lxs', name: '冷线索', status: 'enabled' }
+  { id: 'db',  localCode: 'SCN-DB',  name: '督办',   status: 'enabled' },
+  { id: 'fw',  localCode: 'SCN-FW',  name: '服务',   status: 'enabled' },
+  { id: 'hf',  localCode: 'SCN-HF',  name: '回访',   status: 'enabled' },
+  { id: 'xxs', localCode: 'SCN-XXS', name: '新线索', status: 'enabled' },
+  { id: 'lxs', localCode: 'SCN-LXS', name: '冷线索', status: 'enabled' }
 ];
 
 /* 各供应商标签池 */
 var MockSupplierTagPool = {
   'kdxf': [
-    { id: 'kdxf_1', name: 'A-高意向',       sort: 1,  platformTagId: null },
-    { id: 'kdxf_2', name: 'B-意向客户',     sort: 2,  platformTagId: null },
-    { id: 'kdxf_3', name: 'C-潜在客户',     sort: 3,  platformTagId: null },
-    { id: 'kdxf_4', name: 'D-无意向',       sort: 4,  platformTagId: null },
-    { id: 'kdxf_5', name: 'E-需再次跟进',   sort: 5,  platformTagId: null },
-    { id: 'kdxf_6', name: 'F-号码无效',     sort: 6,  platformTagId: null },
-    { id: 'kdxf_7', name: 'G-空号/停机',    sort: 7,  platformTagId: null },
-    { id: 'kdxf_8', name: 'H-其他',         sort: 8,  platformTagId: null }
+    { id: 'kdxf_1', localCode: 'TAG-KDXF-001', name: 'A-高意向',       sort: 1,  platformTagId: null },
+    { id: 'kdxf_2', localCode: 'TAG-KDXF-002', name: 'B-意向客户',     sort: 2,  platformTagId: null },
+    { id: 'kdxf_3', localCode: 'TAG-KDXF-003', name: 'C-潜在客户',     sort: 3,  platformTagId: null },
+    { id: 'kdxf_4', localCode: 'TAG-KDXF-004', name: 'D-无意向',       sort: 4,  platformTagId: null },
+    { id: 'kdxf_5', localCode: 'TAG-KDXF-005', name: 'E-需再次跟进',   sort: 5,  platformTagId: null },
+    { id: 'kdxf_6', localCode: 'TAG-KDXF-006', name: 'F-号码无效',     sort: 6,  platformTagId: null },
+    { id: 'kdxf_7', localCode: 'TAG-KDXF-007', name: 'G-空号/停机',    sort: 7,  platformTagId: null },
+    { id: 'kdxf_8', localCode: 'TAG-KDXF-008', name: 'H-其他',         sort: 8,  platformTagId: null }
   ],
   'blvcp': [
-    { id: 'blvcp_1', name: '高意向-近期成交',  sort: 1,  platformTagId: null },
-    { id: 'blvcp_2', name: '中意向-考虑中',    sort: 2,  platformTagId: null },
-    { id: 'blvcp_3', name: '一般意向',        sort: 3,  platformTagId: null },
-    { id: 'blvcp_4', name: '低意向-暂不需要',  sort: 4,  platformTagId: null },
-    { id: 'blvcp_5', name: '已成交',          sort: 5,  platformTagId: null },
-    { id: 'blvcp_6', name: '无效号码',        sort: 6,  platformTagId: null },
-    { id: 'blvcp_7', name: '空号',            sort: 7,  platformTagId: null },
-    { id: 'blvcp_8', name: '拒接',            sort: 8,  platformTagId: null },
-    { id: 'blvcp_9', name: '忙线/未接通',     sort: 9,  platformTagId: null },
-    { id: 'blvcp_10', name: '需回访',         sort: 10, platformTagId: null }
+    { id: 'blvcp_1', localCode: 'TAG-BLVCP-001', name: '高意向-近期成交',  sort: 1,  platformTagId: null },
+    { id: 'blvcp_2', localCode: 'TAG-BLVCP-002', name: '中意向-考虑中',    sort: 2,  platformTagId: null },
+    { id: 'blvcp_3', localCode: 'TAG-BLVCP-003', name: '一般意向',        sort: 3,  platformTagId: null },
+    { id: 'blvcp_4', localCode: 'TAG-BLVCP-004', name: '低意向-暂不需要',  sort: 4,  platformTagId: null },
+    { id: 'blvcp_5', localCode: 'TAG-BLVCP-005', name: '已成交',          sort: 5,  platformTagId: null },
+    { id: 'blvcp_6', localCode: 'TAG-BLVCP-006', name: '无效号码',        sort: 6,  platformTagId: null },
+    { id: 'blvcp_7', localCode: 'TAG-BLVCP-007', name: '空号',            sort: 7,  platformTagId: null },
+    { id: 'blvcp_8', localCode: 'TAG-BLVCP-008', name: '拒接',            sort: 8,  platformTagId: null },
+    { id: 'blvcp_9', localCode: 'TAG-BLVCP-009', name: '忙线/未接通',     sort: 9,  platformTagId: null },
+    { id: 'blvcp_10', localCode: 'TAG-BLVCP-010', name: '需回访',         sort: 10, platformTagId: null }
   ],
   'bl': [
-    { id: 'bl_1',  name: 'S级-超高意向',    sort: 1,  platformTagId: null },
-    { id: 'bl_2',  name: 'A级-高意向',      sort: 2,  platformTagId: null },
-    { id: 'bl_3',  name: 'B级-中高意向',    sort: 3,  platformTagId: null },
-    { id: 'bl_4',  name: 'C级-中等意向',    sort: 4,  platformTagId: null },
-    { id: 'bl_5',  name: 'D级-一般意向',    sort: 5,  platformTagId: null },
-    { id: 'bl_6',  name: 'E级-低意向',      sort: 6,  platformTagId: null },
-    { id: 'bl_7',  name: 'F级-无意向',      sort: 7,  platformTagId: null },
-    { id: 'bl_8',  name: '已成交-待回访',   sort: 8,  platformTagId: null },
-    { id: 'bl_9',  name: '号码无效',        sort: 9,  platformTagId: null },
-    { id: 'bl_10', name: '空号',            sort: 10, platformTagId: null },
-    { id: 'bl_11', name: '停机',            sort: 11, platformTagId: null },
-    { id: 'bl_12', name: '其他无效',        sort: 12, platformTagId: null }
+    { id: 'bl_1',  localCode: 'TAG-BL-001', name: 'S级-超高意向',    sort: 1,  platformTagId: null },
+    { id: 'bl_2',  localCode: 'TAG-BL-002', name: 'A级-高意向',      sort: 2,  platformTagId: null },
+    { id: 'bl_3',  localCode: 'TAG-BL-003', name: 'B级-中高意向',    sort: 3,  platformTagId: null },
+    { id: 'bl_4',  localCode: 'TAG-BL-004', name: 'C级-中等意向',    sort: 4,  platformTagId: null },
+    { id: 'bl_5',  localCode: 'TAG-BL-005', name: 'D级-一般意向',    sort: 5,  platformTagId: null },
+    { id: 'bl_6',  localCode: 'TAG-BL-006', name: 'E级-低意向',      sort: 6,  platformTagId: null },
+    { id: 'bl_7',  localCode: 'TAG-BL-007', name: 'F级-无意向',      sort: 7,  platformTagId: null },
+    { id: 'bl_8',  localCode: 'TAG-BL-008', name: '已成交-待回访',   sort: 8,  platformTagId: null },
+    { id: 'bl_9',  localCode: 'TAG-BL-009', name: '号码无效',        sort: 9,  platformTagId: null },
+    { id: 'bl_10', localCode: 'TAG-BL-010', name: '空号',            sort: 10, platformTagId: null },
+    { id: 'bl_11', localCode: 'TAG-BL-011', name: '停机',            sort: 11, platformTagId: null },
+    { id: 'bl_12', localCode: 'TAG-BL-012', name: '其他无效',        sort: 12, platformTagId: null }
   ],
   'yzzh': [
-    { id: 'yzzh_1', name: '意向强烈',       sort: 1,  platformTagId: null },
-    { id: 'yzzh_2', name: '有意向',         sort: 2,  platformTagId: null },
-    { id: 'yzzh_3', name: '待跟进',         sort: 3,  platformTagId: null },
-    { id: 'yzzh_4', name: '无意向',         sort: 4,  platformTagId: null },
-    { id: 'yzzh_5', name: '已成交',         sort: 5,  platformTagId: null },
-    { id: 'yzzh_6', name: '无效客户',       sort: 6,  platformTagId: null },
-    { id: 'yzzh_7', name: '号码异常',       sort: 7,  platformTagId: null },
-    { id: 'yzzh_8', name: '投诉/敏感',      sort: 8,  platformTagId: null },
-    { id: 'yzzh_9', name: '需人工复核',     sort: 9,  platformTagId: null }
+    { id: 'yzzh_1', localCode: 'TAG-YZZH-001', name: '意向强烈',       sort: 1,  platformTagId: null },
+    { id: 'yzzh_2', localCode: 'TAG-YZZH-002', name: '有意向',         sort: 2,  platformTagId: null },
+    { id: 'yzzh_3', localCode: 'TAG-YZZH-003', name: '待跟进',         sort: 3,  platformTagId: null },
+    { id: 'yzzh_4', localCode: 'TAG-YZZH-004', name: '无意向',         sort: 4,  platformTagId: null },
+    { id: 'yzzh_5', localCode: 'TAG-YZZH-005', name: '已成交',         sort: 5,  platformTagId: null },
+    { id: 'yzzh_6', localCode: 'TAG-YZZH-006', name: '无效客户',       sort: 6,  platformTagId: null },
+    { id: 'yzzh_7', localCode: 'TAG-YZZH-007', name: '号码异常',       sort: 7,  platformTagId: null },
+    { id: 'yzzh_8', localCode: 'TAG-YZZH-008', name: '投诉/敏感',      sort: 8,  platformTagId: null },
+    { id: 'yzzh_9', localCode: 'TAG-YZZH-009', name: '需人工复核',     sort: 9,  platformTagId: null }
   ],
   'zkj': [
-    { id: 'zkj_1', name: '高意向',          sort: 1,  platformTagId: null },
-    { id: 'zkj_2', name: '中意向',          sort: 2,  platformTagId: null },
-    { id: 'zkj_3', name: '低意向',          sort: 3,  platformTagId: null },
-    { id: 'zkj_4', name: '无意向',          sort: 4,  platformTagId: null },
-    { id: 'zkj_5', name: '非本人',          sort: 5,  platformTagId: null },
-    { id: 'zkj_6', name: '无效号码',        sort: 6,  platformTagId: null }
+    { id: 'zkj_1', localCode: 'TAG-ZKJ-001', name: '高意向',          sort: 1,  platformTagId: null },
+    { id: 'zkj_2', localCode: 'TAG-ZKJ-002', name: '中意向',          sort: 2,  platformTagId: null },
+    { id: 'zkj_3', localCode: 'TAG-ZKJ-003', name: '低意向',          sort: 3,  platformTagId: null },
+    { id: 'zkj_4', localCode: 'TAG-ZKJ-004', name: '无意向',          sort: 4,  platformTagId: null },
+    { id: 'zkj_5', localCode: 'TAG-ZKJ-005', name: '非本人',          sort: 5,  platformTagId: null },
+    { id: 'zkj_6', localCode: 'TAG-ZKJ-006', name: '无效号码',        sort: 6,  platformTagId: null }
   ]
 };
 
@@ -541,6 +541,76 @@ var MockTagConfigs = {
   'zkj_headquarters_hf':  { enabledTagIds: ['zkj_1','zkj_2','zkj_3','zkj_4','zkj_5','zkj_6'] },
   'zkj_headquarters_xxs': { enabledTagIds: ['zkj_1','zkj_2','zkj_3','zkj_4'] }
 };
+
+/* 本地标准标签集：key = "tenantType_sceneId"。供应商标签最终映射到这里的唯一标签。 */
+var MockLocalTagSets = {
+  'store_db': [
+    { id: 'local_store_db_1', localCode: 'LOCAL-STORE-DB-001', name: '高优先级', sort: 1 },
+    { id: 'local_store_db_2', localCode: 'LOCAL-STORE-DB-002', name: '中优先级', sort: 2 },
+    { id: 'local_store_db_3', localCode: 'LOCAL-STORE-DB-003', name: '低优先级', sort: 3 },
+    { id: 'local_store_db_4', localCode: 'LOCAL-STORE-DB-004', name: '无需处理', sort: 4 },
+    { id: 'local_store_db_5', localCode: 'LOCAL-STORE-DB-005', name: '无效客户', sort: 5 }
+  ],
+  'store_fw': [
+    { id: 'local_store_fw_1', localCode: 'LOCAL-STORE-FW-001', name: '服务满意', sort: 1 },
+    { id: 'local_store_fw_2', localCode: 'LOCAL-STORE-FW-002', name: '需跟进', sort: 2 },
+    { id: 'local_store_fw_3', localCode: 'LOCAL-STORE-FW-003', name: '投诉风险', sort: 3 },
+    { id: 'local_store_fw_4', localCode: 'LOCAL-STORE-FW-004', name: '无效客户', sort: 4 }
+  ],
+  'store_hf': [
+    { id: 'local_store_hf_1', localCode: 'LOCAL-STORE-HF-001', name: '已确认', sort: 1 },
+    { id: 'local_store_hf_2', localCode: 'LOCAL-STORE-HF-002', name: '待二次回访', sort: 2 },
+    { id: 'local_store_hf_3', localCode: 'LOCAL-STORE-HF-003', name: '无意向', sort: 3 },
+    { id: 'local_store_hf_4', localCode: 'LOCAL-STORE-HF-004', name: '无效客户', sort: 4 }
+  ],
+  'store_xxs': [
+    { id: 'local_store_xxs_1', localCode: 'LOCAL-STORE-XXS-001', name: '高意向', sort: 1 },
+    { id: 'local_store_xxs_2', localCode: 'LOCAL-STORE-XXS-002', name: '中意向', sort: 2 },
+    { id: 'local_store_xxs_3', localCode: 'LOCAL-STORE-XXS-003', name: '低意向', sort: 3 },
+    { id: 'local_store_xxs_4', localCode: 'LOCAL-STORE-XXS-004', name: '无意向', sort: 4 },
+    { id: 'local_store_xxs_5', localCode: 'LOCAL-STORE-XXS-005', name: '无效客户', sort: 5 }
+  ],
+  'store_lxs': [
+    { id: 'local_store_lxs_1', localCode: 'LOCAL-STORE-LXS-001', name: '可激活', sort: 1 },
+    { id: 'local_store_lxs_2', localCode: 'LOCAL-STORE-LXS-002', name: '需培育', sort: 2 },
+    { id: 'local_store_lxs_3', localCode: 'LOCAL-STORE-LXS-003', name: '无意向', sort: 3 },
+    { id: 'local_store_lxs_4', localCode: 'LOCAL-STORE-LXS-004', name: '无效客户', sort: 4 }
+  ],
+  'headquarters_db': [
+    { id: 'local_headquarters_db_1', localCode: 'LOCAL-HQ-DB-001', name: '总部重点跟进', sort: 1 },
+    { id: 'local_headquarters_db_2', localCode: 'LOCAL-HQ-DB-002', name: '区域协同', sort: 2 },
+    { id: 'local_headquarters_db_3', localCode: 'LOCAL-HQ-DB-003', name: '门店自处理', sort: 3 },
+    { id: 'local_headquarters_db_4', localCode: 'LOCAL-HQ-DB-004', name: '无效客户', sort: 4 }
+  ],
+  'headquarters_fw': [
+    { id: 'local_headquarters_fw_1', localCode: 'LOCAL-HQ-FW-001', name: '服务达标', sort: 1 },
+    { id: 'local_headquarters_fw_2', localCode: 'LOCAL-HQ-FW-002', name: '服务预警', sort: 2 },
+    { id: 'local_headquarters_fw_3', localCode: 'LOCAL-HQ-FW-003', name: '投诉风险', sort: 3 },
+    { id: 'local_headquarters_fw_4', localCode: 'LOCAL-HQ-FW-004', name: '无效客户', sort: 4 }
+  ],
+  'headquarters_hf': [
+    { id: 'local_headquarters_hf_1', localCode: 'LOCAL-HQ-HF-001', name: '已完成', sort: 1 },
+    { id: 'local_headquarters_hf_2', localCode: 'LOCAL-HQ-HF-002', name: '需复访', sort: 2 },
+    { id: 'local_headquarters_hf_3', localCode: 'LOCAL-HQ-HF-003', name: '无意向', sort: 3 },
+    { id: 'local_headquarters_hf_4', localCode: 'LOCAL-HQ-HF-004', name: '无效客户', sort: 4 }
+  ],
+  'headquarters_xxs': [
+    { id: 'local_headquarters_xxs_1', localCode: 'LOCAL-HQ-XXS-001', name: '高意向', sort: 1 },
+    { id: 'local_headquarters_xxs_2', localCode: 'LOCAL-HQ-XXS-002', name: '中意向', sort: 2 },
+    { id: 'local_headquarters_xxs_3', localCode: 'LOCAL-HQ-XXS-003', name: '低意向', sort: 3 },
+    { id: 'local_headquarters_xxs_4', localCode: 'LOCAL-HQ-XXS-004', name: '无意向', sort: 4 },
+    { id: 'local_headquarters_xxs_5', localCode: 'LOCAL-HQ-XXS-005', name: '无效客户', sort: 5 }
+  ],
+  'headquarters_lxs': [
+    { id: 'local_headquarters_lxs_1', localCode: 'LOCAL-HQ-LXS-001', name: '可激活', sort: 1 },
+    { id: 'local_headquarters_lxs_2', localCode: 'LOCAL-HQ-LXS-002', name: '需培育', sort: 2 },
+    { id: 'local_headquarters_lxs_3', localCode: 'LOCAL-HQ-LXS-003', name: '无意向', sort: 3 },
+    { id: 'local_headquarters_lxs_4', localCode: 'LOCAL-HQ-LXS-004', name: '无效客户', sort: 4 }
+  ]
+};
+
+/* 供应商标签到本地标准标签映射：key = "supplierId_tenantType_sceneId"。 */
+var MockSupplierLocalTagMappings = {};
 
 /*
  * 工具函数：获取指定组合的标签配置

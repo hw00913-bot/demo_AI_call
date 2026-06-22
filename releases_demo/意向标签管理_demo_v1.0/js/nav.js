@@ -161,13 +161,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const subReport = document.getElementById('sub-report');
   if (subReport) subReport.classList.remove('open');
 
-  // 默认展开"系统管理"菜单并进入业务场景
+  // 默认展开"系统管理"菜单并进入标签管理
   const navSystem = document.getElementById('nav-system');
   if (navSystem) navSystem.classList.add('open', 'active-parent');
 
-  // 激活"业务场景"菜单项
-  const sceneItem = document.getElementById('sys-scene');
-  if (sceneItem) sceneItem.classList.add('active');
+  // 激活"标签管理"菜单项
+  const tagItem = document.getElementById('sys-tags');
+  if (tagItem) tagItem.classList.add('active');
 
-  navigateTo('sys-scene', 'sys-scene');
+  navigateTo('sys-tags', 'sys-tags');
 });

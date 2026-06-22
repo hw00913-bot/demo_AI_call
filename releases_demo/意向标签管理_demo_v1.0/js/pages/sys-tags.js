@@ -1,7 +1,7 @@
 /**
  * js/pages/sys-tags.js — 标签管理页面
  * 左侧：供应商→租户类型→场景 三级配置树
- * 右侧：标签列表 CRUD + 复制配置
+ * 右侧：中台标签集维护 + 供应商标签映射
  * 弹窗：场景配置 CRUD
  */
 
@@ -10,6 +10,7 @@ window.Pages['sys-tags'] = (function() {
   'use strict';
 
   /* ===== 内部状态 ===== */
+  var currentMode = 'supplier';
   var currentSupplier = '';
   var currentTenantType = '';
   var currentScene = '';
@@ -22,10 +23,10 @@ window.Pages['sys-tags'] = (function() {
   }
 
   function init() {
+    initDefaultLocalMappings();
     bindTreeEvents();
     bindTagEvents();
     bindSceneModalEvents();
-    bindCopyModalEvents();
     bindSupplierModalEvents();
     bindPromptModalEvents();
     bindConfirmModalEvents();
@@ -45,7 +46,6 @@ window.Pages['sys-tags'] = (function() {
       '</div>' +
       // 弹窗
       buildSceneModalHTML() +
-      buildCopyModalHTML() +
       buildSupplierModalHTML() +
       buildPromptModalHTML() +
       buildConfirmModalHTML() +
@@ -72,14 +72,51 @@ window.Pages['sys-tags'] = (function() {
     var html = '<div class="tags-tree-panel" id="tags-tree-panel" style="width:260px;min-width:260px;background:#fafafa;border-right:1px solid #e8e8e8;overflow-y:auto;padding:8px 0;">';
     html += '<div class="tree-header" style="padding:8px 16px;font-size:12px;color:#999;font-weight:500;">配置树</div>';
 
+    html += '<div class="tree-root-group">';
+    html += '<div class="tree-node tree-root tree-local-root expanded" style="display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:13px;user-select:none;">';
+    html += '<span class="tree-arrow" style="display:inline-flex;width:16px;font-size:10px;color:#999;transition:transform 0.2s;">▸</span>';
+    html += '<span class="tree-icon" style="margin-right:6px;">🏷</span>';
+    html += '<span class="tree-label" style="color:#333;font-weight:600;">中台标签集</span>';
+    html += '</div>';
+    html += '<div class="tree-children" style="display:block;">';
+    MockTenantTypes.forEach(function(tt) {
+      html += '<div class="tree-tenant-group">';
+      html += '<div class="tree-node tree-local-tenant" data-tenant="' + tt.id + '" style="display:flex;align-items:center;padding:6px 16px 6px 40px;cursor:pointer;font-size:13px;user-select:none;">';
+      html += '<span class="tree-arrow" style="display:inline-flex;width:16px;font-size:10px;color:#999;transition:transform 0.2s;">▸</span>';
+      html += '<span class="tree-icon" style="margin-right:6px;">📁</span>';
+      html += '<span class="tree-label" style="color:#555;">' + tt.name + '</span>';
+      html += '</div>';
+      html += '<div class="tree-children" style="display:none;">';
+      MockTagScenes.forEach(function(sc) {
+        var sceneDisabled = sc.status === 'disabled';
+        var localCount = getLocalTags(tt.id, sc.id).length;
+        html += '<div class="tree-node tree-local-scene leaf' + (sceneDisabled ? ' is-disabled' : '') + '" data-tenant="' + tt.id + '" data-scene="' + sc.id + '" style="display:flex;align-items:center;padding:5px 16px 5px 64px;cursor:pointer;font-size:13px;user-select:none;border-radius:0;">';
+        html += '<span class="tree-dot" style="width:7px;height:7px;border-radius:50%;background:' + (localCount ? '#52c41a' : '#d9d9d9') + ';margin-right:8px;flex-shrink:0;"></span>';
+        html += '<span class="tree-label" style="color:#555;">' + escapeHTML(sc.name) + '</span>';
+        html += '<span class="tree-count-tag">' + localCount + '</span>';
+        if (sceneDisabled) html += '<span class="tree-status-tag">停用</span>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="tree-root-group">';
+    html += '<div class="tree-node tree-root tree-supplier-root" style="display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:13px;user-select:none;">';
+    html += '<span class="tree-arrow" style="display:inline-flex;width:16px;font-size:10px;color:#999;transition:transform 0.2s;">▸</span>';
+    html += '<span class="tree-icon" style="margin-right:6px;">🏢</span>';
+    html += '<span class="tree-label" style="color:#333;font-weight:600;">供应商标签集</span>';
+    html += '</div>';
+    html += '<div class="tree-children" style="display:none;">';
     MockTagSuppliers.forEach(function(sup) {
-      var supHasConfig = checkSupplierHasAnyConfig(sup.id);
+      var supplierDisabled = sup.status === 'disabled';
       html += '<div class="tree-supplier-group">';
       // 供应商节点
-      html += '<div class="tree-node tree-supplier" data-supplier="' + sup.id + '" style="display:flex;align-items:center;padding:6px 16px;cursor:pointer;font-size:13px;user-select:none;">';
+      html += '<div class="tree-node tree-supplier' + (supplierDisabled ? ' is-disabled' : '') + '" data-supplier="' + sup.id + '" style="display:flex;align-items:center;padding:6px 16px;cursor:pointer;font-size:13px;user-select:none;">';
       html += '<span class="tree-arrow" style="display:inline-flex;width:16px;font-size:10px;color:#999;transition:transform 0.2s;">▸</span>';
       html += '<span class="tree-icon" style="margin-right:6px;">🔵</span>';
       html += '<span class="tree-label" style="color:#333;font-weight:500;">' + escapeHTML(sup.name) + '</span>';
+      if (supplierDisabled) html += '<span class="tree-status-tag">停用</span>';
       html += '</div>';
       // 子节点容器
       html += '<div class="tree-children" style="display:none;">';
@@ -95,11 +132,13 @@ window.Pages['sys-tags'] = (function() {
 
         MockTagScenes.forEach(function(sc) {
           var configKey = sup.id + '_' + tt.id + '_' + sc.id;
-          var hasConfig = !!MockTagConfigs[configKey];
+          var sceneDisabled = sc.status === 'disabled';
+          var hasConfig = hasEnabledConfig(configKey);
           var dotColor = hasConfig ? '#52c41a' : '#d9d9d9';
-          html += '<div class="tree-node tree-scene leaf" data-supplier="' + sup.id + '" data-tenant="' + tt.id + '" data-scene="' + sc.id + '" style="display:flex;align-items:center;padding:5px 16px 5px 64px;cursor:pointer;font-size:13px;user-select:none;border-radius:0;">';
+          html += '<div class="tree-node tree-scene leaf' + (supplierDisabled || sceneDisabled ? ' is-disabled' : '') + '" data-supplier="' + sup.id + '" data-tenant="' + tt.id + '" data-scene="' + sc.id + '" style="display:flex;align-items:center;padding:5px 16px 5px 64px;cursor:pointer;font-size:13px;user-select:none;border-radius:0;">';
           html += '<span class="tree-dot" style="width:7px;height:7px;border-radius:50%;background:' + dotColor + ';margin-right:8px;flex-shrink:0;"></span>';
           html += '<span class="tree-label" style="color:#555;">' + escapeHTML(sc.name) + '</span>';
+          if (sceneDisabled) html += '<span class="tree-status-tag">停用</span>';
           html += '</div>';
         });
 
@@ -108,6 +147,7 @@ window.Pages['sys-tags'] = (function() {
 
       html += '</div></div>';
     });
+    html += '</div></div>';
 
     html += '</div>';
     return html;
@@ -134,6 +174,9 @@ window.Pages['sys-tags'] = (function() {
     var tenant = findTenantType(tenantType);
     var scene = findScene(sceneId);
     var enabledIds = configData.enabledTagIds;
+    var localTags = getLocalTags(tenantType, sceneId);
+    var mappedCount = getMappedCount(supplierId, tenantType, sceneId, enabledIds);
+    var disabledContext = (supplier && supplier.status === 'disabled') || (scene && scene.status === 'disabled');
 
     var html = '<div id="tags-detail-area" style="flex:1;display:flex;flex-direction:column;min-height:0;">';
 
@@ -143,16 +186,24 @@ window.Pages['sys-tags'] = (function() {
     html += '<span style="font-size:14px;color:#999;">' + supplier.name + ' / ' + tenant.name + ' / </span>';
     html += '<span style="font-size:15px;font-weight:600;color:#333;">' + scene.name + '</span>';
     html += '<span style="margin-left:10px;font-size:12px;color:#52c41a;">● 已配置 ' + enabledIds.length + ' 个标签</span>';
+    html += '<span style="margin-left:8px;font-size:12px;color:#1677ff;">已映射 ' + mappedCount + ' 个</span>';
+    if (disabledContext) html += '<span style="margin-left:8px;font-size:12px;color:#fa8c16;">当前节点已停用</span>';
     html += '</div>';
     html += '<div style="display:flex;gap:8px;">';
-    html += '<button class="btn-copy-config" style="padding:6px 14px;background:#fff;border:1px solid #1677ff;color:#1677ff;border-radius:4px;cursor:pointer;font-size:13px;">📋 复制配置</button>';
-    html += '<button class="btn-add-tag" style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">+ 新增标签</button>';
+    html += '<button class="btn-add-tag" style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">供应商标签池：新增标签</button>';
     html += '</div>';
     html += '</div>';
 
     // 提示：当前显示的标签来自供应商标签池
     html += '<div style="padding:8px 12px;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;margin-bottom:12px;font-size:12px;color:#ad8b00;">';
-    html += '💡 以下为供应商 <b>' + supplier.name + '</b> 的标签池。<b style="color:#52c41a;">绿色勾选</b> 表示当前组合已启用该标签，点击行可切换启用状态。';
+    html += '当前在供应商标签集下配置 <b>' + supplier.name + '</b> 的标签启用状态和映射关系。';
+    html += '</div>';
+    html += '<div class="tag-config-toolbar">';
+    html += '<input type="text" id="tagSearchInput" class="tag-filter-input" placeholder="搜索标签名称/编码">';
+    html += '<select id="tagStatusFilter" class="tag-filter-select"><option value="all">全部标签</option><option value="enabled">已启用</option><option value="disabled">未启用</option></select>';
+    html += '<button class="tag-mini-btn btn-enable-all" ' + (disabledContext ? 'disabled' : '') + '>全选启用</button>';
+    html += '<button class="tag-mini-btn btn-disable-all" ' + (disabledContext ? 'disabled' : '') + '>清空启用</button>';
+    html += '<span class="tag-toolbar-note">当前配置操作</span>';
     html += '</div>';
 
     // 标签表格
@@ -161,7 +212,9 @@ window.Pages['sys-tags'] = (function() {
     html += '<thead><tr>';
     html += '<th style="width:50px;text-align:center;">启用</th>';
     html += '<th style="width:60px;">序号</th>';
+    html += '<th style="width:150px;">本地编码</th>';
     html += '<th>标签名称</th>';
+    html += '<th style="width:320px;">映射本地标签</th>';
     html += '<th style="width:100px;">排序</th>';
     html += '<th style="width:120px;">操作</th>';
     html += '</tr></thead>';
@@ -169,15 +222,18 @@ window.Pages['sys-tags'] = (function() {
 
     configData.tags.forEach(function(tag, idx) {
       var isEnabled = configData.enabledSet[tag.id];
-      html += '<tr class="tag-row" data-tag-id="' + tag.id + '" style="' + (isEnabled ? '' : 'opacity:0.5;') + '">';
+      var mappedLocalId = getMappedLocalTagId(supplierId, tenantType, sceneId, tag.id);
+      html += '<tr class="tag-row" data-tag-id="' + tag.id + '" data-tag-name="' + escapeHTML(tag.name).toLowerCase() + '" data-tag-code="' + escapeHTML(tag.localCode || tag.id).toLowerCase() + '" data-enabled="' + (isEnabled ? '1' : '0') + '" style="' + (isEnabled ? '' : 'opacity:0.5;') + '">';
       html += '<td style="text-align:center;">';
-      html += '<input type="checkbox" class="tag-enable-cb" data-tag-id="' + tag.id + '" ' + (isEnabled ? 'checked' : '') + ' style="cursor:pointer;width:16px;height:16px;">';
+      html += '<input type="checkbox" class="tag-enable-cb" data-tag-id="' + tag.id + '" ' + (isEnabled ? 'checked' : '') + (disabledContext ? ' disabled' : '') + ' style="cursor:pointer;width:16px;height:16px;">';
       html += '</td>';
       html += '<td style="color:#999;">' + (idx + 1) + '</td>';
+      html += '<td><code class="local-code-text">' + escapeHTML(tag.localCode || tag.id) + '</code></td>';
       html += '<td>';
       html += '<span class="tag-name-display">' + escapeHTML(tag.name) + '</span>';
       html += '<input type="text" class="tag-name-input" value="' + escapeHTML(tag.name) + '" style="display:none;width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;">';
       html += '</td>';
+      html += '<td>' + buildLocalMappingSelect(tag.id, localTags, mappedLocalId, disabledContext) + '</td>';
       html += '<td style="color:#999;">' + tag.sort + '</td>';
       html += '<td>';
       html += '<button class="btn-tag-edit" data-tag-id="' + tag.id + '" style="padding:3px 10px;font-size:12px;border:1px solid #d9d9d9;background:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">✏ 编辑</button>';
@@ -192,6 +248,47 @@ window.Pages['sys-tags'] = (function() {
     html += '</div>';
 
     html += '</div>';
+    return html;
+  }
+
+  function buildLocalTagSetHTML(tenantType, sceneId) {
+    var tenant = findTenantType(tenantType);
+    var scene = findScene(sceneId);
+    var localTags = getLocalTags(tenantType, sceneId);
+    var disabledContext = scene && scene.status === 'disabled';
+
+    var html = '<div id="tags-detail-area" style="flex:1;display:flex;flex-direction:column;min-height:0;">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
+    html += '<div>';
+    html += '<span style="font-size:14px;color:#999;">中台标签集 / ' + tenant.name + ' / </span>';
+    html += '<span style="font-size:15px;font-weight:600;color:#333;">' + scene.name + '</span>';
+    html += '<span style="margin-left:10px;font-size:12px;color:#52c41a;">● 本地标签 ' + localTags.length + ' 个</span>';
+    if (disabledContext) html += '<span style="margin-left:8px;font-size:12px;color:#fa8c16;">当前场景已停用</span>';
+    html += '</div>';
+    html += '<button class="btn-add-local-tag" ' + (disabledContext ? 'disabled ' : '') + 'style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">新增本地标签</button>';
+    html += '</div>';
+    html += '<div style="padding:8px 12px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:4px;margin-bottom:12px;font-size:12px;color:#3f6600;">';
+    html += '这里维护当前租户类型+场景下的中台唯一标签。供应商标签集只能映射到这些本地标签。';
+    html += '</div>';
+    html += '<div style="flex:1;overflow-y:auto;">';
+    html += '<table class="data-table" style="width:100%;border-collapse:collapse;">';
+    html += '<thead><tr><th style="width:70px;">序号</th><th style="width:180px;">本地编码</th><th>本地标签名称</th><th style="width:100px;">排序</th><th style="width:150px;">操作</th></tr></thead>';
+    html += '<tbody>';
+    localTags.forEach(function(tag, idx) {
+      html += '<tr class="local-tag-row" data-local-tag-id="' + tag.id + '">';
+      html += '<td style="color:#999;">' + (idx + 1) + '</td>';
+      html += '<td><code class="local-code-text">' + escapeHTML(tag.localCode) + '</code></td>';
+      html += '<td><span class="local-tag-name-display">' + escapeHTML(tag.name) + '</span>';
+      html += '<input type="text" class="local-tag-name-input" value="' + escapeHTML(tag.name) + '" style="display:none;width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;"></td>';
+      html += '<td style="color:#999;">' + tag.sort + '</td>';
+      html += '<td>';
+      html += '<button class="btn-local-tag-edit" data-local-tag-id="' + tag.id + '" style="padding:3px 10px;font-size:12px;border:1px solid #d9d9d9;background:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">编辑</button>';
+      html += '<button class="btn-local-tag-save" data-local-tag-id="' + tag.id + '" style="display:none;padding:3px 10px;font-size:12px;border:1px solid #52c41a;background:#52c41a;color:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">保存</button>';
+      html += '<button class="btn-local-tag-cancel" data-local-tag-id="' + tag.id + '" style="display:none;padding:3px 10px;font-size:12px;border:1px solid #d9d9d9;background:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">取消</button>';
+      html += '<button class="btn-local-tag-delete" data-local-tag-id="' + tag.id + '" style="padding:3px 10px;font-size:12px;border:1px solid #ff4d4f;color:#ff4d4f;background:#fff;border-radius:3px;cursor:pointer;">删除</button>';
+      html += '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
     return html;
   }
 
@@ -216,13 +313,14 @@ window.Pages['sys-tags'] = (function() {
 
   function buildSceneTableHTML() {
     var html = '<table class="data-table" style="width:100%;border-collapse:collapse;">';
-    html += '<thead><tr><th style="width:60px;">序号</th><th>场景名称</th><th style="width:80px;">状态</th><th style="width:100px;">操作</th></tr></thead>';
+    html += '<thead><tr><th style="width:60px;">序号</th><th style="width:130px;">本地编码</th><th>场景名称</th><th style="width:80px;">状态</th><th style="width:100px;">操作</th></tr></thead>';
     html += '<tbody>';
     MockTagScenes.forEach(function(sc, idx) {
       var statusColor = sc.status === 'enabled' ? '#52c41a' : '#d9d9d9';
       var statusText = sc.status === 'enabled' ? '启用' : '停用';
       html += '<tr data-scene-id="' + sc.id + '">';
       html += '<td style="color:#999;">' + (idx + 1) + '</td>';
+      html += '<td><code class="local-code-text">' + escapeHTML(sc.localCode || sc.id) + '</code></td>';
       html += '<td><span class="scene-name-display">' + escapeHTML(sc.name) + '</span>';
       html += '<input type="text" class="scene-name-input" value="' + escapeHTML(sc.name) + '" style="display:none;width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;"></td>';
       html += '<td><span style="color:' + statusColor + ';">● ' + statusText + '</span></td>';
@@ -236,25 +334,6 @@ window.Pages['sys-tags'] = (function() {
       html += '</tr>';
     });
     html += '</tbody></table>';
-    return html;
-  }
-
-  function buildCopyModalHTML() {
-    var html = '<div class="modal-overlay" id="copy-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">';
-    html += '<div class="modal-content" style="background:#fff;border-radius:8px;width:460px;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
-    html += '<div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">';
-    html += '<span style="font-size:16px;font-weight:600;">📋 复制配置到其他节点</span>';
-    html += '<button onclick="window.Pages[\'sys-tags\'].closeCopyModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;padding:0;">✕</button>';
-    html += '</div>';
-    html += '<div class="modal-body" id="copy-modal-body" style="padding:20px;">';
-    html += '<div style="margin-bottom:12px;font-size:13px;color:#666;">选择目标节点（可多选），将当前标签配置复制到所选节点：</div>';
-    html += '<div id="copy-target-list" style="max-height:300px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:4px;padding:8px;"></div>';
-    html += '</div>';
-    html += '<div class="modal-footer" style="padding:12px 20px;border-top:1px solid #f0f0f0;text-align:right;">';
-    html += '<button onclick="window.Pages[\'sys-tags\'].closeCopyModal()" style="padding:6px 16px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;cursor:pointer;font-size:13px;margin-right:8px;">取消</button>';
-    html += '<button class="btn-copy-confirm" style="padding:6px 16px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">确认复制</button>';
-    html += '</div>';
-    html += '</div></div>';
     return html;
   }
 
@@ -277,7 +356,7 @@ window.Pages['sys-tags'] = (function() {
 
   function buildSupplierTableHTML() {
     var html = '<table class="data-table" style="width:100%;border-collapse:collapse;">';
-    html += '<thead><tr><th style="width:60px;">序号</th><th>供应商名称</th><th style="width:60px;">标签数</th><th style="width:80px;">状态</th><th style="width:100px;">操作</th></tr></thead>';
+    html += '<thead><tr><th style="width:60px;">序号</th><th style="width:140px;">本地编码</th><th>供应商名称</th><th style="width:60px;">标签数</th><th style="width:80px;">状态</th><th style="width:100px;">操作</th></tr></thead>';
     html += '<tbody>';
     MockTagSuppliers.forEach(function(sp, idx) {
       var tagCount = (MockSupplierTagPool[sp.id] || []).length;
@@ -285,6 +364,7 @@ window.Pages['sys-tags'] = (function() {
       var statusText = sp.status === 'enabled' ? '启用' : '停用';
       html += '<tr data-supplier-id="' + sp.id + '">';
       html += '<td style="color:#999;">' + (idx + 1) + '</td>';
+      html += '<td><code class="local-code-text">' + escapeHTML(sp.localCode || sp.id) + '</code></td>';
       html += '<td><span class="spl-name-display">' + escapeHTML(sp.name) + '</span>';
       html += '<input type="text" class="spl-name-input" value="' + escapeHTML(sp.name) + '" style="display:none;width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;"></td>';
       html += '<td style="color:#999;">' + tagCount + '</td>';
@@ -349,9 +429,23 @@ window.Pages['sys-tags'] = (function() {
       '.tree-node:hover { background: #e6f7ff; }' +
       '.tree-node.selected { background: #bae7ff !important; }' +
       '.tree-node.selected .tree-label { color: #1677ff !important; font-weight:600; }' +
+      '.tree-node.is-disabled { opacity: .55; }' +
+      '.tree-status-tag { margin-left:auto;font-size:11px;color:#fa8c16;background:#fff7e6;border:1px solid #ffd591;border-radius:3px;padding:0 4px;line-height:16px; }' +
+      '.tree-count-tag { margin-left:auto;font-size:11px;color:#52c41a;background:#f6ffed;border:1px solid #b7eb8f;border-radius:3px;padding:0 4px;line-height:16px; }' +
+      '.tree-node.tree-root.expanded .tree-arrow { transform: rotate(90deg); }' +
       '.tree-node.tree-supplier.expanded .tree-arrow { transform: rotate(90deg); }' +
+      '.tree-node.tree-local-tenant.expanded .tree-arrow { transform: rotate(90deg); }' +
       '.tree-node.tree-tenant.expanded .tree-arrow { transform: rotate(90deg); }' +
       '.tag-row:hover { background: #fafafa; }' +
+      '.tag-config-toolbar { display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:#f7f9fc;border:1px solid #edf0f5;border-radius:4px; }' +
+      '.tag-filter-input { width:220px;padding:6px 10px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px; }' +
+      '.tag-filter-select { width:120px;padding:6px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;background:#fff; }' +
+      '.tag-mini-btn { padding:6px 10px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer;font-size:12px;color:#333; }' +
+      '.tag-mini-btn:disabled, .tag-enable-cb:disabled { cursor:not-allowed !important; opacity:.55; }' +
+      '.tag-toolbar-note { margin-left:auto;color:#8c8c8c;font-size:12px; }' +
+      '.local-code-text { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12px;color:#595959;background:#f5f5f5;border:1px solid #e8e8e8;border-radius:3px;padding:1px 5px;white-space:nowrap; }' +
+      '.local-map-select { width:100%;min-width:300px;height:30px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:12px;color:#333; }' +
+      '.local-map-select:disabled { opacity:.55;cursor:not-allowed; }' +
       '.modal-overlay.show { display: flex !important; }' +
       '.btn-tag-delete:hover { background: #fff1f0 !important; }' +
     '</style>';
@@ -366,8 +460,8 @@ window.Pages['sys-tags'] = (function() {
       var node = e.target.closest('.tree-node');
       if (!node) return;
 
-      // 供应商节点：展开/折叠
-      if (node.classList.contains('tree-supplier')) {
+      // 根节点、供应商节点、租户节点：展开/折叠
+      if (node.classList.contains('tree-root') || node.classList.contains('tree-supplier') || node.classList.contains('tree-local-tenant')) {
         toggleTreeNode(node);
         return;
       }
@@ -375,6 +469,11 @@ window.Pages['sys-tags'] = (function() {
       // 租户节点：展开/折叠
       if (node.classList.contains('tree-tenant')) {
         toggleTreeNode(node);
+        return;
+      }
+
+      if (node.classList.contains('tree-local-scene')) {
+        selectLocalSceneNode(node);
         return;
       }
 
@@ -402,6 +501,7 @@ window.Pages['sys-tags'] = (function() {
     var tenantType = node.getAttribute('data-tenant');
     var sceneId = node.getAttribute('data-scene');
 
+    currentMode = 'supplier';
     currentSupplier = supplierId;
     currentTenantType = tenantType;
     currentScene = sceneId;
@@ -423,6 +523,25 @@ window.Pages['sys-tags'] = (function() {
     updatePageBreadcrumb();
   }
 
+  function selectLocalSceneNode(node) {
+    var tenantType = node.getAttribute('data-tenant');
+    var sceneId = node.getAttribute('data-scene');
+
+    currentMode = 'local';
+    currentSupplier = '';
+    currentTenantType = tenantType;
+    currentScene = sceneId;
+
+    var panel = document.getElementById('tags-tree-panel');
+    if (panel) {
+      panel.querySelectorAll('.tree-node').forEach(function(n) { n.classList.remove('selected'); });
+    }
+    node.classList.add('selected');
+    expandPath(node);
+    loadLocalTagSet(tenantType, sceneId);
+    updatePageBreadcrumb();
+  }
+
   function expandPath(sceneNode) {
     // 向上展开所有父节点
     var parent = sceneNode.parentElement;
@@ -439,7 +558,7 @@ window.Pages['sys-tags'] = (function() {
   }
 
   function updatePageBreadcrumb() {
-    if (!currentSupplier) return;
+    if (!currentTenantType || !currentScene) return;
     var supplier = findSupplier(currentSupplier);
     var tenant = findTenantType(currentTenantType);
     var scene = findScene(currentScene);
@@ -459,6 +578,13 @@ window.Pages['sys-tags'] = (function() {
     if (!panel) return;
     panel.innerHTML = buildTagListHTML(supplierId, tenantType, sceneId);
     bindTagEvents();
+  }
+
+  function loadLocalTagSet(tenantType, sceneId) {
+    var panel = document.getElementById('tags-content-panel');
+    if (!panel) return;
+    panel.innerHTML = buildLocalTagSetHTML(tenantType, sceneId);
+    bindLocalTagEvents();
   }
 
   /* ===== 标签事件绑定 ===== */
@@ -509,19 +635,163 @@ window.Pages['sys-tags'] = (function() {
       });
     }
 
-    // 复制配置
-    var copyBtn = panel.querySelector('.btn-copy-config');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', function() {
-        openCopyModal();
+    panel.querySelectorAll('.local-map-select').forEach(function(select) {
+      select.addEventListener('change', function() {
+        updateLocalMapping(select.getAttribute('data-tag-id'), select.value);
+      });
+    });
+
+    var searchInput = panel.querySelector('#tagSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', applyTagFilters);
+    }
+    var statusFilter = panel.querySelector('#tagStatusFilter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', applyTagFilters);
+    }
+    var enableAllBtn = panel.querySelector('.btn-enable-all');
+    if (enableAllBtn) {
+      enableAllBtn.addEventListener('click', function() {
+        setAllTagsEnabled(true);
+      });
+    }
+    var disableAllBtn = panel.querySelector('.btn-disable-all');
+    if (disableAllBtn) {
+      disableAllBtn.addEventListener('click', function() {
+        setAllTagsEnabled(false);
       });
     }
   }
 
+  function bindLocalTagEvents() {
+    var panel = document.getElementById('tags-content-panel');
+    if (!panel) return;
+
+    var addLocalBtn = panel.querySelector('.btn-add-local-tag');
+    if (addLocalBtn) {
+      addLocalBtn.addEventListener('click', function() {
+        addNewLocalTag();
+      });
+    }
+    panel.querySelectorAll('.btn-local-tag-edit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        enterLocalTagEditMode(btn.getAttribute('data-local-tag-id'));
+      });
+    });
+    panel.querySelectorAll('.btn-local-tag-save').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        saveLocalTagEdit(btn.getAttribute('data-local-tag-id'));
+      });
+    });
+    panel.querySelectorAll('.btn-local-tag-cancel').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        cancelLocalTagEdit(btn.getAttribute('data-local-tag-id'));
+      });
+    });
+    panel.querySelectorAll('.btn-local-tag-delete').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        deleteLocalTag(btn.getAttribute('data-local-tag-id'));
+      });
+    });
+  }
+
   /* ===== 标签 CRUD ===== */
+
+  function buildLocalMappingSelect(tagId, localTags, mappedLocalId, disabled) {
+    var html = '<select class="local-map-select" data-tag-id="' + tagId + '"' + (disabled ? ' disabled' : '') + '>';
+    html += '<option value="">未映射</option>';
+    localTags.forEach(function(localTag) {
+      html += '<option value="' + localTag.id + '"' + (mappedLocalId === localTag.id ? ' selected' : '') + '>' +
+        escapeHTML(localTag.localCode) + ' / ' + escapeHTML(localTag.name) + '</option>';
+    });
+    html += '</select>';
+    return html;
+  }
+
+  function isCurrentContextDisabled() {
+    var supplier = findSupplier(currentSupplier);
+    var scene = findScene(currentScene);
+    return !!((supplier && supplier.status === 'disabled') || (scene && scene.status === 'disabled'));
+  }
+
+  function applyTagFilters() {
+    var panel = document.getElementById('tags-content-panel');
+    if (!panel) return;
+    var keywordEl = panel.querySelector('#tagSearchInput');
+    var statusEl = panel.querySelector('#tagStatusFilter');
+    var keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
+    var status = statusEl ? statusEl.value : 'all';
+
+    panel.querySelectorAll('.tag-row').forEach(function(row) {
+      var name = row.getAttribute('data-tag-name') || '';
+      var code = row.getAttribute('data-tag-code') || '';
+      var enabled = row.getAttribute('data-enabled') === '1';
+      var matchName = !keyword || name.indexOf(keyword) !== -1 || code.indexOf(keyword) !== -1;
+      var matchStatus = status === 'all' || (status === 'enabled' && enabled) || (status === 'disabled' && !enabled);
+      row.style.display = matchName && matchStatus ? '' : 'none';
+    });
+  }
+
+  function setAllTagsEnabled(enabled) {
+    if (!currentSupplier || !currentTenantType || !currentScene) return;
+    if (isCurrentContextDisabled()) {
+      showToast('当前供应商或场景已停用，不能调整配置', 'warning');
+      return;
+    }
+    var configKey = currentSupplier + '_' + currentTenantType + '_' + currentScene;
+    var config = MockTagConfigs[configKey] || { enabledTagIds: [] };
+    var pool = MockSupplierTagPool[currentSupplier] || [];
+    config.enabledTagIds = enabled ? pool.map(function(tag) { return tag.id; }) : [];
+    MockTagConfigs[configKey] = config;
+    if (enabled) ensureMappingsForEnabledTags(currentSupplier, currentTenantType, currentScene);
+    if (!enabled && config.enabledTagIds.length === 0) {
+      MockTagConfigs[configKey] = config;
+    }
+    loadTagList(currentSupplier, currentTenantType, currentScene);
+    refreshTreeNodeDot();
+    showToast(enabled ? '已启用全部标签' : '已清空当前配置', 'success');
+  }
+
+  function updateLocalMapping(tagId, localTagId) {
+    if (!currentSupplier || !currentTenantType || !currentScene) return;
+    if (isCurrentContextDisabled()) {
+      showToast('当前供应商或场景已停用，不能调整映射', 'warning');
+      return;
+    }
+    var mappingKey = getConfigKey(currentSupplier, currentTenantType, currentScene);
+    MockSupplierLocalTagMappings[mappingKey] = MockSupplierLocalTagMappings[mappingKey] || {};
+    if (localTagId) {
+      MockSupplierLocalTagMappings[mappingKey][tagId] = localTagId;
+      showToast('映射已更新', 'success');
+    } else {
+      delete MockSupplierLocalTagMappings[mappingKey][tagId];
+      showToast('映射已清除', 'info');
+    }
+    refreshMappedCount();
+  }
+
+  function refreshMappedCount() {
+    var configKey = getConfigKey(currentSupplier, currentTenantType, currentScene);
+    var config = MockTagConfigs[configKey];
+    var enabledIds = config ? config.enabledTagIds : [];
+    var mappedCount = getMappedCount(currentSupplier, currentTenantType, currentScene, enabledIds);
+    var detailArea = document.getElementById('tags-detail-area');
+    if (!detailArea) return;
+    var spans = detailArea.querySelectorAll('span');
+    spans.forEach(function(span) {
+      if (span.textContent.indexOf('已映射') === 0) {
+        span.textContent = '已映射 ' + mappedCount + ' 个';
+      }
+    });
+  }
 
   function toggleTagEnable(tagId, checked) {
     if (!currentSupplier || !currentTenantType || !currentScene) return;
+    if (isCurrentContextDisabled()) {
+      showToast('当前供应商或场景已停用，不能调整配置', 'warning');
+      loadTagList(currentSupplier, currentTenantType, currentScene);
+      return;
+    }
     var configKey = currentSupplier + '_' + currentTenantType + '_' + currentScene;
     var config = MockTagConfigs[configKey];
     if (!config) {
@@ -532,6 +802,7 @@ window.Pages['sys-tags'] = (function() {
       if (config.enabledTagIds.indexOf(tagId) === -1) {
         config.enabledTagIds.push(tagId);
       }
+      ensureMappingsForEnabledTags(currentSupplier, currentTenantType, currentScene);
       showToast('标签已启用', 'success');
     } else {
       config.enabledTagIds = config.enabledTagIds.filter(function(id) { return id !== tagId; });
@@ -543,12 +814,14 @@ window.Pages['sys-tags'] = (function() {
     refreshTreeNodeDot();
     // 更新标题计数
     refreshTagCount();
+    refreshMappedCount();
   }
 
   function refreshTagRowStyle(tagId, enabled) {
     var row = document.querySelector('.tag-row[data-tag-id="' + tagId + '"]');
     if (row) {
       row.style.opacity = enabled ? '1' : '0.5';
+      row.setAttribute('data-enabled', enabled ? '1' : '0');
     }
   }
 
@@ -569,7 +842,7 @@ window.Pages['sys-tags'] = (function() {
   function refreshTreeNodeDot() {
     if (!currentSupplier || !currentTenantType || !currentScene) return;
     var configKey = currentSupplier + '_' + currentTenantType + '_' + currentScene;
-    var hasConfig = !!MockTagConfigs[configKey];
+    var hasConfig = hasEnabledConfig(configKey);
     var panel = document.getElementById('tags-tree-panel');
     if (!panel) return;
     var node = panel.querySelector('.tree-scene[data-supplier="' + currentSupplier + '"][data-tenant="' + currentTenantType + '"][data-scene="' + currentScene + '"]');
@@ -643,7 +916,7 @@ window.Pages['sys-tags'] = (function() {
     // 检查是否被其他配置引用
     var usedIn = [];
     Object.keys(MockTagConfigs).forEach(function(key) {
-      if (key.indexOf(currentSupplier) === 0) {
+      if (key.indexOf(currentSupplier + '_') === 0) {
         var cfg = MockTagConfigs[key];
         if (cfg.enabledTagIds.indexOf(tagId) !== -1) {
           usedIn.push(key);
@@ -660,9 +933,14 @@ window.Pages['sys-tags'] = (function() {
       MockSupplierTagPool[currentSupplier] = pool.filter(function(t) { return t.id !== tagId; });
       // 从所有配置中移除
       Object.keys(MockTagConfigs).forEach(function(key) {
-        if (key.indexOf(currentSupplier) === 0) {
+        if (key.indexOf(currentSupplier + '_') === 0) {
           var cfg = MockTagConfigs[key];
           cfg.enabledTagIds = cfg.enabledTagIds.filter(function(id) { return id !== tagId; });
+        }
+      });
+      Object.keys(MockSupplierLocalTagMappings).forEach(function(key) {
+        if (key.indexOf(currentSupplier + '_') === 0 && MockSupplierLocalTagMappings[key]) {
+          delete MockSupplierLocalTagMappings[key][tagId];
         }
       });
       showToast('标签已删除', 'success');
@@ -686,6 +964,7 @@ window.Pages['sys-tags'] = (function() {
       pool.forEach(function(t) { if (t.sort > maxSort) maxSort = t.sort; });
       var newTag = {
         id: currentSupplier + '_' + Date.now(),
+        localCode: nextTagLocalCode(currentSupplier),
         name: name,
         sort: maxSort + 1,
         platformTagId: null
@@ -693,6 +972,111 @@ window.Pages['sys-tags'] = (function() {
       pool.push(newTag);
       showToast('标签已添加', 'success');
       loadTagList(currentSupplier, currentTenantType, currentScene);
+    });
+  }
+
+  function addNewLocalTag() {
+    if (!currentTenantType || !currentScene) {
+      showToast('请先在左侧选择一个场景节点', 'info');
+      return;
+    }
+    var localKey = getLocalKey(currentTenantType, currentScene);
+    MockLocalTagSets[localKey] = MockLocalTagSets[localKey] || [];
+    var localTags = MockLocalTagSets[localKey];
+    showPromptModal('新增本地标签', '请输入本地标准标签名称', function(value) {
+      var exists = localTags.some(function(t) { return t.name === value; });
+      if (exists) return '本地标签名称已存在';
+      return null;
+    }, function(name) {
+      var maxSort = 0;
+      localTags.forEach(function(t) { if (t.sort > maxSort) maxSort = t.sort; });
+      localTags.push({
+        id: 'local_' + currentTenantType + '_' + currentScene + '_' + Date.now(),
+        localCode: nextLocalStandardTagCode(currentTenantType, currentScene),
+        name: name,
+        sort: maxSort + 1
+      });
+      showToast('本地标签已添加', 'success');
+      if (currentMode === 'local') loadLocalTagSet(currentTenantType, currentScene);
+      else loadTagList(currentSupplier, currentTenantType, currentScene);
+    });
+  }
+
+  function enterLocalTagEditMode(localTagId) {
+    var row = document.querySelector('.local-tag-row[data-local-tag-id="' + localTagId + '"]');
+    if (!row) return;
+    row.querySelector('.local-tag-name-display').style.display = 'none';
+    row.querySelector('.local-tag-name-input').style.display = 'inline-block';
+    row.querySelector('.btn-local-tag-edit').style.display = 'none';
+    row.querySelector('.btn-local-tag-delete').style.display = 'none';
+    row.querySelector('.btn-local-tag-save').style.display = 'inline-block';
+    row.querySelector('.btn-local-tag-cancel').style.display = 'inline-block';
+    row.querySelector('.local-tag-name-input').focus();
+  }
+
+  function exitLocalTagEditMode(row) {
+    row.querySelector('.local-tag-name-display').style.display = '';
+    row.querySelector('.local-tag-name-input').style.display = 'none';
+    row.querySelector('.btn-local-tag-edit').style.display = '';
+    row.querySelector('.btn-local-tag-delete').style.display = '';
+    row.querySelector('.btn-local-tag-save').style.display = 'none';
+    row.querySelector('.btn-local-tag-cancel').style.display = 'none';
+  }
+
+  function saveLocalTagEdit(localTagId) {
+    var row = document.querySelector('.local-tag-row[data-local-tag-id="' + localTagId + '"]');
+    if (!row) return;
+    var input = row.querySelector('.local-tag-name-input');
+    var newName = input.value.trim();
+    if (!newName) {
+      showToast('本地标签名称不能为空', 'error');
+      return;
+    }
+    var tags = MockLocalTagSets[getLocalKey(currentTenantType, currentScene)] || [];
+    var exists = tags.some(function(tag) { return tag.id !== localTagId && tag.name === newName; });
+    if (exists) {
+      showToast('本地标签名称已存在', 'error');
+      return;
+    }
+    tags.forEach(function(tag) {
+      if (tag.id === localTagId) tag.name = newName;
+    });
+    row.querySelector('.local-tag-name-display').textContent = newName;
+    exitLocalTagEditMode(row);
+    showToast('本地标签已更新', 'success');
+  }
+
+  function cancelLocalTagEdit(localTagId) {
+    var row = document.querySelector('.local-tag-row[data-local-tag-id="' + localTagId + '"]');
+    if (!row) return;
+    row.querySelector('.local-tag-name-input').value = row.querySelector('.local-tag-name-display').textContent;
+    exitLocalTagEditMode(row);
+  }
+
+  function deleteLocalTag(localTagId) {
+    var usedCount = 0;
+    Object.keys(MockSupplierLocalTagMappings).forEach(function(key) {
+      var mapping = MockSupplierLocalTagMappings[key] || {};
+      Object.keys(mapping).forEach(function(tagId) {
+        if (mapping[tagId] === localTagId) usedCount++;
+      });
+    });
+    var msg = usedCount > 0
+      ? '该本地标签已被 ' + usedCount + ' 个供应商标签映射，删除后这些映射会被清空。'
+      : '确认删除该本地标签？';
+    showConfirmModal('删除本地标签', msg, function(confirmed) {
+      if (!confirmed) return;
+      var localKey = getLocalKey(currentTenantType, currentScene);
+      MockLocalTagSets[localKey] = (MockLocalTagSets[localKey] || []).filter(function(tag) { return tag.id !== localTagId; });
+      Object.keys(MockSupplierLocalTagMappings).forEach(function(key) {
+        var mapping = MockSupplierLocalTagMappings[key] || {};
+        Object.keys(mapping).forEach(function(tagId) {
+          if (mapping[tagId] === localTagId) delete mapping[tagId];
+        });
+      });
+      refreshTreePanel();
+      loadLocalTagSet(currentTenantType, currentScene);
+      showToast('本地标签已删除', 'success');
     });
   }
 
@@ -845,7 +1229,7 @@ window.Pages['sys-tags'] = (function() {
       return null;
     }, function(name) {
       var newId = 'sc_' + Date.now();
-      MockTagScenes.push({ id: newId, name: name, status: 'enabled' });
+      MockTagScenes.push({ id: newId, localCode: nextSceneLocalCode(), name: name, status: 'enabled' });
       refreshSceneModalBody();
       refreshTreePanel();
       showToast('场景已添加', 'success');
@@ -871,7 +1255,12 @@ window.Pages['sys-tags'] = (function() {
   }
 
   function restoreSelection() {
-    if (currentSupplier && currentTenantType && currentScene) {
+    if (currentMode === 'local' && currentTenantType && currentScene) {
+      var localNode = document.querySelector('.tree-local-scene[data-tenant="' + currentTenantType + '"][data-scene="' + currentScene + '"]');
+      if (localNode) selectLocalSceneNode(localNode);
+      return;
+    }
+    if (currentMode === 'supplier' && currentSupplier && currentTenantType && currentScene) {
       var node = document.querySelector('.tree-scene[data-supplier="' + currentSupplier + '"][data-tenant="' + currentTenantType + '"][data-scene="' + currentScene + '"]');
       if (node) selectSceneNode(node);
     }
@@ -880,83 +1269,11 @@ window.Pages['sys-tags'] = (function() {
   function resetContentPanel() {
     var panel = document.getElementById('tags-content-panel');
     if (!panel) return;
+    currentMode = 'supplier';
     currentSupplier = '';
     currentTenantType = '';
     currentScene = '';
     panel.innerHTML = buildEmptyStateHTML();
-  }
-
-  /* ===== 复制配置弹窗 ===== */
-  function openCopyModal() {
-    var overlay = document.getElementById('copy-modal-overlay');
-    if (!overlay) return;
-    overlay.classList.add('show');
-    buildCopyTargetList();
-  }
-
-  function buildCopyTargetList() {
-    var list = document.getElementById('copy-target-list');
-    if (!list) return;
-    var html = '';
-    MockTagSuppliers.forEach(function(sup) {
-      html += '<div style="padding:6px 8px;font-weight:600;font-size:13px;color:#333;">' + escapeHTML(sup.name) + '</div>';
-      MockTenantTypes.forEach(function(tt) {
-        MockTagScenes.forEach(function(sc) {
-          // 排除当前选中的节点
-          if (sup.id === currentSupplier && tt.id === currentTenantType && sc.id === currentScene) return;
-          var cfgKey = sup.id + '_' + tt.id + '_' + sc.id;
-          html += '<label style="display:flex;align-items:center;padding:4px 8px 4px 24px;cursor:pointer;font-size:13px;">';
-          html += '<input type="checkbox" class="copy-target-cb" value="' + cfgKey + '" style="margin-right:8px;">';
-          html += tt.name + ' / ' + sc.name;
-          html += '</label>';
-        });
-      });
-    });
-    list.innerHTML = html || '<div style="padding:12px;color:#999;text-align:center;">无可用目标节点</div>';
-  }
-
-  function bindCopyModalEvents() {
-    var overlay = document.getElementById('copy-modal-overlay');
-    if (!overlay) return;
-
-    overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) closeCopyModal();
-    });
-
-    var confirmBtn = overlay.querySelector('.btn-copy-confirm');
-    if (confirmBtn) {
-      confirmBtn.addEventListener('click', function() {
-        executeCopy();
-      });
-    }
-  }
-
-  function executeCopy() {
-    var sourceKey = currentSupplier + '_' + currentTenantType + '_' + currentScene;
-    var sourceConfig = MockTagConfigs[sourceKey];
-    if (!sourceConfig) {
-      showToast('源配置不存在', 'error');
-      return;
-    }
-    var checkboxes = document.querySelectorAll('.copy-target-cb:checked');
-    if (checkboxes.length === 0) {
-      showToast('请选择至少一个目标节点', 'info');
-      return;
-    }
-    var count = 0;
-    checkboxes.forEach(function(cb) {
-      var targetKey = cb.value;
-      MockTagConfigs[targetKey] = { enabledTagIds: sourceConfig.enabledTagIds.slice() };
-      count++;
-    });
-    closeCopyModal();
-    refreshTreePanel();
-    showToast('已复制到 ' + count + ' 个节点', 'success');
-  }
-
-  function closeCopyModal() {
-    var overlay = document.getElementById('copy-modal-overlay');
-    if (overlay) overlay.classList.remove('show');
   }
 
   /* ===== 供应商弹窗 ===== */
@@ -1066,7 +1383,7 @@ window.Pages['sys-tags'] = (function() {
       return null;
     }, function(name) {
       var newId = 'sp_' + Date.now();
-      MockTagSuppliers.push({ id: newId, name: name, status: 'enabled' });
+      MockTagSuppliers.push({ id: newId, localCode: nextSupplierLocalCode(), name: name, status: 'enabled' });
       MockSupplierTagPool[newId] = [];
       refreshSupplierModalBody();
       refreshTreePanel();
@@ -1220,33 +1537,200 @@ window.Pages['sys-tags'] = (function() {
     return null;
   }
 
+  function normalizeCodePart(value) {
+    return String(value || 'NEW').toUpperCase().replace(/[^A-Z0-9]+/g, '');
+  }
+
+  function nextSupplierLocalCode() {
+    var max = 0;
+    MockTagSuppliers.forEach(function(supplier) {
+      var match = String(supplier.localCode || '').match(/^SUP-NEW-(\d+)$/);
+      if (match) max = Math.max(max, Number(match[1]));
+    });
+    return 'SUP-NEW-' + String(max + 1).padStart(3, '0');
+  }
+
+  function nextSceneLocalCode() {
+    var max = 0;
+    MockTagScenes.forEach(function(scene) {
+      var match = String(scene.localCode || '').match(/^SCN-NEW-(\d+)$/);
+      if (match) max = Math.max(max, Number(match[1]));
+    });
+    return 'SCN-NEW-' + String(max + 1).padStart(3, '0');
+  }
+
+  function nextTagLocalCode(supplierId) {
+    var supplierCode = normalizeCodePart((findSupplier(supplierId) || {}).localCode || supplierId).replace(/^SUP/, '');
+    supplierCode = supplierCode.replace(/^-+/, '') || normalizeCodePart(supplierId);
+    var prefix = 'TAG-' + supplierCode + '-';
+    var max = 0;
+    Object.keys(MockSupplierTagPool).forEach(function(key) {
+      (MockSupplierTagPool[key] || []).forEach(function(tag) {
+        var code = String(tag.localCode || '');
+        if (code.indexOf(prefix) === 0) {
+          var num = Number(code.slice(prefix.length));
+          if (!Number.isNaN(num)) max = Math.max(max, num);
+        }
+      });
+    });
+    return prefix + String(max + 1).padStart(3, '0');
+  }
+
+  function getConfigKey(supplierId, tenantType, sceneId) {
+    return supplierId + '_' + tenantType + '_' + sceneId;
+  }
+
+  function parseConfigKey(configKey) {
+    for (var s = 0; s < MockTagScenes.length; s++) {
+      var sceneId = MockTagScenes[s].id;
+      var sceneSuffix = '_' + sceneId;
+      if (configKey.slice(-sceneSuffix.length) !== sceneSuffix) continue;
+      var left = configKey.slice(0, -sceneSuffix.length);
+      for (var t = 0; t < MockTenantTypes.length; t++) {
+        var tenantType = MockTenantTypes[t].id;
+        var tenantSuffix = '_' + tenantType;
+        if (left.slice(-tenantSuffix.length) !== tenantSuffix) continue;
+        return {
+          supplierId: left.slice(0, -tenantSuffix.length),
+          tenantType: tenantType,
+          sceneId: sceneId
+        };
+      }
+    }
+    return null;
+  }
+
+  function getLocalKey(tenantType, sceneId) {
+    return tenantType + '_' + sceneId;
+  }
+
+  function getLocalTags(tenantType, sceneId) {
+    var localKey = getLocalKey(tenantType, sceneId);
+    return (MockLocalTagSets[localKey] || []).slice().sort(function(a, b) {
+      return Number(a.sort || 0) - Number(b.sort || 0);
+    });
+  }
+
+  function getMappedLocalTagId(supplierId, tenantType, sceneId, supplierTagId) {
+    var mappingKey = getConfigKey(supplierId, tenantType, sceneId);
+    var mapping = MockSupplierLocalTagMappings[mappingKey] || {};
+    return mapping[supplierTagId] || '';
+  }
+
+  function getMappedCount(supplierId, tenantType, sceneId, enabledTagIds) {
+    var mappingKey = getConfigKey(supplierId, tenantType, sceneId);
+    var mapping = MockSupplierLocalTagMappings[mappingKey] || {};
+    var ids = enabledTagIds || [];
+    return ids.filter(function(tagId) { return !!mapping[tagId]; }).length;
+  }
+
+  function nextLocalStandardTagCode(tenantType, sceneId) {
+    var tenantCode = tenantType === 'headquarters' ? 'HQ' : 'STORE';
+    var scene = findScene(sceneId);
+    var sceneCode = normalizeCodePart((scene && scene.localCode) || sceneId).replace(/^SCN/, '');
+    sceneCode = sceneCode.replace(/^-+/, '') || normalizeCodePart(sceneId);
+    var prefix = 'LOCAL-' + tenantCode + '-' + sceneCode + '-';
+    var max = 0;
+    Object.keys(MockLocalTagSets).forEach(function(key) {
+      (MockLocalTagSets[key] || []).forEach(function(tag) {
+        var code = String(tag.localCode || '');
+        if (code.indexOf(prefix) === 0) {
+          var num = Number(code.slice(prefix.length));
+          if (!Number.isNaN(num)) max = Math.max(max, num);
+        }
+      });
+    });
+    return prefix + String(max + 1).padStart(3, '0');
+  }
+
+  function guessLocalTagId(localTags, supplierTagName) {
+    var name = String(supplierTagName || '');
+    var patterns = [
+      { words: ['高', '强烈', 'S级', 'A级', '近期成交'], target: ['高意向', '高优先级', '总部重点跟进', '可激活'] },
+      { words: ['中', 'B级', 'C级', '考虑', '潜在', '待跟进', '需再次', '需回访'], target: ['中意向', '中优先级', '需跟进', '待二次回访', '需培育', '区域协同', '需复访'] },
+      { words: ['低', 'D级', 'E级', '一般'], target: ['低意向', '低优先级', '需培育', '门店自处理'] },
+      { words: ['无意向', '无需求', '暂不需要', '无需'], target: ['无意向', '无需处理'] },
+      { words: ['无效', '空号', '停机', '异常', '非本人', '拒接', '未接通', '投诉', '敏感'], target: ['无效客户', '投诉风险', '服务预警'] }
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var pattern = patterns[i];
+      if (pattern.words.some(function(word) { return name.indexOf(word) !== -1; })) {
+        var matched = localTags.find(function(localTag) {
+          return pattern.target.some(function(target) { return localTag.name.indexOf(target) !== -1; });
+        });
+        if (matched) return matched.id;
+      }
+    }
+    return localTags[0] ? localTags[0].id : '';
+  }
+
+  function ensureMappingsForEnabledTags(supplierId, tenantType, sceneId) {
+    var configKey = getConfigKey(supplierId, tenantType, sceneId);
+    var localTags = getLocalTags(tenantType, sceneId);
+    var pool = MockSupplierTagPool[supplierId] || [];
+    var config = MockTagConfigs[configKey];
+    if (!config) return;
+    MockSupplierLocalTagMappings[configKey] = MockSupplierLocalTagMappings[configKey] || {};
+    (config.enabledTagIds || []).forEach(function(tagId) {
+      if (MockSupplierLocalTagMappings[configKey][tagId]) return;
+      var supplierTag = pool.find(function(tag) { return tag.id === tagId; });
+      MockSupplierLocalTagMappings[configKey][tagId] = guessLocalTagId(localTags, supplierTag ? supplierTag.name : '');
+    });
+  }
+
+  function initDefaultLocalMappings() {
+    window.MockSupplierLocalTagMappings = window.MockSupplierLocalTagMappings || {};
+    Object.keys(MockTagConfigs).forEach(function(configKey) {
+      var parts = parseConfigKey(configKey);
+      if (!parts) return;
+      ensureMappingsForEnabledTags(parts.supplierId, parts.tenantType, parts.sceneId);
+    });
+  }
+
+  function getEnabledCount(configKey) {
+    var config = MockTagConfigs[configKey];
+    return config && Array.isArray(config.enabledTagIds) ? config.enabledTagIds.length : 0;
+  }
+
+  function hasEnabledConfig(configKey) {
+    return getEnabledCount(configKey) > 0;
+  }
+
+  function getTagConfig(supplierId, tenantType, sceneId) {
+    var pool = (MockSupplierTagPool[supplierId] || []).slice().sort(function(a, b) {
+      return Number(a.sort || 0) - Number(b.sort || 0);
+    });
+    var configKey = getConfigKey(supplierId, tenantType, sceneId);
+    var enabledTagIds = (MockTagConfigs[configKey] && MockTagConfigs[configKey].enabledTagIds)
+      ? MockTagConfigs[configKey].enabledTagIds.filter(function(id) {
+        return pool.some(function(tag) { return tag.id === id; });
+      })
+      : [];
+    var enabledSet = {};
+    enabledTagIds.forEach(function(id) {
+      enabledSet[id] = true;
+    });
+    return {
+      tags: pool,
+      enabledTagIds: enabledTagIds,
+      enabledSet: enabledSet
+    };
+  }
+
   function checkSupplierHasAnyConfig(supplierId) {
     var keys = Object.keys(MockTagConfigs);
     for (var i = 0; i < keys.length; i++) {
-      if (keys[i].indexOf(supplierId) === 0) return true;
+      if (keys[i].indexOf(supplierId + '_') === 0 && hasEnabledConfig(keys[i])) return true;
     }
     return false;
   }
 
   function autoSelectFirst() {
-    if (MockTagSuppliers.length === 0) return;
-    var firstSup = MockTagSuppliers[0];
     var firstTT = MockTenantTypes[0];
     var firstSc = MockTagScenes[0];
-    // 找第一个有配置的场景
-    for (var t = 0; t < MockTenantTypes.length; t++) {
-      for (var s = 0; s < MockTagScenes.length; s++) {
-        var key = firstSup.id + '_' + MockTenantTypes[t].id + '_' + MockTagScenes[s].id;
-        if (MockTagConfigs[key]) {
-          firstTT = MockTenantTypes[t];
-          firstSc = MockTagScenes[s];
-          t = MockTenantTypes.length; // break outer
-          break;
-        }
-      }
-    }
-    var node = document.querySelector('.tree-scene[data-supplier="' + firstSup.id + '"][data-tenant="' + firstTT.id + '"][data-scene="' + firstSc.id + '"]');
-    if (node) selectSceneNode(node);
+    if (!firstTT || !firstSc) return;
+    var node = document.querySelector('.tree-local-scene[data-tenant="' + firstTT.id + '"][data-scene="' + firstSc.id + '"]');
+    if (node) selectLocalSceneNode(node);
   }
 
   /* ===== 对外方法 ===== */
@@ -1269,8 +1753,6 @@ window.Pages['sys-tags'] = (function() {
       var overlay = document.getElementById('supplier-modal-overlay');
       if (overlay) overlay.classList.remove('show');
     },
-    openCopyModal: openCopyModal,
-    closeCopyModal: closeCopyModal,
     closePromptModal: closePromptModal,
     closeConfirmModal: closeConfirmModal,
     refreshTreePanel: refreshTreePanel
