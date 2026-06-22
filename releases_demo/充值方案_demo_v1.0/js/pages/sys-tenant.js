@@ -1201,9 +1201,10 @@
                 </div>
                 <div id="tenantTrialRechargeFields" class="tenant-trial-form" style="display:none;">
                   <div class="biz-form-row">
-                    <label class="biz-form-label required">有效时间</label>
+                    <label class="biz-form-label">有效时间</label>
                     <div class="biz-form-field">
                       <select class="biz-form-select" id="tenantTrialValidityMonths">
+                        <option value="">请选择</option>
                         <option value="1">1 个月</option>
                         <option value="2">2 个月</option>
                         <option value="3">3 个月</option>
@@ -1211,7 +1212,7 @@
                     </div>
                   </div>
                   <div class="biz-form-row">
-                    <label class="biz-form-label required">通话费用</label>
+                    <label class="biz-form-label">通话费用</label>
                     <div class="biz-form-field">
                       <input class="biz-form-input" id="tenantTrialCallFee" type="number" min="0.01" step="0.01" placeholder="请输入通话费用（元）">
                     </div>
@@ -1222,7 +1223,7 @@
                   </div>
                   <div class="biz-modal-notice tenant-notice">
                     <span class="biz-notice-icon">&#x26A0;</span>
-                    <div class="biz-notice-body">试用有效时间按每月 30 日换算；生效时可再次调整添加时长，通话费用在生效后计入资金余额。</div>
+                    <div class="biz-notice-body">有效时间与通话费用至少填写一项；试用有效时间按每月 30 日换算，生效时可再次调整时长，通话费用在生效后计入资金余额。</div>
                   </div>
                 </div>
               </div>
@@ -1343,32 +1344,51 @@
     const callFeeInput = document.getElementById('tenantTrialCallFee');
     const callFee = Number(callFeeInput?.value);
 
-    if (![1, 2, 3].includes(months)) {
-      showToast('请选择有效时间', 'warning');
+    const hasValidity = [1, 2, 3].includes(months);
+    const hasCallFee = Number.isFinite(callFee) && callFee > 0;
+
+    if (!hasValidity && !hasCallFee) {
+      showToast('有效时间和通话费用至少填写一项', 'warning');
       return;
     }
-    if (!Number.isFinite(callFee) || callFee <= 0) {
-      callFeeInput?.focus();
-      showToast('通话费用必须大于 0', 'warning');
-      return;
+
+    var billingType, seatFeePackage, trialMonths, periodDays, rechargeAmount;
+    if (hasValidity && hasCallFee) {
+      billingType = '坐席费+通话费';
+      seatFeePackage = '试用' + months + '个月';
+      trialMonths = months;
+      periodDays = months * 30;
+      rechargeAmount = callFee;
+    } else if (hasValidity) {
+      billingType = '仅坐席费';
+      seatFeePackage = '试用' + months + '个月';
+      trialMonths = months;
+      periodDays = months * 30;
+      rechargeAmount = 0;
+    } else {
+      billingType = '仅通话费';
+      seatFeePackage = '-';
+      trialMonths = 0;
+      periodDays = 0;
+      rechargeAmount = callFee;
     }
 
     const now = new Date();
     const store = getTenantStoreInfo(tenantName);
-    const rechargeNo = `TRY${formatLocalDate(now).replace(/-/g, '')}${String(now.getTime()).slice(-6)}`;
+    const rechargeNo = 'TRY' + formatLocalDate(now).replace(/-/g, '') + String(now.getTime()).slice(-6);
     getHistoryRows().unshift({
       id: now.getTime(),
       orderType: '试用单',
-      tenantName,
-      rechargeNo,
+      tenantName: tenantName,
+      rechargeNo: rechargeNo,
       storeCode: store.storeCode,
       storeName: store.storeName,
       status: '已支付',
-      billingType: '坐席费+通话费',
-      seatFeePackage: `试用${months}个月`,
-      trialMonths: months,
-      periodDays: months * 30,
-      rechargeAmount: callFee,
+      billingType: billingType,
+      seatFeePackage: seatFeePackage,
+      trialMonths: trialMonths,
+      periodDays: periodDays,
+      rechargeAmount: rechargeAmount,
       validFrom: '-',
       validTo: '-',
       validityActivated: false,
@@ -1379,11 +1399,11 @@
 
     if (callFeeInput) callFeeInput.value = '';
     const monthsSelect = document.getElementById('tenantTrialValidityMonths');
-    if (monthsSelect) monthsSelect.value = '1';
+    if (monthsSelect) monthsSelect.value = '';
     const historyBody = document.getElementById('tenantHistoryBody');
     if (historyBody) historyBody.innerHTML = renderHistoryRows(tenantName);
     updateDrawerFieldsAfterActivation(tenantName);
-    showToast('试用单已关联，请在历史记录中点击“生效”', 'success');
+    showToast('试用单已关联，请在历史记录中点击”生效”', 'success');
   }
 
   function renderCheckedOrder(order) {
