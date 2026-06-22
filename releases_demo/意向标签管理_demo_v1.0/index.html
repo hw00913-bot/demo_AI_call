@@ -8,6 +8,7 @@
   <title>智能外呼中台</title>
 
   <link rel="stylesheet" href="assets/css/app.css?v=3">
+  <link rel="stylesheet" href="annotations/annotation.css">
 
 
 
@@ -168,5 +169,17 @@
 
 <script src="js/app.js?v=2"></script>
 <script src="js/nav.js?v=2"></script>
+<script>
+  window.AnnotationConfig = {
+    page: function() {
+      var active = document.querySelector('.nav-sub-item.active');
+      return active && active.id ? active.id : 'sys-tags';
+    },
+    dataKey: 'AnnotationData',
+    dataVersion: '1'
+  };
+</script>
+<script src="annotations/annotations.js"></script>
+<script src="annotations/annotation-runtime.js"></script>
   </body>
 </html>

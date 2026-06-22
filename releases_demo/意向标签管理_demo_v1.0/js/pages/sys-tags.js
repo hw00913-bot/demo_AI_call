@@ -61,8 +61,8 @@ window.Pages['sys-tags'] = (function() {
         '<span style="font-size:15px;font-weight:600;">📋 意向标签配置</span>' +
       '</div>' +
       '<div style="display:flex;gap:8px;">' +
-        '<button class="btn-scene-mgr" style="padding:6px 16px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;cursor:pointer;font-size:13px;" onclick="window.Pages[\'sys-tags\'].openSceneModal()">⚙ 场景配置</button>' +
-        '<button class="btn-supplier-mgr" style="padding:6px 16px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;cursor:pointer;font-size:13px;" onclick="window.Pages[\'sys-tags\'].openSupplierModal()">🏢 供应商管理</button>' +
+        '<button class="btn-scene-mgr" data-anno="sys-tags-scene-config" style="padding:6px 16px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;cursor:pointer;font-size:13px;" onclick="window.Pages[\'sys-tags\'].openSceneModal()">⚙ 场景配置</button>' +
+        '<button class="btn-supplier-mgr" data-anno="sys-tags-supplier-mgr" style="padding:6px 16px;background:#fff;border:1px solid #d9d9d9;border-radius:4px;cursor:pointer;font-size:13px;" onclick="window.Pages[\'sys-tags\'].openSupplierModal()">🏢 供应商管理</button>' +
       '</div>' +
     '</div>';
   }
@@ -73,7 +73,7 @@ window.Pages['sys-tags'] = (function() {
     html += '<div class="tree-header" style="padding:8px 16px;font-size:12px;color:#999;font-weight:500;">配置树</div>';
 
     html += '<div class="tree-root-group">';
-    html += '<div class="tree-node tree-root tree-local-root expanded" style="display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:13px;user-select:none;">';
+    html += '<div class="tree-node tree-root tree-local-root expanded" data-anno="sys-tags-local-root" style="display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:13px;user-select:none;">';
     html += '<span class="tree-arrow" style="display:inline-flex;width:16px;font-size:10px;color:#999;transition:transform 0.2s;">▸</span>';
     html += '<span class="tree-icon" style="margin-right:6px;">🏷</span>';
     html += '<span class="tree-label" style="color:#333;font-weight:600;">中台标签集</span>';
@@ -102,7 +102,7 @@ window.Pages['sys-tags'] = (function() {
     html += '</div></div>';
 
     html += '<div class="tree-root-group">';
-    html += '<div class="tree-node tree-root tree-supplier-root" style="display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:13px;user-select:none;">';
+    html += '<div class="tree-node tree-root tree-supplier-root" data-anno="sys-tags-supplier-root" style="display:flex;align-items:center;padding:7px 16px;cursor:pointer;font-size:13px;user-select:none;">';
     html += '<span class="tree-arrow" style="display:inline-flex;width:16px;font-size:10px;color:#999;transition:transform 0.2s;">▸</span>';
     html += '<span class="tree-icon" style="margin-right:6px;">🏢</span>';
     html += '<span class="tree-label" style="color:#333;font-weight:600;">供应商标签集</span>';
@@ -190,7 +190,7 @@ window.Pages['sys-tags'] = (function() {
     if (disabledContext) html += '<span style="margin-left:8px;font-size:12px;color:#fa8c16;">当前节点已停用</span>';
     html += '</div>';
     html += '<div style="display:flex;gap:8px;">';
-    html += '<button class="btn-add-tag" style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">供应商标签池：新增标签</button>';
+    html += '<button class="btn-add-tag" data-anno="sys-tags-add-tag" style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">供应商标签池：新增标签</button>';
     html += '</div>';
     html += '</div>';
 
@@ -199,10 +199,10 @@ window.Pages['sys-tags'] = (function() {
     html += '当前在供应商标签集下配置 <b>' + supplier.name + '</b> 的标签启用状态和映射关系。';
     html += '</div>';
     html += '<div class="tag-config-toolbar">';
-    html += '<input type="text" id="tagSearchInput" class="tag-filter-input" placeholder="搜索标签名称/编码">';
-    html += '<select id="tagStatusFilter" class="tag-filter-select"><option value="all">全部标签</option><option value="enabled">已启用</option><option value="disabled">未启用</option></select>';
-    html += '<button class="tag-mini-btn btn-enable-all" ' + (disabledContext ? 'disabled' : '') + '>全选启用</button>';
-    html += '<button class="tag-mini-btn btn-disable-all" ' + (disabledContext ? 'disabled' : '') + '>清空启用</button>';
+    html += '<input type="text" id="tagSearchInput" data-anno="sys-tags-tag-search" class="tag-filter-input" placeholder="搜索标签名称/编码">';
+    html += '<select id="tagStatusFilter" data-anno="sys-tags-tag-filter" class="tag-filter-select"><option value="all">全部标签</option><option value="enabled">已启用</option><option value="disabled">未启用</option></select>';
+    html += '<button class="tag-mini-btn btn-enable-all" data-anno="sys-tags-enable-all" ' + (disabledContext ? 'disabled' : '') + '>全选启用</button>';
+    html += '<button class="tag-mini-btn btn-disable-all" data-anno="sys-tags-disable-all" ' + (disabledContext ? 'disabled' : '') + '>清空启用</button>';
     html += '<span class="tag-toolbar-note">当前配置操作</span>';
     html += '</div>';
 
@@ -210,13 +210,13 @@ window.Pages['sys-tags'] = (function() {
     html += '<div style="flex:1;overflow-y:auto;">';
     html += '<table class="data-table" style="width:100%;border-collapse:collapse;">';
     html += '<thead><tr>';
-    html += '<th style="width:50px;text-align:center;">启用</th>';
+    html += '<th style="width:50px;text-align:center;" data-anno="sys-tags-tag-enable-col">启用</th>';
     html += '<th style="width:60px;">序号</th>';
     html += '<th style="width:150px;">本地编码</th>';
     html += '<th>标签名称</th>';
-    html += '<th style="width:320px;">映射本地标签</th>';
+    html += '<th style="width:320px;" data-anno="sys-tags-tag-mapping-col">映射本地标签</th>';
     html += '<th style="width:100px;">排序</th>';
-    html += '<th style="width:120px;">操作</th>';
+    html += '<th style="width:120px;" data-anno="sys-tags-tag-action-col">操作</th>';
     html += '</tr></thead>';
     html += '<tbody id="tags-table-body">';
 
@@ -265,7 +265,7 @@ window.Pages['sys-tags'] = (function() {
     html += '<span style="margin-left:10px;font-size:12px;color:#52c41a;">● 本地标签 ' + localTags.length + ' 个</span>';
     if (disabledContext) html += '<span style="margin-left:8px;font-size:12px;color:#fa8c16;">当前场景已停用</span>';
     html += '</div>';
-    html += '<button class="btn-add-local-tag" ' + (disabledContext ? 'disabled ' : '') + 'style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">新增本地标签</button>';
+    html += '<button class="btn-add-local-tag" ' + (disabledContext ? 'disabled ' : '') + 'data-anno="sys-tags-add-local-tag" style="padding:6px 14px;background:#1677ff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">新增本地标签</button>';
     html += '</div>';
     html += '<div style="padding:8px 12px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:4px;margin-bottom:12px;font-size:12px;color:#3f6600;">';
     html += '这里维护当前租户类型+场景下的中台唯一标签。供应商标签集只能映射到这些本地标签。';
@@ -296,7 +296,7 @@ window.Pages['sys-tags'] = (function() {
 
   function buildSceneModalHTML() {
     var html = '<div class="modal-overlay" id="scene-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">';
-    html += '<div class="modal-content" style="background:#fff;border-radius:8px;width:520px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
+    html += '<div class="modal-content" data-anno="sys-tags-scene-modal" style="background:#fff;border-radius:8px;width:520px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
     html += '<div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">';
     html += '<span style="font-size:16px;font-weight:600;">⚙ 场景配置</span>';
     html += '<button class="btn-close-modal" onclick="window.Pages[\'sys-tags\'].closeSceneModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;padding:0;">✕</button>';
@@ -339,7 +339,7 @@ window.Pages['sys-tags'] = (function() {
 
   function buildSupplierModalHTML() {
     var html = '<div class="modal-overlay" id="supplier-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">';
-    html += '<div class="modal-content" style="background:#fff;border-radius:8px;width:500px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
+    html += '<div class="modal-content" data-anno="sys-tags-supplier-modal" style="background:#fff;border-radius:8px;width:500px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
     html += '<div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">';
     html += '<span style="font-size:16px;font-weight:600;">🏢 供应商管理</span>';
     html += '<button onclick="window.Pages[\'sys-tags\'].closeSupplierModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;padding:0;">✕</button>';
@@ -1734,24 +1734,37 @@ window.Pages['sys-tags'] = (function() {
   }
 
   /* ===== 对外方法 ===== */
+
+  function scheduleAnnoRefresh() {
+    setTimeout(function() {
+      if (window.AnnotationRuntime && window.AnnotationRuntime.refresh) {
+        window.AnnotationRuntime.refresh();
+      }
+    }, 350);
+  }
+
   return {
     render: render,
     init: init,
     openSceneModal: function() {
       var overlay = document.getElementById('scene-modal-overlay');
       if (overlay) overlay.classList.add('show');
+      scheduleAnnoRefresh();
     },
     closeSceneModal: function() {
       var overlay = document.getElementById('scene-modal-overlay');
       if (overlay) overlay.classList.remove('show');
+      scheduleAnnoRefresh();
     },
     openSupplierModal: function() {
       var overlay = document.getElementById('supplier-modal-overlay');
       if (overlay) overlay.classList.add('show');
+      scheduleAnnoRefresh();
     },
     closeSupplierModal: function() {
       var overlay = document.getElementById('supplier-modal-overlay');
       if (overlay) overlay.classList.remove('show');
+      scheduleAnnoRefresh();
     },
     closePromptModal: closePromptModal,
     closeConfirmModal: closeConfirmModal,
