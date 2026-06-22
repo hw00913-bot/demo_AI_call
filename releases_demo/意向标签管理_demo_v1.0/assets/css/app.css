@@ -2844,6 +2844,637 @@ p { margin-bottom: 8px; }
 .record-tab.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 500; }
 .record-detail-tab-content { min-height: 200px; }
 
+/* ===== 线索记录页 ===== */
+.result-clue-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 20px 32px 24px;
+  background: #f5f5f5;
+}
+.clue-page-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 4px 0 22px;
+}
+.clue-title {
+  color: #1f1f1f;
+  font-size: 20px;
+  font-weight: 600;
+}
+.clue-subtitle {
+  color: #595959;
+  font-size: 14px;
+}
+.clue-filter-card {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 6px;
+}
+.clue-filter-card.is-collapsed .clue-filter-body { display: none; }
+.clue-filter-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 18px 18px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+.clue-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.clue-filter-item label {
+  flex-shrink: 0;
+  color: #262626;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.clue-input,
+.clue-select {
+  width: 256px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  color: #262626;
+  background: #fff;
+  font-size: 14px;
+  outline: none;
+}
+.clue-select { appearance: auto; }
+.clue-input:focus,
+.clue-select:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22,119,255,0.12);
+}
+.clue-date-range {
+  display: flex;
+  align-items: center;
+  width: 256px;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #bfbfbf;
+}
+.clue-date-range .clue-input {
+  width: 104px;
+  height: 30px;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+}
+.clue-calendar {
+  margin-left: auto;
+  padding-right: 10px;
+  color: #bfbfbf;
+  font-size: 12px;
+}
+.clue-filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  margin-left: 0;
+  padding-bottom: 1px;
+}
+.clue-link-btn {
+  border: none;
+  background: transparent;
+  color: #1677ff;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.clue-table-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin-top: 16px;
+  padding: 18px 24px 12px;
+  background: #fff;
+  border-radius: 6px;
+}
+.clue-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.clue-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: #fff;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-size: 18px;
+}
+.clue-icon-btn:hover {
+  background: #f5f5f5;
+  color: #1677ff;
+}
+.clue-table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.clue-table {
+  width: 100%;
+  min-width: 1540px;
+  border-collapse: collapse;
+  color: #1f1f1f;
+  font-size: 14px;
+}
+.clue-table th,
+.clue-table td {
+  height: 68px;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.55;
+}
+.clue-table th {
+  height: 48px;
+  background: #fff;
+  color: #1f1f1f;
+  font-weight: 600;
+}
+.clue-table tbody tr:hover td { background: #fafafa; }
+.clue-record-cell {
+  max-width: 160px;
+  overflow: hidden;
+  text-align: left !important;
+  text-overflow: ellipsis;
+}
+.clue-scene-cell { min-width: 132px; }
+.clue-action-cell {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  width: 86px;
+  background: #fff;
+  box-shadow: -8px 0 18px rgba(0,0,0,0.05);
+}
+.clue-table th.clue-action-cell {
+  z-index: 2;
+  background: #fff;
+}
+.clue-action-cell a,
+.clue-table a {
+  color: #1677ff;
+  text-decoration: none;
+}
+.clue-action-cell a:hover,
+.clue-table a:hover { text-decoration: underline; }
+.clue-table-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  color: #8c8c8c;
+  font-size: 13px;
+}
+.clue-empty {
+  padding: 48px;
+  color: #bfbfbf;
+  text-align: center;
+}
+.clue-detail-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(0,0,0,0.32);
+  display: flex;
+  justify-content: flex-end;
+}
+.clue-detail-panel {
+  width: 520px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+}
+.clue-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 20px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.clue-detail-header button {
+  border: none;
+  background: transparent;
+  color: #8c8c8c;
+  cursor: pointer;
+  font-size: 24px;
+}
+.clue-detail-body {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+.clue-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  color: #262626;
+  font-size: 14px;
+}
+.clue-detail-section-title {
+  margin: 24px 0 10px;
+  color: #1f1f1f;
+  font-weight: 600;
+}
+.clue-detail-summary {
+  padding: 12px;
+  border-radius: 6px;
+  background: #f7f9fc;
+  color: #595959;
+  line-height: 1.8;
+}
+.clue-detail-line { margin-bottom: 14px; }
+.clue-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.clue-tag-pill {
+  padding: 4px 10px;
+  border: 1px solid #91caff;
+  border-radius: 4px;
+  background: #e6f4ff;
+  color: #0958d9;
+  font-size: 13px;
+}
+.clue-tag-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.42);
+}
+.clue-tag-modal {
+  width: 550px;
+  max-width: calc(100vw - 48px);
+  padding: 20px 24px 28px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+}
+.clue-tag-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #1f1f1f;
+  font-size: 16px;
+  font-weight: 600;
+}
+.clue-tag-modal-header button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #8c8c8c;
+  cursor: pointer;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1;
+}
+.clue-tag-modal-header button:hover { color: #262626; }
+.clue-tag-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.clue-tag-field {
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #dbe5fb;
+  border-radius: 4px;
+  background: #f2f5fd;
+  color: #2563eb;
+  font-size: 14px;
+  line-height: 20px;
+}
+.clue-visit-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 18px 28px;
+  background: rgba(0,0,0,0.42);
+}
+.clue-visit-modal {
+  width: min(1728px, calc(100vw - 56px));
+  min-height: 308px;
+  padding: 20px 24px 28px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+}
+.clue-visit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 28px;
+  color: #1f1f1f;
+  font-size: 16px;
+  font-weight: 600;
+}
+.clue-visit-header button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #8c8c8c;
+  cursor: pointer;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1;
+}
+.clue-visit-header button:hover { color: #262626; }
+.clue-visit-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 38px 24px 14px 0;
+}
+.clue-visit-table-wrap {
+  margin: 0 24px;
+  overflow-x: auto;
+}
+.clue-visit-table {
+  width: 100%;
+  min-width: 1380px;
+  border-collapse: collapse;
+  color: #1f1f1f;
+  font-size: 14px;
+}
+.clue-visit-table th,
+.clue-visit-table td {
+  height: 68px;
+  padding: 0 16px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.55;
+}
+.clue-visit-table th {
+  height: 48px;
+  background: #fafafa;
+  font-weight: 600;
+}
+.clue-visit-table a {
+  color: #1677ff;
+  text-decoration: none;
+}
+.clue-visit-table a:hover { text-decoration: underline; }
+.clue-visit-record {
+  max-width: 170px;
+  overflow: hidden;
+  text-align: left !important;
+  text-overflow: ellipsis;
+}
+.clue-visit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 16px 24px 0;
+  color: #1f1f1f;
+  font-size: 14px;
+}
+.clue-page-arrow,
+.clue-page-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #8c8c8c;
+  cursor: pointer;
+}
+.clue-page-arrow.disabled {
+  color: #d9d9d9;
+  cursor: not-allowed;
+}
+.clue-page-current {
+  border-color: #1677ff;
+  color: #1677ff;
+}
+.clue-visit-footer select {
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  color: #1f1f1f;
+  font-size: 14px;
+}
+.clue-call-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5200;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(0,0,0,0.38);
+}
+.clue-call-drawer {
+  width: min(1320px, calc(100vw - 220px));
+  height: 100%;
+  background: #fff;
+  box-shadow: -8px 0 28px rgba(0,0,0,0.14);
+  display: flex;
+  flex-direction: column;
+}
+.clue-call-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 66px;
+  padding: 0 28px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #1f1f1f;
+  font-size: 16px;
+  font-weight: 600;
+}
+.clue-call-header button {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  color: #8c8c8c;
+  cursor: pointer;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+}
+.clue-call-header button:hover { color: #262626; }
+.clue-call-body {
+  display: grid;
+  grid-template-columns: minmax(620px, 1fr) 430px;
+  flex: 1;
+  min-height: 0;
+}
+.clue-call-left {
+  min-width: 0;
+  padding: 10px 22px 28px 24px;
+  overflow: auto;
+}
+.clue-call-right {
+  border-left: 1px solid #f0f0f0;
+  padding: 10px 28px;
+  overflow: auto;
+}
+.clue-call-audio {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 78px;
+  padding: 0 30px;
+  border: 1px solid #8c8c8c;
+  border-radius: 6px;
+  color: #1f1f1f;
+}
+.clue-call-audio > span:first-child,
+.clue-call-audio > span:nth-child(2),
+.clue-call-audio > span:nth-child(4),
+.clue-call-audio > span:nth-child(5) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.clue-call-audio i {
+  display: inline-block;
+  width: 76px;
+  height: 3px;
+  background: #595959;
+}
+.clue-call-audio-icon {
+  margin-left: 10px;
+  font-size: 22px;
+}
+.clue-call-transcript {
+  margin-top: 18px;
+}
+.clue-call-talk-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.clue-call-speaker {
+  padding-top: 8px;
+  color: #1f1f1f;
+  font-size: 14px;
+  text-align: center;
+}
+.clue-call-bubble {
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #f2f2f2;
+  color: #1f1f1f;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.clue-call-tabs {
+  display: flex;
+  gap: 34px;
+  height: 46px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.clue-call-tabs button {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-size: 14px;
+}
+.clue-call-tabs button.active {
+  border-bottom-color: #1677ff;
+  color: #1677ff;
+  font-weight: 600;
+}
+.clue-call-tab-content {
+  padding-top: 28px;
+}
+.clue-call-section-title {
+  margin-bottom: 12px;
+  color: #1f1f1f;
+  font-size: 15px;
+  font-weight: 600;
+}
+.clue-call-summary {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  background: #f2f2f2;
+  color: #1f1f1f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.clue-call-info-row {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 8px;
+  align-items: start;
+  margin-bottom: 20px;
+  color: #1f1f1f;
+  font-size: 14px;
+}
+.clue-call-info-row span {
+  text-align: right;
+  font-weight: 600;
+}
+.clue-call-info-row b {
+  font-weight: 500;
+  color: #595959;
+  word-break: break-word;
+}
+.clue-call-info-list {
+  padding-top: 6px;
+}
+
+@media (max-width: 1440px) {
+  .clue-filter-body { grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
+  .clue-call-drawer { width: min(1060px, calc(100vw - 160px)); }
+  .clue-call-body { grid-template-columns: minmax(560px, 1fr) 360px; }
+}
+
 /* ===== 通话记录表头排序按钮 ===== */
 .sort-toggle {
   display: inline-block;

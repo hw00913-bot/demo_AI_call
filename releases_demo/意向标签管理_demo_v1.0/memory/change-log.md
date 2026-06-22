@@ -25,3 +25,4 @@
 - 提取 `scheduleAnnoRefresh()` 消除 4 处重复代码
 - 提取 `shiftSortValues()` 通用排序移位函数
 - 新增 CLAUDE.md 中文项目文档
+- 新增 sys-scene 页面标注（智能平台、场景类型、新增业务场景），记录跨模块数据依赖规则
