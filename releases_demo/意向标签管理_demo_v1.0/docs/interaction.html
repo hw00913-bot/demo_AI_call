@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能说明文档</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; padding: 40px 20px; color: #333; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 48px; }
+    h1 { font-size: 24px; font-weight: 600; margin-bottom: 32px; color: #1a1a1a; border-bottom: 2px solid #1677ff; padding-bottom: 12px; }
+    h2 { font-size: 18px; font-weight: 600; margin: 32px 0 16px; color: #1a1a1a; }
+    h3 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; color: #333; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    th, td { border: 1px solid #d9d9d9; padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #fafafa; font-weight: 600; color: #333; }
+    tr:hover { background: #fafafa; }
+    hr { border: none; border-top: 1px solid #e8e8e8; margin: 24px 0; }
+    .section-divider { margin: 32px 0; }
+    p { margin: 8px 0; font-size: 14px; }
+    strong { color: #333; }
+    .jump-btn { display: inline-block; padding: 8px 20px; background: #1677ff; color: #fff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; }
+    .jump-btn:hover { background: #4096ff; text-decoration: none; }
+  </style>
+  <link rel="stylesheet" href="../annotations/annotation.css?v=2">
+</head>
+<body>
+  <div class="container">
+    <div style="text-align: right; margin-bottom: 24px;">
+      <a href="../index.html" class="jump-btn">跳转演示页面 →</a>
+    </div>
+    <h1>功能说明文档</h1>
+
+    <h2>一. 版本说明</h2>
+    <table>
+      <thead>
+        <tr><th>版本号</th><th>更新时间</th><th>更新内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>v1.0</td><td>2026-05-20</td><td>1.新增数据概览模块；2.新增任务详情模块；3.手工导入新增异步导入逻辑；4.一知大小模型模型选项新增关联账号功能。</td></tr>
+        <tr><td>v1.1</td><td>2026-06-05</td><td>1.租户管理-充值单配置新增手动生效逻辑，有效期由自动生成改为手动点击"生效"按钮触发。</td></tr>
+      </tbody>
+    </table>
+    <h2>二. 项目范围</h2>
+    <table>
+      <thead>
+        <tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th><th>对接系统范围</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>智能外呼系统</td><td>外呼列表</td><td>数据概览</td><td>一知</td></tr>
+        <tr><td>智能外呼系统</td><td>外呼列表</td><td>任务详情</td><td>一知</td></tr>
+        <tr><td>智能外呼系统</td><td>外呼列表</td><td>手工导入</td><td>科大、一知、冰兰</td></tr>
+        <tr><td>智能外呼系统</td><td>业务场景</td><td>大小模型关联账号</td><td>一知</td></tr>
+        <tr><td>智能外呼系统</td><td>租户管理</td><td>充值单配置-手动生效</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <h2>三. 逻辑说明</h2>
+    <table>
+      <thead>
+        <tr><th>流程名称</th><th>跳转地址</th></tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <h2>四. 功能说明</h2>
+    <hr class="section-divider">
+    <h3>1. 外呼场景-外呼列表-查看-数据概览</h3>
+    <p><strong>1）功能名称：</strong> 数据概览</p>
+    <p><strong>2）交互说明：</strong> 如图。</p>
+    <p><strong>3）数据来源：</strong> 一知平台回调接口。</p>
+    <p><strong>4）逻辑说明：</strong> 点击页面后传入任务id查询到当前任务的相关数据。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>外呼数据区块标题</td><td>标识外呼数据统计区域</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>导入客户数</td><td>当前任务接口传入或手工导入的客户手机号总数（去重）</td><td>AI 智能外呼中台</td><td>通过本地任务 id 查询传入或导入到系统的总数，去重后的结果</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>外呼客户数</td><td>成功提交到外部智能呼叫系统接口的客户手机号总数（去重），提交失败的不算在这里</td><td>AI 智能外呼中台</td><td>提交到接口后记录下成功传入到接口的数据，并以手机号去重</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>去重过滤客户数</td><td>从本地任务已过滤或提交失败获取（去重）</td><td>AI 智能外呼中台</td><td>从回调的通话状态识别</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>总接听率</td><td>已接听/外呼客户数</td><td>前端Mock</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
+        <tr><td>挂机率</td><td>客户主动挂断的比例</td><td>前端Mock</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
+        <tr><td>平均通话时长</td><td>每次通话的平均时长</td><td>前端Mock</td><td>聚合计算</td><td>秒数</td><td>0秒</td><td>--</td></tr>
+        <tr><td>总外呼数</td><td>成功提交到外部智能呼叫系统接口的客户手机号总数（不去重） ，提交失败的不算在这里</td><td>AI 智能外呼中台</td><td>提交到接口后记录下数据成功传入到接口的数据</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>过滤比例</td><td>过滤客户数/导入客户数</td><td>前端Mock</td><td>聚合计算</td><td>百分比</td><td>0%</td><td>--</td></tr>
+        <tr><td>接听数</td><td>已接通的手机号数量（不去重）</td><td>回调接口获取</td><td>无</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>未接通数</td><td>未接通的手机号数量（不去重）</td><td>回调接口获取</td><td>无</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>意向分类区块标题</td><td>标识意向分类统计区域</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>配置按钮</td><td>意向分类配置功能</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        <tr><td>某类客户占比</td><td>意向等级配置标签</td><td>AI智能外呼中台</td><td>该意向的用户总数/呼叫总数</td><td>百分比</td><td>0%</td><td>--</td></tr>
+        <tr><td>某类客户数</td><td>意向等级配置标签</td><td>AI智能外呼中台</td><td>取配置的选中的意向标签名称对应的客户数</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>意向洞察区块标题</td><td>标识意向洞察统计区域</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>意向分布环形图</td><td>展示当前任务各意向等级客户占比分布</td><td>一知平台回调接口或百联智能体</td><td>见枚举值说明</td><td>环形图/百分比</td><td>0%</td><td>无数据时展示空图或 0%</td></tr>
+        <tr><td>客户关注点排行</td><td>展示客户通话中关注点出现次数排行，默认展示前十</td><td>一知平台回调接口</td><td>按客户关注点标签聚合出现次数并降序排序</td><td>横向条形图/整数</td><td>0</td><td>如果整体无数据隐藏此板块，且一知-总部租户无此统计</td></tr>
+        <tr><td>全部客户关注点排名弹窗</td><td>点击客户关注点排行右上角&quot;全部&quot;后弹出，展示全部客户关注点排名</td><td>一知平台回调接口</td><td>按客户关注点标签聚合出现次数并降序排序，弹窗内展示完整排名、出现次数和占比条</td><td>弹窗/横向条形图/整数</td><td>空</td><td>如果整体无数据隐藏此板块，一知-总部租户无此统计</td></tr>
+        <tr><td>通话时长分布</td><td>展示客户通话时长区间分布</td><td>一知平台回调接口</td><td>按通话时长聚合到 0s-5s、6s-10s、11s-30s、31s-60s、61s-90s、&gt;90s 区间，取单个任务全部外呼回调数据</td><td>柱状图/整数</td><td>0</td><td>无数据时展示空图或 0</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>2. 外呼场景-外呼列表-查看-任务详情</h3>
+    <p><strong>1）功能名称：</strong> 任务详情</p>
+    <p><strong>2）交互说明：</strong> 如图。</p>
+    <p><strong>3）数据来源：</strong> 一知平台任务详情查询接口。</p>
+    <p><strong>4）逻辑说明：</strong> 通过任务id查询接口获取对应字段。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>创建日期</td><td>展示任务创建时间</td><td>一知接口</td><td>取createTime</td><td>字符串</td><td>--</td><td>--</td></tr>
+        <tr><td>话术名称</td><td>展示话术名称</td><td>一知接口</td><td>取dialogFlowName</td><td>字符串</td><td>--</td><td>--</td></tr>
+        <tr><td>任务id</td><td>展示任务id</td><td>一知接口</td><td>取robotCallJobId</td><td>字符串</td><td>--</td><td>--</td></tr>
+        <tr><td>任务描述</td><td>展示任务描述</td><td>一知接口</td><td>取description</td><td>字符串</td><td>--</td><td>--</td></tr>
+        <tr><td>启动方式</td><td>展示任务的启动方式</td><td>一知接口</td><td>取mode</td><td>字符串</td><td>--</td><td>--</td></tr>
+        <tr><td>拨打时段</td><td>展示任务的拨打时段</td><td>一知接口</td><td>取daysOfWeek+dailyStartTime+dailyEndTime</td><td>字符串</td><td>--</td><td>--</td></tr>
+        <tr><td>风控策略</td><td>展示风控策略 id</td><td>一知接口</td><td>取riskControlStrategyId</td><td>long</td><td>--</td><td>--</td></tr>
+        <tr><td>自动重拨设置</td><td>展示自动重拨设置</td><td>一知接口</td><td>取redialSettingList</td><td>数字统计</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>3. 外呼场景-外呼列表-查看-呼叫名单-手动导入</h3>
+    <p><strong>1）功能名称：</strong> 号码文件上传与导入记录管理</p>
+    <p><strong>2）交互说明：</strong> 弹窗内包含两个tab：上传文件和导入记录。上传文件tab支持拖拽上传；导入记录tab支持查看历史记录和导出结果。</p>
+    <p><strong>3）数据来源：</strong> 前端Mock数据。</p>
+    <p><strong>4）逻辑说明：</strong> 点击开始上传后关闭弹窗，可切换到导入记录查看。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>弹窗尺寸</td><td>手动导入弹窗宽度</td><td>前端CSS</td><td>无</td><td>1040px</td><td>--</td><td>--</td></tr>
+        <tr><td>tab-上传文件</td><td>文件上传tab</td><td>前端行为</td><td>无</td><td>Tabs组件</td><td>--</td><td>--</td></tr>
+        <tr><td>tab-导入记录</td><td>导入历史记录tab</td><td>前端行为</td><td>无</td><td>Tabs组件</td><td>--</td><td>--</td></tr>
+        <tr><td>上传区域</td><td>拖拽或点击上传文件</td><td>前端行为</td><td>无</td><td>上传组件</td><td>--</td><td>--</td></tr>
+        <tr><td>上传提示</td><td>支持的文件格式和数量限制</td><td>前端配置</td><td>无</td><td>文本提示</td><td>--</td><td>--</td></tr>
+        <tr><td>开始上传按钮</td><td>执行文件上传（开发中）</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        <tr><td>导入记录列表</td><td>历史导入记录表格</td><td>前端Mock</td><td>无</td><td>表格</td><td>空</td><td>--</td></tr>
+        <tr><td>导出结果按钮</td><td>导出导入结果CSV</td><td>前端JS</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>4. 外呼场景-外呼列表-查看-呼叫名单-手动导入-导出失败记录功能</h3>
+    <p><strong>1）功能名称：</strong> 导入结果Excel导出</p>
+    <p><strong>2）交互说明：</strong> 点击导出失败记录按钮后，生成包含导入结果的CSV文件并自动下载，如果导入记录失败数量=0显示&quot;当前导入全部成功&quot;。</p>
+    <p><strong>3）数据来源：</strong> 前端Mock数据。</p>
+    <p><strong>4）逻辑说明：</strong> 生成CSV文件（兼容Excel），包含BOM防止中文乱码。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>导出字段-导入结果</td><td>导入失败</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>导出字段-失败原因</td><td>失败原因说明</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>导出字段-手机号</td><td>客户手机号</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>导出字段-场景传入信息</td><td>模版填写的业务字段</td><td>前端Mock</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>导出字段-导入时间</td><td>必填时间戳</td><td>前端Mock</td><td>无</td><td>日期时间</td><td>--</td><td>--</td></tr>
+        <tr><td>文件名格式</td><td>导入结果_日期.csv</td><td>前端JS</td><td>日期格式化</td><td>文本</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>5. 业务场景-一知-大小模型选项关联账号</h3>
+    <p><strong>1）功能名称：</strong> 一知大小模型选项关联账号</p>
+    <p><strong>2）交互说明：</strong> 当用户选择&quot;大模型&quot;或&quot;小模型&quot;选项时，可关联对应的账号配置。</p>
+    <p><strong>3）数据来源：</strong> 一知平台接口。</p>
+    <p><strong>4）逻辑说明：</strong> 根据选择的模型类型，加载对应的账号列表供用户选择关联。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>模型类型选择</td><td>大模型/小模型选项</td><td>一知接口</td><td>无</td><td>下拉选择</td><td>--</td><td>--</td></tr>
+        <tr><td>关联账号</td><td>关联对应的账号配置</td><td>一知接口</td><td>根据模型类型筛选</td><td>下拉选择</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>6. 外呼场景-外呼列表-查看-数据概览-意向分类配置</h3>
+    <p><strong>1）功能名称：</strong> 意向数据设置</p>
+    <p><strong>2）交互说明：</strong> 点击&quot;意向分类&quot;区块的配置按钮，弹出配置弹窗。支持对意向等级1/2/3进行标签关联配置，配置多个标签是取多个标签的并集。</p>
+    <p><strong>3）数据来源：</strong> 一知门店类租户取一知回调标签数据，一知总部类租户取百炼标签数据，非一知平台的外呼任务无意向分类的统计看板。</p>
+    <p><strong>4）逻辑说明：</strong> 见其他说明的意向枚举值说明。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>配置弹窗</td><td>意向数据设置弹窗</td><td>前端CSS</td><td>无</td><td>居中弹窗</td><td>--</td><td>--</td></tr>
+        <tr><td>弹窗标题</td><td>意向数据设置</td><td>前端配置</td><td>无</td><td>文本</td><td>--</td><td>--</td></tr>
+        <tr><td>配置提示</td><td>提示字段设置说明</td><td>前端配置</td><td>无</td><td>文本提示</td><td>--</td><td>--</td></tr>
+        <tr><td>意向等级1</td><td>关联标签配置行</td><td>见上方数据来源说明</td><td>无</td><td>多选下拉框</td><td>--</td><td>--</td></tr>
+        <tr><td>意向等级2</td><td>关联标签配置行</td><td>见上方数据来源说明</td><td>无</td><td>多选下拉框</td><td>--</td><td>--</td></tr>
+        <tr><td>意向等级3</td><td>关联标签配置行</td><td>见上方数据来源说明</td><td>无</td><td>多选下拉框</td><td>--</td><td>--</td></tr>
+        <tr><td>取消按钮</td><td>关闭弹窗不保存</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        <tr><td>保存按钮</td><td>保存配置并关闭弹窗</td><td>提交后根据配置重新读取数据</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        <tr><td>关闭图标</td><td>右上角关闭按钮</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+        <tr><td>背景点击</td><td>点击半透明背景关闭弹窗</td><td>前端行为</td><td>无</td><td>点击事件</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>7. 系统管理-租户管理-充值单配置-手动生效</h3>
+    <p><strong>1）功能名称：</strong> 充值单配置-手动生效</p>
+    <p><strong>2）交互说明：</strong> 如图。</p>
+    <p><strong>3）数据来源：</strong> 前端Mock数据。</p>
+    <p><strong>4）逻辑说明：</strong> 关联充值单后有效期不再自动生成，需用户手动点击"生效"按钮触发有效期计算和激活。激活后同步更新历史充值记录中的有效期字段。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>有效期待生效状态</td><td>充值单已支付但有效期尚未激活时，有效期列显示"待生效"</td><td>前端Mock</td><td>充值单状态=已支付 且 计费类型支持有效期（仅坐席费/坐席费+通话费）且 validityActivated=false</td><td>文本</td><td>未生成</td><td>--</td></tr>
+        <tr><td>生效按钮-租户列表</td><td>待生效状态下，租户列表操作列显示"生效"按钮</td><td>前端行为</td><td>hasPendingValidity=true 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
+        <tr><td>生效按钮-充值单抽屉</td><td>待生效状态下，充值单配置抽屉的有效期字段旁显示"生效"按钮</td><td>前端行为</td><td>hasPendingValidity=true 时渲染</td><td>按钮</td><td>隐藏</td><td>--</td></tr>
+        <tr><td>手动生效触发</td><td>点击"生效"按钮后自动计算并激活有效期</td><td>前端JS</td><td>validFrom：若存在历史有效期且未过期，从历史截止日期次日开始（无缝续期）；否则从关联日期开始。validTo = validFrom + 套餐天数 - 1天。套餐天数：半年套餐=180天，全年套餐=365天</td><td>日期范围</td><td>--</td><td>充值单未支付提示"充值单未支付，无法生效"；已激活提示"有效期已生效，无需重复操作"</td></tr>
+        <tr><td>激活后状态更新</td><td>激活成功后有效期从"待生效"变为计算后的日期范围，按钮消失，租户变为可呼叫状态</td><td>前端JS</td><td>设置 validityActivated=true、enabled=true，同步更新历史记录</td><td>状态变更</td><td>--</td><td>--</td></tr>
+        <tr><td>计费类型区分</td><td>仅坐席费生成有效期；仅通话费增加话费不涉及有效期；坐席费+通话费同时支持</td><td>前端Mock</td><td>根据计费类型和套餐计算</td><td>逻辑分支</td><td>--</td><td>仅通话费类型不显示"生效"按钮</td></tr>
+      </tbody>
+    </table>
+    <h2>五. 其他说明</h2>
+    <h3>1. 意向枚举值说明</h3>
+    <table>
+      <thead>
+        <tr><th>智能平台</th><th>租户类型</th><th>数据来源</th><th>取值逻辑</th><th>意向等级枚举</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>一知</td><td>总部</td><td>百炼智能体</td><td>取百炼提取的意向等级</td><td>A (高意向)；B (潜在)；C (一般)；D (忙碌/敷衍)；E (拒绝/无效/无应答) ；F（未接通）</td></tr>
+        <tr><td>一知</td><td>门店</td><td>一知回调</td><td>取一知返回的意向级别</td><td>A (高意向)；B (低意向)；C (意向待定)；D (无意向)；E (未接通)；F（停机/空号）</td></tr>
+      </tbody>
+    </table>
+    <p>百炼智能体：F（未接通）新增默认标签，如果客户未接通自动打上这个标签</p>
+  </div>
+<script>
+  window.AnnotationConfig = {
+    projectId: 'ai-call-recharge-v1',
+    dataVersion: '2',
+    page: 'interaction'
+  };
+</script>
+<script src="../annotations/annotations.js?v=2"></script>
+<script src="../annotations/annotation-runtime.js?v=3"></script>
+</body>
+</html>

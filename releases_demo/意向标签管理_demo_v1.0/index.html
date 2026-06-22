@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>智能外呼中台</title>
+
+  <link rel="stylesheet" href="assets/css/app.css?v=3">
+
+
+
+</head>
+
+<body style="">
+
+
+
+<div class="top-bar">
+
+  <div class="top-bar-left">
+
+    <span class="app-name">智能外呼</span>
+
+  </div>
+
+  <div class="breadcrumb" id="breadcrumb"><span class="bc-link" onclick="navigateTo('nav-system','nav-system')">系统管理</span><span class="bc-sep">/</span><span class="bc-current">业务场景</span></div>
+
+  <div class="right-area">
+
+    <span class="user-role">👤 产品-超管</span>
+
+    <button class="icon-btn">⚙</button>
+
+  </div>
+
+</div>
+
+
+
+<div class="main-layout">
+
+  <aside class="sidebar">
+
+    <div class="sidebar-logo">
+
+      <svg width="20" height="20" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+
+        <path d="M64 12L116 64L64 116L12 64L64 12Z" stroke="#1677ff" stroke-width="12" fill="none"></path>
+
+        <path d="M64 36L92 64L64 92L36 64L64 36Z" fill="#ff4d4f"></path>
+
+      </svg>
+
+      <span class="logo-text">智能外呼</span>
+
+    </div>
+
+
+
+    <div class="nav-item" id="nav-home" onclick="setActive(this)">
+
+      <div class="nav-item-inner"><span class="label">首页</span></div>
+
+    </div>
+
+
+
+    <div class="nav-item" id="nav-scene" onclick="toggleMenu(this,'scene')">
+
+      <div class="nav-item-inner"><span class="label">外呼场景</span></div>
+
+      <span class="arrow">▾</span>
+
+    </div>
+
+    <div class="nav-sub" id="sub-scene">
+
+      <div class="nav-sub-item" id="scene-list" onclick="selectSubMenu(this,'外呼列表')">外呼列表</div>
+
+      <div class="nav-sub-item" id="scene-block" onclick="selectSubMenu(this,'外呼拦截')">外呼拦截</div>
+
+    </div>
+
+
+
+    <div class="nav-item" id="nav-report" onclick="toggleMenu(this,'report')">
+
+      <div class="nav-item-inner"><span class="label">统计分析</span></div>
+
+      <span class="arrow">▾</span>
+
+    </div>
+
+    <div class="nav-sub" id="sub-report">
+
+      <div class="nav-sub-item" id="report-call" onclick="selectSubMenu(this,'通话统计')">通话统计</div>
+
+      <div class="nav-sub-item" id="report-billing" onclick="selectSubMenu(this,'计费统计')">计费统计</div>
+
+
+
+    </div>
+
+
+
+    <div class="nav-item" id="nav-result" onclick="toggleMenu(this,'result')">
+
+      <div class="nav-item-inner"><span class="label">外呼结果</span></div>
+
+      <span class="arrow">▾</span>
+
+    </div>
+
+    <div class="nav-sub" id="sub-result">
+
+      <div class="nav-sub-item" id="result-records" onclick="selectSubMenu(this,'通话记录')">通话记录</div>
+
+      <div class="nav-sub-item" id="result-clue" onclick="selectSubMenu(this,'线索记录')">线索记录</div>
+
+    </div>
+
+
+
+    <div class="nav-item open active-parent" id="nav-system" onclick="toggleMenu(this,'system')">
+
+      <div class="nav-item-inner"><span class="label">系统管理</span></div>
+
+      <span class="arrow">▾</span>
+
+    </div>
+
+    <div class="nav-sub open" id="sub-system">
+
+      <div class="nav-sub-item" id="sys-account" onclick="selectSubMenu(this,'账号管理')">账号管理</div>
+
+      <div class="nav-sub-item" id="sys-tenant" onclick="selectSubMenu(this,'租户管理')">租户管理</div>
+
+      <div class="nav-sub-item" id="sys-channel" onclick="selectSubMenu(this,'通道管理')">通道管理</div>
+
+      <div class="nav-sub-item" id="sys-scene" onclick="selectSubMenu(this,'业务场景')">业务场景</div>
+      <div class="nav-sub-item" id="sys-tags" onclick="selectSubMenu(this,'标签管理')">标签管理</div>
+
+    </div>
+
+  </aside>
+
+
+
+  <div class="content-area" id="page-content" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;background:#f0f2f5;">
+    </div>
+<script src="mock/data.js?v=2"></script>
+
+<script src="js/common.js?v=2"></script>
+
+<script src="js/pages/scene-list.js?v=3"></script>
+
+<script src="js/pages/result-records.js?v=1"></script>
+
+<script src="js/pages/report-call.js?v=1"></script>
+<script src="js/pages/report-billing.js?v=3"></script>
+
+
+<script src="js/pages/sys-scene.js?v=3"></script>
+<script src="js/pages/sys-tenant.js?v=2"></script>
+<script src="js/pages/sys-tags.js?v=1"></script>
+
+<script src="js/app.js?v=2"></script>
+<script src="js/nav.js?v=2"></script>
+  </body>
+</html>
