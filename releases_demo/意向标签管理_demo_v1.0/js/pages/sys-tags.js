@@ -215,7 +215,7 @@ window.Pages['sys-tags'] = (function() {
     html += '<th style="width:150px;">本地编码</th>';
     html += '<th>标签名称</th>';
     html += '<th style="width:320px;" data-anno="sys-tags-tag-mapping-col">映射本地标签</th>';
-    html += '<th style="width:100px;">排序</th>';
+    html += '<th style="width:100px;" data-anno="sys-tags-tag-sort-col">排序</th>';
     html += '<th style="width:120px;" data-anno="sys-tags-tag-action-col">操作</th>';
     html += '</tr></thead>';
     html += '<tbody id="tags-table-body">';
@@ -234,7 +234,7 @@ window.Pages['sys-tags'] = (function() {
       html += '<input type="text" class="tag-name-input" value="' + escapeHTML(tag.name) + '" style="display:none;width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;">';
       html += '</td>';
       html += '<td>' + buildLocalMappingSelect(tag.id, localTags, mappedLocalId, disabledContext) + '</td>';
-      html += '<td style="color:#999;">' + tag.sort + '</td>';
+      html += '<td style="color:#999;"><span class="tag-sort-display">' + tag.sort + '</span><input type="number" class="tag-sort-input" value="' + tag.sort + '" style="display:none;width:60px;padding:2px 4px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;" min="1"></td>';
       html += '<td>';
       html += '<button class="btn-tag-edit" data-tag-id="' + tag.id + '" style="padding:3px 10px;font-size:12px;border:1px solid #d9d9d9;background:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">✏ 编辑</button>';
       html += '<button class="btn-tag-save" data-tag-id="' + tag.id + '" style="display:none;padding:3px 10px;font-size:12px;border:1px solid #52c41a;background:#52c41a;color:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">✓ 保存</button>';
@@ -272,7 +272,7 @@ window.Pages['sys-tags'] = (function() {
     html += '</div>';
     html += '<div style="flex:1;overflow-y:auto;">';
     html += '<table class="data-table" style="width:100%;border-collapse:collapse;">';
-    html += '<thead><tr><th style="width:70px;">序号</th><th style="width:180px;">本地编码</th><th>本地标签名称</th><th style="width:100px;">排序</th><th style="width:150px;">操作</th></tr></thead>';
+    html += '<thead><tr><th style="width:70px;">序号</th><th style="width:180px;">本地编码</th><th>本地标签名称</th><th style="width:100px;" data-anno="sys-tags-local-sort-col">排序</th><th style="width:150px;">操作</th></tr></thead>';
     html += '<tbody>';
     localTags.forEach(function(tag, idx) {
       html += '<tr class="local-tag-row" data-local-tag-id="' + tag.id + '">';
@@ -280,7 +280,7 @@ window.Pages['sys-tags'] = (function() {
       html += '<td><code class="local-code-text">' + escapeHTML(tag.localCode) + '</code></td>';
       html += '<td><span class="local-tag-name-display">' + escapeHTML(tag.name) + '</span>';
       html += '<input type="text" class="local-tag-name-input" value="' + escapeHTML(tag.name) + '" style="display:none;width:100%;padding:4px 8px;border:1px solid #d9d9d9;border-radius:4px;font-size:13px;"></td>';
-      html += '<td style="color:#999;">' + tag.sort + '</td>';
+      html += '<td style="color:#999;"><span class="local-tag-sort-display">' + tag.sort + '</span><input type="number" class="local-tag-sort-input" value="' + tag.sort + '" style="display:none;width:60px;padding:2px 4px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px;" min="1"></td>';
       html += '<td>';
       html += '<button class="btn-local-tag-edit" data-local-tag-id="' + tag.id + '" style="padding:3px 10px;font-size:12px;border:1px solid #d9d9d9;background:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">编辑</button>';
       html += '<button class="btn-local-tag-save" data-local-tag-id="' + tag.id + '" style="display:none;padding:3px 10px;font-size:12px;border:1px solid #52c41a;background:#52c41a;color:#fff;border-radius:3px;cursor:pointer;margin-right:4px;">保存</button>';
@@ -296,7 +296,7 @@ window.Pages['sys-tags'] = (function() {
 
   function buildSceneModalHTML() {
     var html = '<div class="modal-overlay" id="scene-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">';
-    html += '<div class="modal-content" data-anno="sys-tags-scene-modal" style="background:#fff;border-radius:8px;width:520px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
+    html += '<div class="modal-content" data-anno="sys-tags-scene-modal" style="background:#fff;border-radius:8px;width:600px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
     html += '<div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">';
     html += '<span style="font-size:16px;font-weight:600;">⚙ 场景配置</span>';
     html += '<button class="btn-close-modal" onclick="window.Pages[\'sys-tags\'].closeSceneModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;padding:0;">✕</button>';
@@ -339,7 +339,7 @@ window.Pages['sys-tags'] = (function() {
 
   function buildSupplierModalHTML() {
     var html = '<div class="modal-overlay" id="supplier-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center;">';
-    html += '<div class="modal-content" data-anno="sys-tags-supplier-modal" style="background:#fff;border-radius:8px;width:500px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
+    html += '<div class="modal-content" data-anno="sys-tags-supplier-modal" style="background:#fff;border-radius:8px;width:580px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.15);">';
     html += '<div class="modal-header" style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">';
     html += '<span style="font-size:16px;font-weight:600;">🏢 供应商管理</span>';
     html += '<button onclick="window.Pages[\'sys-tags\'].closeSupplierModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#999;padding:0;">✕</button>';
@@ -859,6 +859,8 @@ window.Pages['sys-tags'] = (function() {
     if (!row) return;
     row.querySelector('.tag-name-display').style.display = 'none';
     row.querySelector('.tag-name-input').style.display = 'inline-block';
+    row.querySelector('.tag-sort-display').style.display = 'none';
+    row.querySelector('.tag-sort-input').style.display = 'inline-block';
     row.querySelector('.btn-tag-edit').style.display = 'none';
     row.querySelector('.btn-tag-delete').style.display = 'none';
     row.querySelector('.btn-tag-save').style.display = 'inline-block';
@@ -875,11 +877,22 @@ window.Pages['sys-tags'] = (function() {
       showToast('标签名称不能为空', 'error');
       return;
     }
-    // 更新数据
+    var sortInput = row.querySelector('.tag-sort-input');
+    var newSort = parseInt(sortInput.value, 10);
+    if (isNaN(newSort) || newSort < 1) {
+      showToast('排序值必须为不小于1的整数', 'error');
+      return;
+    }
+    // 更新数据：先移位同供应商标签池内其他标签，再更新当前标签
+    var pool = MockSupplierTagPool[currentSupplier] || [];
+    var oldTag = pool.filter(function(t) { return t.id === tagId; })[0];
+    if (oldTag) {
+      shiftSortValues(pool, tagId, oldTag.sort, newSort);
+    }
     updateTagInPool(currentSupplier, tagId, 'name', newName);
-    // 更新显示
-    row.querySelector('.tag-name-display').textContent = newName;
-    exitEditMode(row);
+    updateTagInPool(currentSupplier, tagId, 'sort', newSort);
+    // 刷新列表以展示移位后的排序
+    loadTagList(currentSupplier, currentTenantType, currentScene);
     showToast('标签已更新', 'success');
   }
 
@@ -888,16 +901,37 @@ window.Pages['sys-tags'] = (function() {
     if (!row) return;
     var input = row.querySelector('.tag-name-input');
     input.value = row.querySelector('.tag-name-display').textContent;
+    var sortInput = row.querySelector('.tag-sort-input');
+    sortInput.value = row.querySelector('.tag-sort-display').textContent;
     exitEditMode(row);
   }
 
   function exitEditMode(row) {
     row.querySelector('.tag-name-display').style.display = '';
     row.querySelector('.tag-name-input').style.display = 'none';
+    row.querySelector('.tag-sort-display').style.display = '';
+    row.querySelector('.tag-sort-input').style.display = 'none';
     row.querySelector('.btn-tag-edit').style.display = '';
     row.querySelector('.btn-tag-delete').style.display = '';
     row.querySelector('.btn-tag-save').style.display = 'none';
     row.querySelector('.btn-tag-cancel').style.display = 'none';
+  }
+
+  function shiftSortValues(tags, currentTagId, oldSort, newSort) {
+    if (newSort === oldSort) return;
+    if (newSort > oldSort) {
+      tags.forEach(function(t) {
+        if (t.id !== currentTagId && t.sort > oldSort && t.sort <= newSort) {
+          t.sort = t.sort - 1;
+        }
+      });
+    } else {
+      tags.forEach(function(t) {
+        if (t.id !== currentTagId && t.sort >= newSort && t.sort < oldSort) {
+          t.sort = t.sort + 1;
+        }
+      });
+    }
   }
 
   function updateTagInPool(supplierId, tagId, field, value) {
@@ -1007,6 +1041,8 @@ window.Pages['sys-tags'] = (function() {
     if (!row) return;
     row.querySelector('.local-tag-name-display').style.display = 'none';
     row.querySelector('.local-tag-name-input').style.display = 'inline-block';
+    row.querySelector('.local-tag-sort-display').style.display = 'none';
+    row.querySelector('.local-tag-sort-input').style.display = 'inline-block';
     row.querySelector('.btn-local-tag-edit').style.display = 'none';
     row.querySelector('.btn-local-tag-delete').style.display = 'none';
     row.querySelector('.btn-local-tag-save').style.display = 'inline-block';
@@ -1017,6 +1053,8 @@ window.Pages['sys-tags'] = (function() {
   function exitLocalTagEditMode(row) {
     row.querySelector('.local-tag-name-display').style.display = '';
     row.querySelector('.local-tag-name-input').style.display = 'none';
+    row.querySelector('.local-tag-sort-display').style.display = '';
+    row.querySelector('.local-tag-sort-input').style.display = 'none';
     row.querySelector('.btn-local-tag-edit').style.display = '';
     row.querySelector('.btn-local-tag-delete').style.display = '';
     row.querySelector('.btn-local-tag-save').style.display = 'none';
@@ -1032,17 +1070,35 @@ window.Pages['sys-tags'] = (function() {
       showToast('本地标签名称不能为空', 'error');
       return;
     }
+    var sortInput = row.querySelector('.local-tag-sort-input');
+    var newSort = parseInt(sortInput.value, 10);
+    if (isNaN(newSort) || newSort < 1) {
+      showToast('排序值必须为不小于1的整数', 'error');
+      return;
+    }
     var tags = MockLocalTagSets[getLocalKey(currentTenantType, currentScene)] || [];
     var exists = tags.some(function(tag) { return tag.id !== localTagId && tag.name === newName; });
     if (exists) {
       showToast('本地标签名称已存在', 'error');
       return;
     }
+    // 先移位同标签集内其他标签，再更新当前标签
+    var oldTag = tags.filter(function(t) { return t.id === localTagId; })[0];
+    if (oldTag) {
+      shiftSortValues(tags, localTagId, oldTag.sort, newSort);
+    }
     tags.forEach(function(tag) {
-      if (tag.id === localTagId) tag.name = newName;
+      if (tag.id === localTagId) {
+        tag.name = newName;
+        tag.sort = newSort;
+      }
     });
-    row.querySelector('.local-tag-name-display').textContent = newName;
-    exitLocalTagEditMode(row);
+    // 刷新列表以展示移位后的排序
+    if (currentMode === 'local') {
+      loadLocalTagSet(currentTenantType, currentScene);
+    } else {
+      loadTagList(currentSupplier, currentTenantType, currentScene);
+    }
     showToast('本地标签已更新', 'success');
   }
 
@@ -1050,6 +1106,7 @@ window.Pages['sys-tags'] = (function() {
     var row = document.querySelector('.local-tag-row[data-local-tag-id="' + localTagId + '"]');
     if (!row) return;
     row.querySelector('.local-tag-name-input').value = row.querySelector('.local-tag-name-display').textContent;
+    row.querySelector('.local-tag-sort-input').value = row.querySelector('.local-tag-sort-display').textContent;
     exitLocalTagEditMode(row);
   }
 
@@ -1455,8 +1512,9 @@ window.Pages['sys-tags'] = (function() {
         return;
       }
     }
+    var cb = promptCallback;
     closePromptModal();
-    if (promptCallback && promptCallback.cb) promptCallback.cb(value);
+    if (cb && cb.cb) cb.cb(value);
   }
 
   function closePromptModal() {
