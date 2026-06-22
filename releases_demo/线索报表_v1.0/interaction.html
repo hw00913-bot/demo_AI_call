@@ -29,7 +29,7 @@
       <a href="index.html" class="jump-btn">跳转演示页面 →</a>
     </div>
     <h1>智能外呼报表系统 · 功能说明文档</h1>
-    <p style="color: #888; font-size: 13px; margin-top: -16px; margin-bottom: 24px;">最后更新：2026-05-22</p>
+    <p style="color: #888; font-size: 13px; margin-top: -16px; margin-bottom: 24px;">最后更新：2026-06-10</p>
 
     <h2>一. 版本说明</h2>
     <table>
@@ -38,6 +38,7 @@
       </thead>
       <tbody>
         <tr><td>v1.0</td><td>2026-05-18</td><td>提供智能外呼报表看板，包含【外呼线索统计】、【外呼线索明细】、【线索回流统计】三大核心功能板块。支持大区/小区/门店三级联动选择与门店模糊搜索过滤；支持按日期和业务类型等条件筛选、异步文件导出及重置刷新机制；制定了全局敏感数据脱敏规范（手机号 138****8888 掩码处理）并集成了完整的通话状态枚举和 NLP 意向级别映射。</td></tr>
+        <tr><td>v1.1</td><td>2026-06-10</td><td>【外呼线索统计】新增「外呼客户量」字段（位于导入线索量之后），根据回调去重过滤用户得出；修正「AI 接通率」计算公式为：AI 外呼已接通量 ÷ 外呼客户量。</td></tr>
       </tbody>
     </table>
 
@@ -97,9 +98,10 @@
         <tr><td>导入日期</td><td>线索导入的日期部分</td><td>AI 外呼平台</td><td>截取日期段</td><td>YYYY-MM-DD</td><td>--</td><td>空则显 --</td></tr>
         <tr><td>业务类型</td><td>关联导入批次业务类型</td><td>AI 外呼平台</td><td>批次关联</td><td>文本</td><td>--</td><td>空则显 --</td></tr>
         <tr><td>导入线索量</td><td>导入线索总计</td><td>AI 外呼平台</td><td>count(唯一ID)</td><td>整数</td><td>0</td><td>--</td></tr>
+        <tr><td>外呼客户量</td><td>实际外呼的客户数（去重）</td><td>AI 外呼平台</td><td>根据回调去重过滤用户得出</td><td>整数</td><td>0</td><td>--</td></tr>
         <tr><td>AI 外呼已接通量</td><td>统计接通状态线索总量</td><td>AI 外呼平台</td><td>状态=已接通的count</td><td>整数</td><td>0</td><td>--</td></tr>
         <tr><td>已下发线索数</td><td>已下发门店的线索量</td><td>总部 DCC/线索中心</td><td>下发成功状态count</td><td>整数</td><td>0</td><td>--</td></tr>
-        <tr><td>AI 接通率</td><td>外呼接通转化率</td><td>聚合计算</td><td>外呼已接通量/导入线索量</td><td>百分比</td><td>0.0%</td><td>分母为0时显 0.0%</td></tr>
+        <tr><td>AI 接通率</td><td>外呼接通转化率</td><td>聚合计算</td><td>AI 外呼已接通量/外呼客户量</td><td>百分比</td><td>0.0%</td><td>分母为0时显 0.0%</td></tr>
         <tr><td>平均通话时长</td><td>线索接通的平均时长</td><td>AI 外呼平台</td><td>avg(通话时长)</td><td>mm:ss</td><td>00:00</td><td>--</td></tr>
         <tr><td>各意向级别客户数</td><td>业务系统对应意向级别的客户量</td><td>业务系统</td><td>业务系统回调</td><td>整数</td><td>0</td><td>--</td></tr>
       </tbody>
