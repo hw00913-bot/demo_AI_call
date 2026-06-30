@@ -84,11 +84,11 @@
     var phone = page.querySelector('#cluePhone').value.trim();
     var status = page.querySelector('#clueStatus').value;
     var scene = page.querySelector('#clueScene').value;
-    var level = scene ? page.querySelector('#clueLevel').value : '';
+    var selectedLevels = scene ? getSelectedLevels() : [];
     rows = allRows.filter(function (item) {
       return (!phone || item.phone.indexOf(phone) > -1) &&
         (!status || item.callStatus === status) &&
-        (!level || item.level === level) &&
+        (selectedLevels.length === 0 || selectedLevels.indexOf(item.level) > -1) &&
         (!scene || item.sceneName === scene);
     });
     refreshTable();
@@ -100,6 +100,7 @@
     if (!page) return;
     page.querySelectorAll('input').forEach(function (input) { input.value = ''; });
     page.querySelectorAll('select').forEach(function (select) { select.selectedIndex = 0; });
+    resetLevelMultiSelect();
     updateLevelFilterVisibility();
     rows = allRows.slice();
     refreshTable();
@@ -121,19 +122,97 @@
     btn.innerHTML = collapsed ? '展开 <span>⌄</span>' : '收起 <span>⌃</span>';
   }
 
+  function toggleLevelDropdown(e) {
+    if (e) e.stopPropagation();
+    var selectEl = document.querySelector('.clue-multi-select');
+    var dropdown = document.querySelector('.clue-multi-select-dropdown');
+    if (!selectEl || !dropdown) return;
+    var isOpen = selectEl.classList.toggle('is-open');
+    dropdown.style.display = isOpen ? 'block' : 'none';
+  }
+
+  function toggleCheckbox(el) {
+    var cb = el.querySelector('input[type="checkbox"]');
+    if (cb) {
+      cb.checked = !cb.checked;
+      handleLevelChange();
+    }
+  }
+
+  function handleLevelChange(e) {
+    if (e) e.stopPropagation();
+    var triggerText = document.querySelector('.clue-multi-select-text');
+    if (!triggerText) return;
+    var selected = getSelectedLevels();
+    if (selected.length === 0) {
+      triggerText.textContent = '请选择';
+    } else {
+      triggerText.textContent = selected.join(', ');
+    }
+  }
+
+  function getSelectedLevels() {
+    var dropdown = document.querySelector('.clue-multi-select-dropdown');
+    if (!dropdown) return [];
+    var checked = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+    var values = [];
+    for (var i = 0; i < checked.length; i++) {
+      values.push(checked[i].value);
+    }
+    return values;
+  }
+
+  function resetLevelMultiSelect() {
+    var dropdown = document.querySelector('.clue-multi-select-dropdown');
+    var triggerText = document.querySelector('.clue-multi-select-text');
+    var selectEl = document.querySelector('.clue-multi-select');
+    if (dropdown) {
+      var checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(function (cb) {
+        cb.checked = false;
+      });
+    }
+    if (triggerText) {
+      triggerText.textContent = '请选择';
+    }
+    if (selectEl) {
+      selectEl.classList.remove('is-open');
+      dropdown.style.display = 'none';
+    }
+  }
+
   function updateLevelFilterVisibility() {
     var sceneSelect = document.querySelector('#clueScene');
     var levelItem = document.querySelector('#clueLevelItem');
-    var levelSelect = document.querySelector('#clueLevel');
-    if (!sceneSelect || !levelItem || !levelSelect) return;
+    var dropdown = document.querySelector('.clue-multi-select-dropdown');
+    var triggerText = document.querySelector('.clue-multi-select-text');
+    if (!sceneSelect || !levelItem || !dropdown || !triggerText) return;
     var sceneName = sceneSelect.value;
     if (!sceneName) {
       levelItem.style.display = 'none';
-      levelSelect.innerHTML = '<option value="">请选择</option>';
+      dropdown.innerHTML = '';
+      triggerText.textContent = '请选择';
       return;
     }
     levelItem.style.display = '';
-    levelSelect.innerHTML = '<option value="">请选择</option>' + renderLevelOptionsByScene(sceneName);
+    
+    var levels = allRows.reduce(function (acc, row) {
+      if (row.sceneName === sceneName && row.level && acc.indexOf(row.level) === -1) acc.push(row.level);
+      return acc;
+    }, []);
+
+    if (levels.length === 0) {
+      dropdown.innerHTML = '<div style="padding: 6px 12px; font-size: 13px; color: #999; text-align: center;">暂无级别</div>';
+      triggerText.textContent = '暂无级别';
+    } else {
+      dropdown.innerHTML = levels.map(function (item) {
+        return '<div class="clue-multi-select-option" onclick="window.Pages[\'result-clue\'].toggleCheckbox(this)">' +
+          '<input type="checkbox" value="' + escapeHTML(item) + '" onchange="window.Pages[\'result-clue\'].handleLevelChange(event)" onclick="event.stopPropagation()">' +
+          '<span>' + escapeHTML(item) + '</span>' +
+          '</div>';
+      }).join('');
+      triggerText.textContent = '请选择';
+    }
   }
 
   function showTags(index) {
@@ -318,7 +397,15 @@
       '<div class="clue-filter-item"><label>最后回访时间：</label><div class="clue-date-range"><input class="clue-input" type="text" placeholder="请选择"><span>→</span><input class="clue-input" type="text" placeholder="请选择"><span class="clue-calendar">□</span></div></div>' +
       '<div class="clue-filter-item"><label>最后通话状态：</label><select id="clueStatus" class="clue-select"><option value="">请选择</option>' + renderOptions('callStatus') + '</select></div>' +
       '<div class="clue-filter-item" data-anno="result-clue-scene-filter"><label>场景名称：</label><select id="clueScene" class="clue-select" onchange="window.Pages[\'result-clue\'].updateLevelFilterVisibility()"><option value="">请选择</option>' + renderOptions('sceneName') + '</select></div>' +
-      '<div class="clue-filter-item" id="clueLevelItem" style="display:none;"><label>最后通话用户意向级别：</label><select id="clueLevel" class="clue-select"><option value="">请选择</option></select></div>' +
+      '<div class="clue-filter-item" id="clueLevelItem" style="display:none;"><label>最后通话用户意向级别：</label>' +
+      '<div class="clue-multi-select" id="clueLevelMulti">' +
+      '<div class="clue-multi-select-trigger" onclick="window.Pages[\'result-clue\'].toggleLevelDropdown(event)">' +
+      '<span class="clue-multi-select-text">请选择</span>' +
+      '<span class="clue-multi-select-arrow">▼</span>' +
+      '</div>' +
+      '<div class="clue-multi-select-dropdown" style="display:none;"></div>' +
+      '</div>' +
+      '</div>' +
       '</div>' +
       '<div class="clue-filter-actions"><button class="btn btn-default" onclick="window.Pages[\'result-clue\'].resetFilters()">重 置</button><button class="btn btn-primary" onclick="window.Pages[\'result-clue\'].applyFilters()">查 询</button><button class="clue-link-btn clue-collapse-btn" onclick="window.Pages[\'result-clue\'].toggleFilters()">收起 <span>⌃</span></button></div>' +
       '</div>' +
@@ -337,7 +424,17 @@
     updateLevelFilterVisibility();
   }
 
-  window.Pages = window.Pages || {};
+  document.addEventListener('click', function (e) {
+    var selectEl = document.querySelector('.clue-multi-select');
+    var dropdown = document.querySelector('.clue-multi-select-dropdown');
+    if (selectEl && dropdown && dropdown.style.display === 'block') {
+      if (!selectEl.contains(e.target)) {
+        selectEl.classList.remove('is-open');
+        dropdown.style.display = 'none';
+      }
+    }
+  });
+
   window.Pages['result-clue'] = {
     render: render,
     init: init,
@@ -352,6 +449,9 @@
     switchCallTab: switchCallTab,
     closeCallDetail: closeCallDetail,
     closeVisitModal: closeVisitModal,
-    closeTagModal: closeTagModal
+    closeTagModal: closeTagModal,
+    toggleLevelDropdown: toggleLevelDropdown,
+    toggleCheckbox: toggleCheckbox,
+    handleLevelChange: handleLevelChange
   };
 })();
