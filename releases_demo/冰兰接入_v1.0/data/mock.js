@@ -57,16 +57,16 @@ var MockCallStatsRows = [
 
 /* ===== 通话记录 Mock 数据 ===== */
 var MockCallRecordRows = [
-  { phone: '15305168633', startTime: '2026-05-26 16:10:58', endTime: '2026-05-26 16:11:28', duration: '-', sceneName: '燃油车新线索-一知', status: '无人接听', summary: '', platform: '一知科技', lastNode: '-' },
-  { phone: '15926488867', startTime: '2026-05-26 16:10:49', endTime: '2026-05-26 16:11:19', duration: '-', sceneName: '燃油车新线索-一知', status: '占线', summary: '', platform: '一知科技', lastNode: '-' },
-  { phone: '18153323979', startTime: '2026-05-26 16:10:33', endTime: '2026-05-26 16:11:04', duration: '-', sceneName: '燃油车新线索-一知', status: '占线', summary: '', platform: '一知科技', lastNode: '-' },
-  { phone: '18525601142', startTime: '2026-05-26 16:10:19', endTime: '2026-05-26 16:10:50', duration: '-', sceneName: '燃油车新线索-一知', status: '拒接', summary: '', platform: '一知科技', lastNode: '-' },
-  { phone: '16674357576', startTime: '2026-05-26 16:10:16', endTime: '2026-05-26 16:10:54', duration: '27秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户预计1周内到店购车，有购车意愿。客户痛点在于未明确表达具体购车需求及关注点，仅知晓日产优惠活动，需进一步沟通了解其对车型、配置、价格等方面的期望。', platform: '一知科技', lastNode: '-' },
-  { phone: '15158207682', startTime: '2026-05-26 16:10:15', endTime: '2026-05-26 16:11:05', duration: '50秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户未明确购车意愿、时间及城市。其痛点可能在于对日产车优惠政策不够了解，希望通过销售顾问加微信获取详细优惠信息，以便进一步考虑购车。', platform: '一知科技', lastNode: '-' },
-  { phone: '19562456113', startTime: '2026-05-26 16:10:05', endTime: '2026-05-26 16:10:35', duration: '-', sceneName: '燃油车新线索-一知', status: '无人接听', summary: '', platform: '一知科技', lastNode: '-' },
-  { phone: '13375248621', startTime: '2026-05-26 16:09:58', endTime: '2026-05-26 16:10:41', duration: '32秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户表示近期考虑看车，需要销售顾问进一步确认车型和到店时间。', platform: '一知科技', lastNode: '-' },
-  { phone: '18673642091', startTime: '2026-05-26 16:09:44', endTime: '2026-05-26 16:10:14', duration: '-', sceneName: '燃油车新线索-一知', status: '关机', summary: '', platform: '一知科技', lastNode: '-' },
-  { phone: '17784269023', startTime: '2026-05-26 16:09:31', endTime: '2026-05-26 16:10:08', duration: '24秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户希望了解金融方案，已同意后续门店销售联系。', platform: '一知科技', lastNode: '-' }
+  { phone: '15305168633', startTime: '2026-05-26 16:10:58', endTime: '2026-05-26 16:11:28', duration: '-', sceneName: '燃油车新线索-一知', status: '无人接听', summary: '', platform: '一知科技', lastNode: '-', isRedial: false },
+  { phone: '15926488867', startTime: '2026-05-26 16:10:49', endTime: '2026-05-26 16:11:19', duration: '-', sceneName: '燃油车新线索-一知', status: '占线', summary: '', platform: '一知科技', lastNode: '-', isRedial: true },
+  { phone: '18153323979', startTime: '2026-05-26 16:10:33', endTime: '2026-05-26 16:11:04', duration: '-', sceneName: '燃油车新线索-一知', status: '占线', summary: '', platform: '一知科技', lastNode: '-', isRedial: false },
+  { phone: '18525601142', startTime: '2026-05-26 16:10:19', endTime: '2026-05-26 16:10:50', duration: '-', sceneName: '燃油车新线索-一知', status: '拒接', summary: '', platform: '一知科技', lastNode: '-', isRedial: true },
+  { phone: '16674357576', startTime: '2026-05-26 16:10:16', endTime: '2026-05-26 16:10:54', duration: '27秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户预计1周内到店购车，有购车意愿。客户痛点在于未明确表达具体购车需求及关注点，仅知晓日产优惠活动，需进一步沟通了解其对车型、配置、价格等方面的期望。', platform: '一知科技', lastNode: '-', isRedial: false },
+  { phone: '15158207682', startTime: '2026-05-26 16:10:15', endTime: '2026-05-26 16:11:05', duration: '50秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户未明确购车意愿、时间及城市。其痛点可能在于对日产车优惠政策不够了解，希望通过销售顾问加微信获取详细优惠信息，以便进一步考虑购车。', platform: '一知科技', lastNode: '-', isRedial: true },
+  { phone: '19562456113', startTime: '2026-05-26 16:10:05', endTime: '2026-05-26 16:10:35', duration: '-', sceneName: '燃油车新线索-一知', status: '无人接听', summary: '', platform: '一知科技', lastNode: '-', isRedial: false },
+  { phone: '13375248621', startTime: '2026-05-26 16:09:58', endTime: '2026-05-26 16:10:41', duration: '32秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户表示近期考虑看车，需要销售顾问进一步确认车型和到店时间。', platform: '一知科技', lastNode: '-', isRedial: false },
+  { phone: '18673642091', startTime: '2026-05-26 16:09:44', endTime: '2026-05-26 16:10:14', duration: '-', sceneName: '燃油车新线索-一知', status: '关机', summary: '', platform: '一知科技', lastNode: '-', isRedial: false },
+  { phone: '17784269023', startTime: '2026-05-26 16:09:31', endTime: '2026-05-26 16:10:08', duration: '24秒', sceneName: '燃油车新线索-一知', status: '已接通', summary: '客户希望了解金融方案，已同意后续门店销售联系。', platform: '一知科技', lastNode: '-', isRedial: true }
 ];
 
 /* ===== 线索记录 Mock 数据 ===== */
