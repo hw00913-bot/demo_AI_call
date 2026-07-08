@@ -2177,6 +2177,7 @@ a:hover { text-decoration: underline; }
 .overview-grid { display: flex; gap: 14px; }
 .overview-grid.cols-3 .overview-card { flex: 1; }
 .overview-grid.cols-4 .overview-card { flex: 1; }
+.overview-grid.cols-5 .overview-card { flex: 1; min-width: 140px; }
 .overview-grid.cols-6 .overview-card { flex: 1; min-width: 140px; }
 .overview-grid[style*="margin-top"] { margin-top: 14px; }
 .overview-card {

@@ -427,7 +427,7 @@
               <div class="overview-block-title">外呼数据</div>
             </div>
             <div class="overview-block-body">
-              <div class="overview-grid cols-6">
+              <div class="overview-grid cols-5">
                 <div class="overview-card">
                   <div class="overview-card-title">导入客户数 <span class="overview-help" data-tooltip="当前任务导入的客户手机号总数（去重）">&#9432;</span></div>
                   <div class="overview-card-value">6</div>
@@ -438,19 +438,14 @@
                   <div class="overview-card-sub">总外呼数：2</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">过滤客户数 <span class="overview-help" data-tooltip="从本地任务已过滤获取（去重）">&#9432;</span></div>
+                  <div class="overview-card-title">去重过滤客户数 <span class="overview-help" data-tooltip="从本地任务已过滤获取（去重）">&#9432;</span></div>
                   <div class="overview-card-value">5</div>
                   <div class="overview-card-sub">过滤比例：83.33%</div>
                 </div>
                 <div class="overview-card">
-                  <div class="overview-card-title">接听数 <span class="overview-help" data-tooltip="已接通的手机号数量（不去重）">&#9432;</span></div>
+                  <div class="overview-card-title">接听客户数 <span class="overview-help" data-tooltip="已接听的客户手机号数量（去重）">&#9432;</span></div>
                   <div class="overview-card-value">0</div>
-                  <div class="overview-card-sub">接听率：0%</div>
-                </div>
-                <div class="overview-card">
-                  <div class="overview-card-title">未接通数 <span class="overview-help" data-tooltip="未接通的手机号数量（不去重）">&#9432;</span></div>
-                  <div class="overview-card-value">0</div>
-                  <div class="overview-card-sub">未接通率：0%</div>
+                  <div class="overview-card-sub">总接听率：0%</div>
                 </div>
                 <div class="overview-card">
                   <div class="overview-card-title">平均通话时长 <span class="overview-help" data-tooltip="每次通话的平均时长">&#9432;</span></div>

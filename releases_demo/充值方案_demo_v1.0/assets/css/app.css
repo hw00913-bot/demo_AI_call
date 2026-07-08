@@ -686,6 +686,7 @@ p { margin-bottom: 8px; }
 .overview-grid { display: flex; gap: 14px; }
 .overview-grid.cols-3 .overview-card { flex: 1; }
 .overview-grid.cols-4 .overview-card { flex: 1; }
+.overview-grid.cols-5 .overview-card { flex: 1; min-width: 140px; }
 .overview-grid.cols-6 .overview-card { flex: 1; min-width: 140px; }
 .overview-grid[style*="margin-top"] { margin-top: 14px; }
 .overview-card {
@@ -1704,6 +1705,7 @@ p { margin-bottom: 8px; }
   .overview-grid { flex-wrap: wrap; }
   .overview-grid.cols-3 .overview-card,
   .overview-grid.cols-4 .overview-card,
+  .overview-grid.cols-5 .overview-card,
   .overview-grid.cols-6 .overview-card { flex: 1 1 calc(50% - 6px); }
   .intent-donut-panel { min-height: 300px; overflow-x: auto; justify-content: flex-start; }
   .intent-donut-chart { min-width: 720px; height: 290px; transform: scale(0.86); transform-origin: left center; }
