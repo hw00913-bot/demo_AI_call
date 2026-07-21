@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Source Material",
+  "type": "object",
+  "required": ["source_id", "type", "title", "received_at", "key_points", "used_in"],
+  "properties": {
+    "source_id": { "type": "string", "pattern": "^SRC-\\d{3}$" },
+    "type": { "type": "string" },
+    "title": { "type": "string" },
+    "received_at": { "type": "string" },
+    "key_points": { "type": "string" },
+    "used_in": { "type": "string" }
+  }
+}

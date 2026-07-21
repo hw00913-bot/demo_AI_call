@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Dependencies / generated verification outputs
+node_modules/
+package.json
+package-lock.json
+playwright-report/
+test-results/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Local assistant and browser verification state
+.claude/
+.playwright-cli/

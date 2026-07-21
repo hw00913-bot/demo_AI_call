@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:,">
+  <title>电声接入 - 功能说明文档</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; padding: 40px 20px; color: #333; line-height: 1.6; }
+    .container { max-width: 1180px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 48px; }
+    h1 { font-size: 24px; font-weight: 600; margin-bottom: 32px; color: #1a1a1a; border-bottom: 2px solid #1677ff; padding-bottom: 12px; }
+    h2 { font-size: 18px; font-weight: 600; margin: 32px 0 16px; color: #1a1a1a; }
+    h3 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; color: #333; }
+    p { margin: 8px 0; font-size: 14px; }
+    strong { color: #333; }
+    code { padding: 1px 4px; border-radius: 3px; background: #f5f5f5; font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px; }
+    a { color: #1677ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid #d9d9d9; padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #fafafa; font-weight: 600; color: #333; white-space: nowrap; }
+    tr:hover { background: #fafafa; }
+    hr { border: none; border-top: 1px solid #e8e8e8; margin: 24px 0; }
+    .section-divider { margin: 32px 0; }
+    .jump-btn { display: inline-block; padding: 8px 20px; background: #1677ff; color: #fff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; }
+    .jump-btn:hover { background: #4096ff; text-decoration: none; }
+    @media (max-width: 640px) { body { padding: 20px 12px; } .container { padding: 24px 18px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="text-align: right; margin-bottom: 24px;">
+      <a href="../index.html" class="jump-btn">跳转演示页面 →</a>
+    </div>
+    <h1>功能说明文档</h1>
+
+    <h2>一. 版本说明</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>版本号</th><th>更新时间</th><th>更新内容</th></tr></thead>
+        <tbody>
+          <tr><td>v1.0</td><td>2026-07-20</td><td>1. 业务场景新增电声呼叫任务配置；2. 外呼列表接入外呼任务、导入批次和执行批次；3. 新增电声通话记录、线索记录、通话统计、计费统计与标签管理；4. 外呼黑名单采用中台主数据与多平台同步模型，并补充中台与电声字段映射；5. 按最新版接口更新任务主键和批次字段。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>二. 项目范围</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>系统名称</th><th>涉及板块</th><th>功能范围</th><th>对接系统范围</th></tr></thead>
+        <tbody>
+          <tr><td>智能外呼系统</td><td>系统管理</td><td>业务场景、电声任务配置</td><td>电声</td></tr>
+          <tr><td>智能外呼系统</td><td>外呼场景</td><td>外呼列表、数据概览、呼叫名单、任务详情</td><td>电声</td></tr>
+          <tr><td>智能外呼系统</td><td>外呼拦截</td><td>中台自建黑名单分组与号码管理</td><td>中台自建</td></tr>
+          <tr><td>智能外呼系统</td><td>外呼结果</td><td>通话记录、通话详情</td><td>电声</td></tr>
+          <tr><td>智能外呼系统</td><td>外呼结果</td><td>线索记录、回访明细</td><td>电声</td></tr>
+          <tr><td>智能外呼系统</td><td>统计分析</td><td>通话统计、客户统计</td><td>电声</td></tr>
+          <tr><td>智能外呼系统</td><td>统计分析</td><td>计费汇总与明细</td><td>电声 / 演示数据</td></tr>
+          <tr><td>智能外呼系统</td><td>系统管理</td><td>供应商标签池与中台标签映射</td><td>电声</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>三. 逻辑说明</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>流程名称</th><th>跳转地址</th></tr></thead>
+        <tbody>
+          <tr><td>电声接入核心链路</td><td>本期未提供 ProcessOn 流程链接；后续可在 <code>flowcharts/processon-links.txt</code> 中补充并由流程图集自动展示。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>四. 功能说明</h2>
+    <hr class="section-divider">
+    <h3>1. 系统管理-业务场景-新增电声场景</h3>
+    <p><strong>1）功能名称：</strong> 新增电声业务场景与呼叫任务配置</p>
+    <p><strong>2）交互说明：</strong> 管理员在新增业务场景抽屉选择“电声”后，页面根据场景类型自动匹配并只读展示机器人名称和编码，同时展示呼叫时段、重呼规则、黑名单校验、自动启动、模型类型和电声账号。点击“确定并生成任务”后按钮进入加载状态，中台先调用电声新增外呼策略接口；接口成功后生成任务并回到场景列表，接口失败则保留抽屉和已填写内容。</p>
+    <p><strong>3）数据来源：</strong> SRC-001、SRC-002、SRC-008；字段对应 FLD-001、FLD-016～FLD-023。</p>
+    <p><strong>4）逻辑说明：</strong> 20260713 接口以 <code>strategyCode</code> 作为外呼任务引用键。提交顺序为：完成前端校验、调用 <code>/strategy/policy/create</code>、校验 <code>code=S0000</code> 及任务标识、写入本地数据。接口失败或响应不完整时不写入业务场景、外呼列表和任务详情；新建任务时不预生成导入批次或执行批次。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>智能平台</td><td>选择场景的外呼供应商</td><td>SRC-001 / 前端配置</td><td>选择电声后显示电声专属面板</td><td>单选</td><td>未选择</td><td>未选择时阻止提交并提示必填</td></tr>
+        <tr><td>外呼任务编码</td><td>关联后续导入和执行批次</td><td>SRC-008 / FLD-001</td><td>接口返回成功后读取 <code>strategyCode</code></td><td>字符串</td><td>-</td><td>接口失败、非成功码或缺少任务标识时不保存场景，并提示失败原因</td></tr>
+        <tr><td>匹配机器人</td><td>展示场景类型自动匹配的电声机器人</td><td>SRC-008 / FLD-016、FLD-017</td><td>根据场景类型从本地配置读取机器人名称和编码，提交时自动生成映射</td><td>只读文本</td><td>随场景类型自动匹配</td><td>场景类型未配置机器人时阻止提交并提示联系管理员</td></tr>
+        <tr><td>呼叫时段</td><td>配置允许拨打的星期和时间</td><td>SRC-008 / FLD-018、FLD-019</td><td>每条 <code>windows[]</code> 独立保存星期、开始和结束时间</td><td>多行复合字段</td><td>一条</td><td>至少一条完整时段，每条至少选择一天</td></tr>
+        <tr><td>自动重呼配置</td><td>配置单条 N 天 M 呼规则的最大天数、最大次数和间隔分钟数组</td><td>SRC-009</td><td>写入 <code>nDayMCallPolicy</code></td><td>单组复合字段</td><td>呼叫状态为未接通，最大执行 3 天、最大呼叫 3 次，间隔分钟数默认不选</td><td>不支持新增多条规则；间隔分钟数为多选，下拉枚举 15、30、45、60、90、120，未选择时阻止提交</td></tr>
+        <tr><td>黑名单与自动启动</td><td>控制导入前校验和执行启动方式</td><td>SRC-009 / FLD-022、FLD-023</td><td>分别映射 <code>blacklistCheck</code> 与 <code>autoStart</code></td><td>开关 + 配置</td><td>自动启动默认开启</td><td>关闭自动启动时执行时间必填</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>2. 外呼场景-外呼列表-详情</h3>
+    <p><strong>1）功能名称：</strong> 电声外呼任务卡片与三页签详情</p>
+    <p><strong>2）交互说明：</strong> 用户可按电声平台筛选任务，点击“查看”打开详情抽屉，并在数据概览、呼叫名单、任务详情三个页签间切换。呼叫名单包含已分配、待呼叫、已呼叫、已过滤和呼叫失败五个子页签。</p>
+    <p><strong>3）数据来源：</strong> SRC-003、SRC-004、SRC-008；字段对应 FLD-001～FLD-004、FLD-013、FLD-024、FLD-025。</p>
+    <p><strong>4）逻辑说明：</strong> 线索通过 <code>/lead/batch/async/import</code> 返回 <code>importBatchId</code> 后，中台必须在本地保存导入批次编码，并建立其与本地任务、<code>strategyCode</code> 的关联。<code>isCompleted=false</code> 时保留该批次为“可继续导入”，后续通过本地保存的 <code>importBatchId</code> 继续追加；仅当 <code>isCompleted=true</code> 时才进入执行流程，返回 <code>executeBatchId</code> 后再保存导入批次与执行批次的关联。电声不提供单线索停止，运营只能通过 <code>/execute/batch/stop</code> 停止整个执行批次。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>任务卡片</td><td>展示电声任务、平台和执行概况</td><td>SRC-005 / Mock</td><td>按平台和筛选条件渲染任务</td><td>卡片</td><td>全部任务</td><td>无匹配任务时显示空状态</td></tr>
+        <tr><td>意向分类</td><td>沿用中台意向等级配置和分类统计功能</td><td>SRC-009 / FLD-009、FLD-010</td><td>电声任务的标签下拉仅提供 A（高意向）、B（中意向）、C（低意向）、D（无意向）</td><td>配置弹窗 + 6 项统计卡片</td><td>默认配置 A、B、C</td><td>不展示 E、F 选项</td></tr>
+        <tr><td>意向洞察</td><td>沿用原有环形图和通话时长图</td><td>SRC-009 / FLD-010</td><td>电声环形图图例使用 A=高意向、B=中意向、C=低意向、D=无意向</td><td>环形图 + 通话时长图</td><td>原型示例数据</td><td>未接通由主、子接听状态承载，不作为意向枚举</td></tr>
+        <tr><td>导入批次</td><td>跟踪异步线索导入并支持续传</td><td>SRC-008 / FLD-002</td><td>导入成功后将 <code>importBatchId</code>、<code>strategyCode</code>、本地任务、<code>isCompleted</code>、累计导入数和最近导入时间保存在本地；未完成批次用原 <code>importBatchId</code> 继续导入</td><td>字符串 + 本地关联记录</td><td>-</td><td>受理成功不代表全部线索已入库；接口失败不新增或更新本地批次</td></tr>
+        <tr><td>执行批次</td><td>跟踪启动、查询和停止</td><td>SRC-008 / FLD-002</td><td>以 <code>executeBatchId</code> 查询执行状态</td><td>字符串 + 状态</td><td>-</td><td>查询失败时保留最近状态并提示</td></tr>
+        <tr><td>已过滤名单</td><td>展示被电声过滤或拉黑的号码</td><td>SRC-009 / FLD-013</td><td><code>finalCallResult=BLOCKED</code> 时在“过滤原因”列统一显示“过滤/拉黑（BLOCKED）”，不单独展示最终呼叫结果字段</td><td>表格 + 标签</td><td>无</td><td>缺少枚举时显示“-”</td></tr>
+        <tr><td>任务详情</td><td>展示本期开放的任务基础信息和任务配置</td><td>SRC-009 / FLD-024、FLD-025</td><td>按任务编码读取机器人、场景类型、时段、N天M呼、黑名单、自动启动、备注及创建/更新时间；不展示任务状态、转人工或执行批次字段</td><td>详情页签</td><td>-</td><td>缺失对象显示“-”</td></tr>
+        <tr><td>任务卡片</td><td>展示电声任务状态并支持暂停</td><td>SRC-009 / FLD-025A</td><td><code>statusType=1</code> 映射“进行中”，<code>statusType=0</code> 映射“用户暂停”；更多菜单固定为“删除、暂停、终止、启动”，当前仅“暂停”可用并调用失效策略接口</td><td>更多操作菜单</td><td>成功提示并刷新卡片</td><td>接口失败时保持原状态；不展示“停止执行批次”</td></tr>
+        <tr><td>呼叫名单</td><td>查看当前任务关联的电声执行批次</td><td>SRC-009 / FLD-025B</td><td>点击“执行批次”后从中台读取关联批次号，再调用批次详情接口刷新状态和统计</td><td>按钮+弹窗表格</td><td>展示最新批次状态</td><td>无批次显示空状态，查询失败提示重试</td></tr>
+        <tr><td>执行批次</td><td>停止待启动或执行中的批次</td><td>SRC-009 / FLD-025B</td><td>确认批次号、待停止线索数和停止原因后调用 <code>/execute/batch/stop</code></td><td>停止按钮+二次确认弹窗</td><td>批次更新为已停止并刷新统计</td><td>接口失败不更新本地；任务状态保持不变</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>3. 外呼拦截-外呼黑名单</h3>
+    <p><strong>1）功能名称：</strong> 中台黑名单与多平台同步管理</p>
+    <p><strong>2）交互说明：</strong> 用户可搜索、新建和编辑分组，按号码、添加类型、平台整体同步状态和添加时间筛选，执行新增、导入、导出、批量移动、同步重试和移除。平台绑定、单平台详情和号码同步明细通过弹窗展示。</p>
+    <p><strong>3）数据来源：</strong> SRC-009 与中台 Mock；字段对应 FLD-026、FLD-027。</p>
+    <p><strong>4）逻辑说明：</strong> 中台分组和号码为业务主数据，一个分组可启用多个已接入平台，每个平台独立维护分组键和同步结果。运营不维护映射表或 JSON；电声适配器生成 <code>groupCode</code>，首次新增号码时自动建组。任一平台删除失败时保留本地拦截。</p>
+    <p><strong>5）中台与电声字段映射</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>字段范围</th><th>中台字段</th><th>电声字段</th><th>映射方式</th><th>规则说明</th></tr></thead>
+      <tbody>
+        <tr><td>分组</td><td>分组标识</td><td>无</td><td>仅中台保存</td><td>中台黑名单分组内部主键，不下发电声。</td></tr>
+        <tr><td>分组</td><td>分组名称</td><td><code>groupName</code></td><td>直接映射</td><td>首次新增号码自动创建电声分组时使用，后续以中台名称展示。</td></tr>
+        <tr><td>分组</td><td>分组描述</td><td>无</td><td>仅中台保存</td><td>用于运营识别分组，不下发电声。</td></tr>
+        <tr><td>分组</td><td>分组有效期</td><td>无分组级字段</td><td>转换到号码字段</td><td>新增号码时转换为 <code>effectiveStart</code>、<code>effectiveEnd</code>；永久有效时结束时间可不传。</td></tr>
+        <tr><td>分组</td><td>平台分组编码</td><td><code>groupCode</code></td><td>系统生成并锁定</td><td>电声外部唯一分组键；若不存在，首次新增号码时由电声自动建组。</td></tr>
+        <tr><td>分组</td><td>平台分组标识</td><td><code>groupId</code></td><td>同步成功后回填</td><td>电声内部主键，只读展示，不由运营填写。</td></tr>
+        <tr><td>分组</td><td>平台已同步号码数</td><td><code>recordCount</code></td><td>查询结果回填</td><td>记录该平台分组下的有效号码数量。</td></tr>
+        <tr><td>分组</td><td>平台启用与同步状态</td><td><code>isEnabled</code></td><td>状态转换</td><td>电声启用状态与中台已同步、待同步、同步失败等状态结合展示。</td></tr>
+        <tr><td>分组</td><td>无</td><td><code>externalSource</code>、<code>owner</code></td><td>平台返回字段</td><td>属于电声特有信息，可保存在平台扩展数据中，不进入中台公共字段。</td></tr>
+        <tr><td>新增号码</td><td>平台分组编码</td><td><code>groupCode</code></td><td>直接映射</td><td>必填，决定号码写入哪个电声黑名单分组。</td></tr>
+        <tr><td>新增号码</td><td>系统批次号</td><td><code>externalBatchId</code></td><td>系统自动生成</td><td>用于批次追踪；电声以 <code>groupCode + phoneNumber</code> 保证号码幂等。</td></tr>
+        <tr><td>新增号码</td><td>客户名称</td><td><code>items[].name</code></td><td>直接映射</td><td>非必填；新增号码页面未录入时不传。</td></tr>
+        <tr><td>新增号码</td><td>用户号码</td><td><code>items[].phoneNumber</code></td><td>直接映射</td><td>必填，提交前校验为 11 位手机号。</td></tr>
+        <tr><td>新增号码</td><td>添加类型</td><td><code>items[].addType</code></td><td>枚举直接映射</td><td>必填：普通添加=<code>OTHER</code>、意向保护=<code>INTENT</code>、明确拒绝=<code>DECLINE</code>。</td></tr>
+        <tr><td>新增号码</td><td>来源类型</td><td><code>items[].sourceType</code></td><td>枚举直接映射</td><td>必填；手工新增传 <code>MANUAL</code>，批量导入传 <code>API</code>。</td></tr>
+        <tr><td>新增号码</td><td>添加原因</td><td><code>items[].reason</code></td><td>直接映射</td><td>非必填，记录具体拉黑原因。</td></tr>
+        <tr><td>新增号码</td><td>有效期</td><td><code>items[].effectiveStart</code>、<code>effectiveEnd</code></td><td>格式转换</td><td>转换为 <code>yyyy-MM-dd HH:mm:ss</code>；开始时间取新增时间，结束时间按分组有效期计算。</td></tr>
+        <tr><td>号码查询</td><td>平台记录标识</td><td><code>id</code></td><td>查询结果回填</td><td>电声黑名单记录内部主键，仅用于同步追踪。</td></tr>
+        <tr><td>号码查询</td><td>平台同步状态</td><td><code>statusType</code></td><td>状态转换</td><td>电声 <code>0</code> 冻结、<code>1</code> 启用，转换为中台平台同步状态展示。</td></tr>
+        <tr><td>删除号码</td><td>分组的平台编码</td><td><code>groupCode</code></td><td>直接映射</td><td>必填，从当前分组的平台绑定中取得。</td></tr>
+        <tr><td>删除号码</td><td>选中号码集合</td><td><code>phoneNumbers[]</code></td><td>直接映射</td><td>电声返回 <code>deleteCount</code>；远端删除成功后才解除本地拦截。</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>6）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>分组管理</td><td>维护本地字段，保存后选择需要同步的平台</td><td>SRC-009 / FLD-026</td><td>每个平台独立生成平台分组编码并回填远端 ID</td><td>列表 + 弹窗</td><td>仅本地</td><td>含号码分组不允许直接删除</td></tr>
+        <tr><td>新增号码</td><td>向当前分组加入 1-10 个手机号，选择添加类型并可填写添加原因</td><td>SRC-009 / FLD-027</td><td>添加类型直接映射平台 <code>addType</code>，写入中台后按已启用平台分别生成同步任务</td><td>多值输入 + 下拉框</td><td>普通添加</td><td>非法号码提示；重复号码自动跳过</td></tr>
+        <tr><td>同步异常</td><td>展示分组和号码的平台级同步结果</td><td>SRC-009 / FLD-026、FLD-027</td><td>平台间状态互不影响，失败时可按平台或号码重试</td><td>状态 + 操作</td><td>仅本地</td><td>任一远端删除失败则不删本地</td></tr>
+        <tr><td>批量移动/移除</td><td>批量维护号码归属</td><td>中台状态 / SRC-009</td><td>按原分组和目标分组的平台绑定生成删除与新增任务</td><td>批量操作</td><td>未选择</td><td>移除前必须二次确认</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>4. 外呼结果-通话记录</h3>
+    <p><strong>1）功能名称：</strong> 电声通话记录与会话详情</p>
+    <p><strong>2）交互说明：</strong> 用户可按号码、场景、状态和平台查询记录，点击详情查看录音卡片、机器人会话文本、外呼小结、百炼外呼结果标签和详细话单字段。本期不展示挂机类型和转人工信息。</p>
+    <p><strong>3）数据来源：</strong> SRC-001、SRC-006、SRC-007；字段对应 FLD-003、FLD-004、FLD-006～FLD-012、FLD-014。</p>
+    <p><strong>4）逻辑说明：</strong> 中台只有一个“通话状态”字段。优先按电声 <code>answerStatus</code> 映射具体状态，子状态缺失或未知时再用 <code>answerMainStatus</code> 兜底；页面不独立展示主、子接听状态。列表和详情均不展示线路类型、数字员工岗位和加微状态；是否重拨在线索回访明细中根据拨打次数派生。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>通话状态</td><td>展示中台统一通话状态</td><td>SRC-001、SRC-006 / FLD-006、FLD-007</td><td><code>answerStatus</code> 优先；未知时由 <code>answerMainStatus</code> 兜底</td><td>单一状态标签</td><td>-</td><td>两个字段均无法识别时显示“-”，原始值留在供应商数据中</td></tr>
+        <tr><td>通话时长</td><td>展示实际接通时长</td><td>SRC-001 / FLD-008</td><td>读取 <code>callDurationSeconds</code></td><td>秒</td><td>-</td><td>未接通显示“-”</td></tr>
+        <tr><td>外呼小结</td><td>展示本通电话的总结</td><td>电声 <code>summary</code>、百炼 <code>bailianSummary</code> / FLD-028</td><td>电声有值优先展示；电声为空时取百炼；均为空显示“-”</td><td>文本</td><td>-</td><td>空字符串按无值处理</td></tr>
+        <tr><td>外呼结果</td><td>展示百炼智能体返回的五个业务标签</td><td>百炼 <code>bailianAgentTags</code> / FLD-029</td><td>固定按意向标签、计划到店时间、预计购车时间、意向品牌中文名、意向车系中文名的顺序渲染，不读取电声意向字段</td><td>固定标签键值</td><td>字段缺失显示“-”</td><td>只读取百炼智能体对应标签值</td></tr>
+        <tr><td>电声意向原始字段</td><td>在详细信息“意向研判”小节展示意向状态、等级和标签</td><td>SRC-009、SRC-007 / FLD-009、FLD-010、FLD-010A</td><td>仅用于供应商结果核对，不作为外呼结果标签来源；状态和等级使用单值胶囊，多个意向标签拆成独立胶囊</td><td>胶囊标签</td><td>无结果 / 无</td><td>多标签自动换行，字段名顶部对齐</td></tr>
+        <tr><td>会话详情</td><td>查看录音、文本、外呼小结和外呼结果</td><td>电声回调 + 百炼智能体 Mock</td><td>点击详情直接打开机器人会话内容</td><td>抽屉</td><td>关闭</td><td>无内容时展示明确空状态</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>5. 外呼结果-线索记录</h3>
+    <p><strong>1）功能名称：</strong> 电声客户线索与回访明细</p>
+    <p><strong>2）交互说明：</strong> 用户在线索维度查看最后回访时间、回访次数、通话状态、回访记录、意向级别、详细标签和场景信息。点击详情打开回访明细，并可从当前回访记录继续查看通话详情。</p>
+    <p><strong>3）数据来源：</strong> SRC-009、SRC-006、SRC-007；字段对应 FLD-003～FLD-005、FLD-010、FLD-014。</p>
+    <p><strong>4）逻辑说明：</strong> 手机号脱敏展示；当前静态原型在回访明细中演示一条记录。“是否重拨”由执行批次线索明细的已拨打次数派生，不取话单回调。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>线索列表</td><td>展示客户最后回访和场景结果</td><td>线索 Mock / FLD-003、FLD-004、FLD-010</td><td>按当前筛选条件展示脱敏手机号、回访次数、状态、意向级别和场景</td><td>表格</td><td>-</td><td>无记录时显示空状态</td></tr>
+        <tr><td>是否重拨</td><td>标识当前线索是否发生重复拨打</td><td>SRC-009 / FLD-014</td><td><code>attemptCount &gt; 1</code> 显示“是”，否则显示“否”</td><td>派生文本</td><td>-</td><td>未取得执行明细时显示“-”</td></tr>
+        <tr><td>回访明细</td><td>查看当前线索的回访记录并进入通话详情</td><td>电声回调 Mock</td><td>当前原型演示一条回访明细</td><td>弹窗表格</td><td>一条演示数据</td><td>无记录时显示空状态</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>6. 统计分析-通话统计</h3>
+    <p><strong>1）功能名称：</strong> 电声外呼统计与客户统计</p>
+    <p><strong>2）交互说明：</strong> 用户可按呼叫时间、场景名称和智能平台筛选，并在外呼统计、客户统计两个页签间切换。无数据时表格展示空状态。</p>
+    <p><strong>3）数据来源：</strong> 电声任务、执行批次和通话 Mock；字段对应 FLD-002、FLD-006～FLD-010。</p>
+    <p><strong>4）逻辑说明：</strong> 外呼统计展示拨打次数、名单数、接通数、未接通数、接通率、触达率和累计通话时长；客户统计展示客户总数、有效通话客户数、累计通话时长和客户平均通话时长。比率分母为 0 时显示 0%。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>外呼统计</td><td>展示呼叫时间、场景、拨打总次数、名单总数、接通与未接通数、接通率、触达率和累计时长</td><td>通话统计 Mock</td><td>按当前数据行渲染并计算接通率和触达率</td><td>10 列表格</td><td>-</td><td>无数据时显示空状态</td></tr>
+        <tr><td>客户统计</td><td>展示呼叫时间、场景、客户总数、有效通话客户数、累计时长和平均时长</td><td>通话统计 Mock</td><td>平均通话时长按当前演示数据生成</td><td>7 列表格</td><td>-</td><td>无数据时显示空状态</td></tr>
+        <tr><td>接通率/触达率</td><td>展示外呼统计中的比率指标</td><td>前端计算</td><td>接通率=接通总数/名单总数；触达率=（接通总数+未接通总数）/拨打总次数</td><td>百分比</td><td>0.00%</td><td>分母为 0 时显示 0.00%</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>7. 统计分析-计费统计</h3>
+    <p><strong>1）功能名称：</strong> 租户通话计费时长与明细</p>
+    <p><strong>2）交互说明：</strong> 用户可按计费日期和租户名称查询计费时长，在列表中查看租户汇总，并通过两级详情查看模型类型和通话级计费记录。</p>
+    <p><strong>3）数据来源：</strong> 项目 Mock 与底座展示颗粒度 SRC-005。</p>
+    <p><strong>4）逻辑说明：</strong> 页面按分钟展示计费时长，客户接通后才计费，未满 1 分钟按 1 分钟计。当前原型不展示金额、单价、平台费用概览，也不统计按账号收取的费用。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>计费汇总</td><td>展示计费日期区间、租户名称和计费时长</td><td>计费 Mock</td><td>按租户名称筛选并展示当前汇总记录</td><td>5 列表格</td><td>全部租户</td><td>无匹配数据时显示空状态</td></tr>
+        <tr><td>计费详情</td><td>第一级详情展示计费日期、租户、模型类型和计费时长；第二级详情展示号码、通话起止时间、通话时长、计费分钟数和场景</td><td>计费明细 Mock</td><td>从汇总记录逐级进入详情</td><td>两级弹窗表格</td><td>无</td><td>无明细时显示空状态</td></tr>
+        <tr><td>计费口径</td><td>说明当前页面的计费时长规则</td><td>项目 Mock</td><td>接通后按分钟计费，未满 1 分钟按 1 分钟</td><td>页面备注</td><td>显示</td><td>不展示生产单价或结算金额</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h3>8. 系统管理-标签管理</h3>
+    <p><strong>1）功能名称：</strong> 电声供应商标签池与中台标签映射</p>
+    <p><strong>2）交互说明：</strong> 用户可查看电声供应商标签和中台标签集，统一维护意向、加微、重拨及过滤类标签的映射关系。标签管理不按电声任务场景支持范围禁用配置。</p>
+    <p><strong>3）数据来源：</strong> SRC-006、SRC-007 与电声平台标签 Mock。</p>
+    <p><strong>4）逻辑说明：</strong> 供应商标签保留电声原始含义，中台标签用于跨平台归一；映射保存后更新当前展示，不改写原始回调值。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
+      <tbody>
+        <tr><td>供应商标签池</td><td>展示电声原始标签</td><td>SRC-006、SRC-007</td><td>按标签分类加载</td><td>表格</td><td>电声</td><td>无数据时显示空状态</td></tr>
+        <tr><td>中台标签映射</td><td>将供应商标签归一到中台标签</td><td>本地标签 Mock</td><td>选择映射目标后保存</td><td>下拉 + 表格</td><td>未映射</td><td>重复或冲突映射时提示</td></tr>
+        <tr><td>标签分类</td><td>区分意向、加微、重拨和过滤</td><td>电声状态与标签资料</td><td>按业务含义分组展示</td><td>标签</td><td>-</td><td>未知标签保留供应商原值</td></tr>
+        <tr><td>场景类型</td><td>默认展示督办、服务、回访、新线索、冷线索，并支持新增、编辑、启停和删除</td><td>中台场景配置</td><td>中台标签集和供应商标签集统一使用，不按电声任务能力禁用</td><td>列表</td><td>新线索</td><td>停用场景时两类标签配置同时停用</td></tr>
+      </tbody>
+    </table></div>
+
+    <hr class="section-divider">
+    <h2>五. 其他说明</h2>
+    <h3>1. 中台任务状态与电声策略状态映射</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>中台任务状态</th><th>电声策略状态</th><th>映射与操作说明</th></tr></thead>
+      <tbody>
+        <tr><td>进行中</td><td><code>statusType=1</code>（启用）</td><td>电声策略启用时展示为进行中，可执行线索导入及后续呼叫流程。</td></tr>
+        <tr><td>用户暂停</td><td><code>statusType=0</code>（冻结）</td><td>中台暂停调用 <code>/strategy/policy/status/inactive/update</code>；仅远端成功后更新本地状态。</td></tr>
+        <tr><td>未开始</td><td>无直接映射</td><td>中台本地生命周期状态，不根据 <code>statusType</code> 单独推导。</td></tr>
+        <tr><td>已终止</td><td>无直接映射</td><td>当前电声没有对应任务终止操作接口，不得用停止执行批次替代。</td></tr>
+        <tr><td>已完成</td><td>无直接映射</td><td>由中台根据任务下线索和执行批次是否全部结束判断，冻结不等于完成。</td></tr>
+      </tbody>
+    </table></div>
+    <p>停止执行批次只更新执行批次状态，不修改电声策略 <code>statusType</code> 和中台任务状态。</p>
+
+    <h3>2. 中台呼叫状态与电声呼叫状态映射</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>中台呼叫名单状态</th><th>电声侧依据</th><th>映射说明</th></tr></thead>
+      <tbody>
+        <tr><td>已分配</td><td>暂无电声呼叫状态</td><td>号码已进入中台本地库，但尚未成功提交电声。</td></tr>
+        <tr><td>待呼叫</td><td>导入接口成功，尚未收到话单回调</td><td>号码已传入电声；执行批次可为 <code>WAIT_START</code> 或 <code>RUNNING</code>，但批次状态不直接替代名单状态。</td></tr>
+        <tr><td>已呼叫</td><td>已收到话单回调且非 <code>BLOCKED</code></td><td>将电声状态映射到中台单一“通话状态”字段。</td></tr>
+        <tr><td>已过滤</td><td><code>finalCallResult=BLOCKED</code></td><td>过滤原因显示“过滤/拉黑（BLOCKED）”。</td></tr>
+        <tr><td>呼叫失败</td><td>提交电声接口失败</td><td>号码未成功进入电声呼叫流程，中台保留失败记录并允许重新提交。</td></tr>
+      </tbody>
+    </table></div>
+    <p>呼叫名单状态、具体通话状态和执行批次状态为三个独立维度，不可互相替代。</p>
+
+    <h3>3. 电声接听状态到中台通话状态映射</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>映射优先级</th><th>电声原始字段和值</th><th>中台通话状态</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>优先</td><td><code>answerStatus=301</code></td><td>已接听</td><td rowspan="5">中台不新增主、子接听状态字段，只展示映射后的单一通话状态。</td></tr>
+        <tr><td>优先</td><td><code>answerStatus=302</code></td><td>秒挂</td></tr>
+        <tr><td>优先</td><td><code>answerStatus=303</code></td><td>伪接通</td></tr>
+        <tr><td>优先</td><td><code>answerStatus=205</code></td><td>拒接</td></tr>
+        <tr><td>优先</td><td><code>answerStatus=206</code></td><td>无应答</td></tr>
+        <tr><td>兜底</td><td><code>answerMainStatus=3</code></td><td>已接听</td><td>仅在子状态缺失或未知时使用。</td></tr>
+        <tr><td>兜底</td><td><code>answerMainStatus=2</code></td><td>未接通</td><td>仅在子状态缺失或未知时使用。</td></tr>
+        <tr><td>意向等级</td><td>A / B / C / D</td><td>高 / 中 / 低 / 无意向</td><td>对应 FLD-010</td></tr>
+        <tr><td>过滤结果</td><td>BLOCKED</td><td>过滤/拉黑</td><td>电声不返回空号、停机、重复号码等细分过滤原因</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>4. 数据来源与可信度</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>来源编号</th><th>来源</th><th>本项目用途</th><th>边界</th></tr></thead>
+      <tbody>
+        <tr><td>SRC-001</td><td>电声核心 API 文档</td><td>回调字段、状态与签名基础规则</td><td>旧版接口事实</td></tr>
+        <tr><td>SRC-002</td><td>LLM WIKI 电声接入知识</td><td>业务规则、话单和意向字段映射</td><td>派生知识，需保留来源追溯</td></tr>
+        <tr><td>SRC-003 / SRC-004</td><td>总体流程与异常处理文档</td><td>数据流、重试、补偿和过滤原因</td><td>业务流程参考</td></tr>
+        <tr><td>SRC-005</td><td>中科金接入底座</td><td>页面结构、通用交互与展示颗粒度</td><td>仅作 reference，不支持电声 API 事实</td></tr>
+        <tr><td>SRC-006 / SRC-007</td><td>状态码与意向等级概念对齐</td><td>页面状态和标签映射</td><td>概念对齐</td></tr>
+        <tr><td>SRC-008</td><td>电声 20260707 新版 API</td><td>外呼任务、导入批次和执行批次</td><td>当前核心接口事实</td></tr>
+        <tr><td>SRC-009</td><td>电声 20260713 API 更新</td><td>N 天 M 呼、任务状态、话单回调、执行批次和黑名单字段</td><td>当前原型的最新电声接口事实</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>5. 已知限制与未决事项</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>说明项</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>静态原型</td><td>不连接真实电声服务，不包含真实签名、账号、密钥、录音下载或生产环境配置。</td></tr>
+        <tr><td>接口对象</td><td>页面按中台业务口径使用“任务”文案，底层接口字段仍使用 <code>strategy*</code>。</td></tr>
+        <tr><td>呼叫次数策略</td><td>新版接口要求 <code>nDayMCallPolicy</code> 为必填对象，页面不再配置首次呼叫状态和多条重呼规则。</td></tr>
+        <tr><td>计费</td><td>当前原型仅演示计费时长及明细层级，不展示生产单价、平台费用或结算金额。</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>6. 角色与权限范围</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>角色</th><th>本轮能力</th><th>范围说明</th></tr></thead>
+      <tbody>
+        <tr><td>超级管理员</td><td>查看全部租户任务、业务场景、记录、统计和标签</td><td>静态原型权限演示</td></tr>
+        <tr><td>租户管理员</td><td>创建和维护本租户场景、任务、名单与黑名单</td><td>只展示本租户语境</td></tr>
+        <tr><td>业务运营</td><td>查看呼叫名单、通话结果和统计</td><td>以查看和日常运营为主</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</body>
+</html>

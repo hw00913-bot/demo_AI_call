@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Prototype Loop Agent Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stage",
+    "owner",
+    "skill",
+    "role",
+    "token_policy",
+    "allowed_read",
+    "allowed_write",
+    "forbidden_read",
+    "forbidden_write",
+    "delegated_write",
+    "support_skills",
+    "handoff"
+  ],
+  "properties": {
+    "stage": {
+      "type": "string",
+      "pattern": "^S[0-9]+$"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "skill": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "const": "phase_owner"
+    },
+    "token_policy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "allowed_read": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowed_write": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_read": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_write": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "support_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete_stage",
+        "preflight_stage"
+      ],
+      "properties": {
+        "complete_stage": {
+          "type": "string",
+          "pattern": "^S[0-9]+$"
+        },
+        "preflight_stage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "delegated_write": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

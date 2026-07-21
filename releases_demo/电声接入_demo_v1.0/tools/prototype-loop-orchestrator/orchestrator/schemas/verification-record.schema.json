@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Verification Record",
+  "type": "object",
+  "required": ["step", "scope", "result", "date", "passed", "failed", "evidence"],
+  "properties": {
+    "step": { "type": "string", "pattern": "^(step-\\d{2}|global)$" },
+    "scope": { "type": "string", "enum": ["step", "global"] },
+    "result": { "type": "string", "enum": ["pass", "fail"] },
+    "date": { "type": "string" },
+    "passed": { "type": "string" },
+    "failed": { "type": "string" },
+    "evidence": { "type": "string" }
+  }
+}

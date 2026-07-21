@@ -1,0 +1,14 @@
+{
+  "sceneRobotMappings": {
+    "NEW_LEAD": {
+      "sceneTypeName": "新线索",
+      "robotCode": "robot_ds_nissan_001",
+      "robotName": "东风日产新线索机器人"
+    },
+    "COLD_LEAD": {
+      "sceneTypeName": "冷线索",
+      "robotCode": "robot_ds_nissan_002",
+      "robotName": "东风日产冷线索机器人"
+    }
+  }
+}

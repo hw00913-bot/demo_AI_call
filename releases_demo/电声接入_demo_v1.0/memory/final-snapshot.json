@@ -1,0 +1,122 @@
+{
+  "toolVersion": "2026-06-27-dispatch-runtime-v1",
+  "createdAt": "2026-07-02T14:36:49",
+  "gate": "final",
+  "files": [
+    {
+      "path": "annotations/annotations.js",
+      "sha256": "e0cc7adfbd168a3afbbc44367f7cf1a0cff2ab837f4645a5f43df55a3be36aec",
+      "mtime": "2026-07-02T11:36:39"
+    },
+    {
+      "path": "assets/css/app.css",
+      "sha256": "4415ad7ba4d8bcfdbccbca35c173ae3fbc2205e4578cdeb6c807615ad90c96e1",
+      "mtime": "2026-06-10T10:24:58"
+    },
+    {
+      "path": "assets/css/global.css",
+      "sha256": "a7b1e5f265b1793d167d1263e7d69408373ae5e59099f2abe34797a3a4ac235e",
+      "mtime": "2026-07-02T11:08:35"
+    },
+    {
+      "path": "index.html",
+      "sha256": "1ea5a40a71f6eea2066a0e3efb05f9bba448ef701c85b36ffd767364f029dfcc",
+      "mtime": "2026-07-02T13:45:48"
+    },
+    {
+      "path": "js/app.js",
+      "sha256": "577dfa534a97ff91e8706dec896c2eb9783c8f01ec0671700d09e2ca037e6a15",
+      "mtime": "2026-05-20T20:35:25"
+    },
+    {
+      "path": "js/common.js",
+      "sha256": "a95733d7bc6aeb4d97e18875433cfded72fa76d9a1e89493001ee8124fff376c",
+      "mtime": "2026-05-22T09:05:43"
+    },
+    {
+      "path": "js/nav.js",
+      "sha256": "f7f0837b32c8d48f2ee58ff237c59968f45de1564a91b45007b1e1ae7ade036b",
+      "mtime": "2026-07-02T13:45:48"
+    },
+    {
+      "path": "js/pages/report-billing.js",
+      "sha256": "4e84ccd2aeb194be621844de3d28c7635137cc06c595fe5b842a4278a72882dd",
+      "mtime": "2026-07-02T11:08:35"
+    },
+    {
+      "path": "js/pages/report-call.js",
+      "sha256": "7259225ce40b406f17c22cd155d9b50a7c7dcf55ed329994a0d6115b2915444b",
+      "mtime": "2026-07-02T11:30:26"
+    },
+    {
+      "path": "js/pages/result-clue.js",
+      "sha256": "6499a83412334952efe317afbc26743cc449c20362fcd244e21e677f961a561e",
+      "mtime": "2026-07-02T11:29:37"
+    },
+    {
+      "path": "js/pages/result-records.js",
+      "sha256": "297e755fe430498b9ab04c75250596a721513b12f21b34dc268e4d2405bbcdb1",
+      "mtime": "2026-07-02T14:34:51"
+    },
+    {
+      "path": "js/pages/scene-list.js",
+      "sha256": "a4f02ad3cabc4db9198425eb0e23c10c1cc2a023ba50874d1d906c1d109001a3",
+      "mtime": "2026-07-02T11:27:26"
+    },
+    {
+      "path": "js/pages/sys-scene.js",
+      "sha256": "feb995c31b49341c9e79e76695627457df39c7298e1610be8cd2d9dae16946e2",
+      "mtime": "2026-07-02T14:28:53"
+    },
+    {
+      "path": "js/pages/sys-tags.js",
+      "sha256": "0f6fc9a9e53248e4c76ac1b16f0843ce11435caca8944c7bc04e4132c258bfa5",
+      "mtime": "2026-07-02T13:46:38"
+    },
+    {
+      "path": "js/pages/sys-tenant.js",
+      "sha256": "6619d819abfffbf4597ae6e8c767e30c241dab90ac0b4a9f445e98371b55194f",
+      "mtime": "2026-06-08T11:48:15"
+    },
+    {
+      "path": "memory/acceptance-map.md",
+      "sha256": "6760902a18ffc52672e467cad57da22436edddcbd419c51b851a152a4314158b",
+      "mtime": "2026-07-02T14:26:45"
+    },
+    {
+      "path": "memory/annotation-coverage.md",
+      "sha256": "9f0b2033af2eb80e347173de9833af3ba2fa765028fd5a991d80a18fc527f47d",
+      "mtime": "2026-07-02T14:26:45"
+    },
+    {
+      "path": "memory/annotation-prompt.md",
+      "sha256": "d4119e06a3cd33f19d9e0ddbbb555dc464fca39bac70d273c1b4ae9d4847f835",
+      "mtime": "2026-07-02T14:26:45"
+    },
+    {
+      "path": "memory/execution-steps.md",
+      "sha256": "c7f7972b2ecbaf4751e69047bff551cb659a42d3f21d93a080d9c153a14dd81d",
+      "mtime": "2026-07-02T11:20:03"
+    },
+    {
+      "path": "memory/field-map.md",
+      "sha256": "017728d0bf073c58477b44fcc5653ff1fa042013cb648fdd7ca372d045d77471",
+      "mtime": "2026-07-02T11:16:20"
+    },
+    {
+      "path": "memory/source-materials.md",
+      "sha256": "ec65ee5792e48f6c048cde9a4847dc253e73194179c6bdc7049112520896138d",
+      "mtime": "2026-07-02T11:16:10"
+    },
+    {
+      "path": "memory/verification-log.md",
+      "sha256": "cea2a4b5e7ba1ca23b16d45b0762abee3290e877d2f59dfad1140157ed0cda39",
+      "mtime": "2026-07-02T14:36:29"
+    },
+    {
+      "path": "mock/data.js",
+      "sha256": "415ee5fde26a409c0ff5de0ea85955b71d19c4fb8c23c21839afbcfc4bce47ac",
+      "mtime": "2026-07-02T13:45:48"
+    }
+  ]
+}

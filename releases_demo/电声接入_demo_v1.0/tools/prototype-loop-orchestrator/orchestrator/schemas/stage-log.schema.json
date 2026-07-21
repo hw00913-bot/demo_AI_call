@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Stage Log Record",
+  "type": "object",
+  "required": ["stage", "stage_name", "input_artifacts", "output_artifacts", "preflight", "gate_result", "decision", "next_stage", "blocked_by", "notes"],
+  "properties": {
+    "date": { "type": "string" },
+    "stage": { "type": "string", "pattern": "^S(0|1|2|3|4|5|6|7|8|9|10|11)$" },
+    "stage_name": { "type": "string" },
+    "input_artifacts": { "type": "string" },
+    "output_artifacts": { "type": "string" },
+    "preflight": { "type": "string" },
+    "gate_result": { "type": "string" },
+    "decision": { "type": "string" },
+    "next_stage": { "type": "string" },
+    "blocked_by": { "type": "string" },
+    "notes": { "type": "string" }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "menu": [
+    {
+      "key": "nav-home",
+      "label": "首页"
+    },
+    {
+      "key": "nav-scene",
+      "label": "外呼场景",
+      "children": [
+        {
+          "key": "scene-list",
+          "label": "外呼列表"
+        },
+        {
+          "key": "scene-block",
+          "label": "外呼拦截"
+        }
+      ]
+    },
+    {
+      "key": "nav-report",
+      "label": "统计分析",
+      "children": [
+        {
+          "key": "report-call",
+          "label": "通话统计"
+        },
+        {
+          "key": "report-billing",
+          "label": "计费统计"
+        }
+      ]
+    },
+    {
+      "key": "nav-result",
+      "label": "外呼结果",
+      "children": [
+        {
+          "key": "result-records",
+          "label": "通话记录"
+        },
+        {
+          "key": "result-clue",
+          "label": "线索记录"
+        }
+      ]
+    },
+    {
+      "key": "nav-system",
+      "label": "系统管理",
+      "children": [
+        {
+          "key": "sys-account",
+          "label": "账号管理"
+        },
+        {
+          "key": "sys-tenant",
+          "label": "租户管理"
+        },
+        {
+          "key": "sys-channel",
+          "label": "通道管理"
+        },
+        {
+          "key": "sys-scene",
+          "label": "业务场景"
+        },
+        {
+          "key": "sys-tags",
+          "label": "标签管理"
+        }
+      ]
+    },
+    {
+      "label": "流程图集",
+      "icon": "流",
+      "href": "flowcharts/index.html"
+    }
+  ]
+}
