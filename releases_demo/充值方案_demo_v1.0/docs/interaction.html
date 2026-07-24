@@ -46,6 +46,7 @@
         <tr><td>v1.5</td><td>2026-06-15</td><td>1.关联充值新增试用单、付费单类型；2.试用单支持选择1/2/3个月并填写通话费用；3.试用单按30/60/90日生成待生效组合单。</td></tr>
         <tr><td>v1.6</td><td>2026-06-15</td><td>1.租户列表新增计费汇总导出；2.导出充值、扣费、冻结、可用余额、大小模型可用分钟数、有效期和呼叫控制状态；3.文件格式为UTF-8 BOM CSV。</td></tr>
         <tr><td>v1.7</td><td>2026-06-16</td><td>1.仅通话费生效前新增添加余额确认弹窗；2.坐席费+通话费生效前同时确认有效时长和添加余额；3.确认前支持调整反显金额。</td></tr>
+        <tr><td>v1.8</td><td>2026-07-24</td><td>1.首页新增用量余额仪表盘，展示门店租户的大模型可用分钟数、小模型可用分钟数、有效期和呼叫控制状态。</td></tr>
       </tbody>
     </table>
     <h2>二. 项目范围</h2>
@@ -60,6 +61,7 @@
         <tr><td>智能外呼系统</td><td>租户管理</td><td>导入冻结校验（外呼列表导入时调用）</td><td>--</td></tr>
         <tr><td>智能外呼系统</td><td>租户管理</td><td>冻结任务生命周期-自动释放与场景终止联动</td><td>--</td></tr>
         <tr><td>智能外呼系统</td><td>租户管理</td><td>租户计费汇总导出</td><td>--</td></tr>
+        <tr><td>智能外呼系统</td><td>首页</td><td>门店用量余额仪表盘（大模型/小模型可用分钟数、有效期、呼叫控制状态）</td><td>--</td></tr>
       </tbody>
     </table>
     <h2>三. 逻辑说明</h2>
@@ -73,6 +75,7 @@
         <tr><td>手工扣减流程</td><td>见 2. 余额调整-手工扣减</td></tr>
         <tr><td>导入冻结校验流程</td><td>见 3. 手动导入-冻结校验</td></tr>
         <tr><td>冻结任务自动释放与场景终止联动</td><td>见 4. 冻结任务生命周期</td></tr>
+        <tr><td>首页用量余额仪表盘</td><td>见 5. 首页用量余额</td></tr>
       </tbody>
     </table>
     <h2>四. 功能说明</h2>
@@ -176,6 +179,28 @@
         <tr><td>场景终止联动</td><td>外呼列表"终止"操作时调用releaseFrozenTasksByScene批量释放该场景冻结</td><td>前端JS</td><td>按sceneName匹配，status=冻结中时释放，返回释放笔数和金额</td><td>联动调用</td><td>--</td><td>幂等，不重复释放</td></tr>
         <tr><td>释放记录</td><td>释放时写入releasedAt（释放时间）和releaseReason（释放原因）</td><td>前端JS</td><td>releaseFrozenTask更新字段</td><td>字段更新</td><td>空</td><td>已释放状态跳过</td></tr>
         <tr><td>释放幂等</td><td>已释放的冻结不会再次释放</td><td>前端JS</td><td>status!=='冻结中' 时跳过</td><td>状态判断</td><td>--</td><td>--</td></tr>
+      </tbody>
+    </table>
+    <hr class="section-divider">
+    <h3>5. 首页-用量余额仪表盘</h3>
+    <p><strong>1）功能名称：</strong> 首页用量余额仪表盘</p>
+    <p><strong>2）交互说明：</strong> 点击左侧导航"首页"进入。页面固定展示门店"重庆东风南方渝兴"的用量概览，包含四张核心指标卡片：大模型可用分钟数、小模型可用分钟数、有效期和呼叫控制状态。底部引导区提供链接，可快速跳转至系统管理 → 租户管理 → 充值管理查看完整计费信息。</p>
+    <p><strong>3）数据来源：</strong> 前端Mock数据（MockTenantRows、MockTenantPriceRules、MockTenantRechargeHistory、MockTenantFrozenTasks、MockTenantBalanceAdjustments、MockTenantCallControlStates）。</p>
+    <p><strong>4）逻辑说明：</strong> 页面内独立实现简化版计费计算逻辑（与租户管理页 getTenantBillingSummary 同源但独立维护）。资金余额 = 已生效通话充值总额 - 手工扣减金额 - 已消费金额。冻结总额 = 有效冻结任务的冻结分钟数 × 单价快照。可用金额 = max(资金余额 - 冻结总额, 0)。大模型/小模型可用分钟数 = 可用金额 ÷ 对应模型默认单价。有效期取已生效历史记录中最晚的 validTo 日期范围。呼叫控制状态 = 有效期内 ∧ 可用金额>0 ∧ 手动开关开启。</p>
+    <p><strong>5）功能明细</strong></p>
+    <table>
+      <thead>
+        <tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>门店标识</td><td>页面标题下方展示当前门店名称</td><td>前端常量</td><td>固定值"重庆东风南方渝兴"</td><td>文本</td><td>重庆东风南方渝兴</td><td>--</td></tr>
+        <tr><td>大模型可用分钟数</td><td>展示大模型对应的可用通话分钟数</td><td>前端JS</td><td>可用金额 ÷ 大模型默认单价</td><td>数字（两位小数）+ "分钟"</td><td>0.00 分钟</td><td>单价未配置时显示0</td></tr>
+        <tr><td>小模型可用分钟数</td><td>展示小模型对应的可用通话分钟数</td><td>前端JS</td><td>可用金额 ÷ 小模型默认单价</td><td>数字（两位小数）+ "分钟"</td><td>0.00 分钟</td><td>单价未配置时显示0</td></tr>
+        <tr><td>有效期</td><td>展示当前租户的有效期范围</td><td>前端JS</td><td>取已生效历史记录中validTo最晚的日期范围</td><td>日期范围文本（YYYY-MM-DD ~ YYYY-MM-DD）</td><td>未生成</td><td>无已生效记录时显示"未生成"</td></tr>
+        <tr><td>呼叫控制状态</td><td>展示可发起/不可发起状态标签</td><td>前端JS</td><td>有效期有效 ∧ 可用金额>0 ∧ 手动开关开启 → 可发起</td><td>状态标签（绿色/红色）</td><td>不可发起</td><td>--</td></tr>
+        <tr><td>底部引导区</td><td>提示用户前往充值管理查看完整信息，点击链接跳转</td><td>前端行为</td><td>调用navigateTo('sys-tenant','sys-tenant')</td><td>文本+可点击链接</td><td>--</td><td>--</td></tr>
+        <tr><td>冻结自动释放</td><td>每次渲染前自动检测并释放符合条件的冻结任务（已完成/已终止/超24小时）</td><td>前端JS</td><td>syncFrozenTaskReleases遍历MockTenantFrozenTasks</td><td>后台逻辑</td><td>--</td><td>幂等，已释放跳过</td></tr>
+        <tr><td>响应式布局</td><td>1100px以下卡片网格变为2列，768px以下变为单列，内边距缩减</td><td>CSS媒体查询</td><td>@media (max-width: 1100px/768px)</td><td>CSS规则</td><td>4列</td><td>--</td></tr>
       </tbody>
     </table>
       </div>
