@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Prototype Annotation",
+  "type": "object",
+  "required": ["id", "target", "title", "body", "sourceRefs"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[1-9]\\d*$" },
+    "target": { "type": "string", "pattern": "^\\[data-anno=" },
+    "title": { "type": "string", "minLength": 1 },
+    "body": { "type": "string", "minLength": 1 },
+    "sourceRefs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^SRC-\\d+$" },
+      "minItems": 1
+    },
+    "fieldRefs": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^FLD-\\d+$" },
+      "minItems": 1
+    }
+  }
+}

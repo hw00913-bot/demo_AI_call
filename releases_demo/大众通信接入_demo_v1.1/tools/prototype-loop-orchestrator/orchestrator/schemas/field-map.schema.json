@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Field Map Record",
+  "type": "object",
+  "required": ["field_id", "source_id", "page_area", "data_field", "display_name", "display_format", "annotation_point"],
+  "properties": {
+    "field_id": { "type": "string", "pattern": "^FLD-\\d{3}$" },
+    "source_id": { "type": "string", "pattern": "^SRC-\\d{3}$" },
+    "page_area": { "type": "string" },
+    "data_field": { "type": "string" },
+    "display_name": { "type": "string" },
+    "display_format": { "type": "string" },
+    "enum_mapping": { "type": "string" },
+    "empty_error_rule": { "type": "string" },
+    "annotation_point": { "type": "string" },
+    "used_in": { "type": "array", "items": { "type": "string" } }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "stage": "none",
+  "stages": {
+    "s0": "completed",
+    "s1": "completed",
+    "s2": "completed",
+    "s3": "completed",
+    "s4": "completed",
+    "s5": "completed",
+    "s6": "completed",
+    "s7": "completed",
+    "s8": "completed",
+    "s9": "completed"
+  },
+  "currentIteration": {
+    "name": "v1.0",
+    "planConfirmed": true,
+    "projectRulesWritten": true,
+    "confirmedAt": "2026-06-29T16:36:27",
+    "memoryInitialized": true,
+    "pmApprovedAt": "2026-06-29T16:36:27",
+    "startupPlanFrozenAt": "2026-06-29T16:36:27"
+  },
+  "frozenArtifacts": {
+    "memory/project-startup-plan.md": {
+      "sha256": "1e5451f06331530db2671910a0bc2eb13ddf6398d878bf2aecd91a8a76225f2d",
+      "frozenAtStage": "S2"
+    }
+  }
+}

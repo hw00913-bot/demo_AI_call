@@ -1,0 +1,6 @@
+{
+  "projectId": "dazhong-outbound",
+  "projectName": "大众通信接入智能外呼原型",
+  "version": "1.0.0",
+  "description": "大众通信外呼渠道集成原型项目，支持 13 通话状态码解析及 A-F 级意向标签手动维护。"
+}

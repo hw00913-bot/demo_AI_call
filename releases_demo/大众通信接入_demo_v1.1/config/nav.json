@@ -1,0 +1,37 @@
+{
+  "menu": [
+    {
+      "id": "nav-system",
+      "name": "系统管理",
+      "items": [
+        {
+          "id": "sys-tags",
+          "name": "标签管理"
+        },
+        {
+          "id": "sys-scene",
+          "name": "业务场景"
+        }
+      ]
+    },
+    {
+      "id": "nav-result",
+      "name": "外呼结果",
+      "items": [
+        {
+          "id": "result-records",
+          "name": "通话记录"
+        },
+        {
+          "id": "result-clue",
+          "name": "线索记录"
+        }
+      ]
+    },
+    {
+      "label": "流程图集",
+      "icon": "流",
+      "href": "flowcharts/index.html"
+    }
+  ]
+}

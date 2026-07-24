@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能说明文档</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 40px 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 48px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 32px;
+      color: #1a1a1a;
+      border-bottom: 2px solid #1677ff;
+      padding-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      color: #1a1a1a;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 24px 0 12px;
+      color: #333;
+    }
+
+    p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    strong {
+      color: #333;
+    }
+
+    a {
+      color: #1677ff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      border: 1px solid #d9d9d9;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e8e8e8;
+      margin: 24px 0;
+    }
+
+    .section-divider {
+      margin: 32px 0;
+    }
+
+    .jump-btn {
+      display: inline-block;
+      padding: 8px 20px;
+      background: #1677ff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .jump-btn:hover {
+      background: #4096ff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div style="text-align: right; margin-bottom: 24px;">
+      <a href="../index.html" class="jump-btn">跳转演示页面 →</a>
+    </div>
+    <h1>功能说明文档</h1>
+
+    <h2>一. 版本说明</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>版本号</th>
+            <th>更新时间</th>
+            <th>更新内容</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>v1.0</td>
+            <td>2026-06-29</td>
+            <td>1. 系统管理-业务场景新增大众通信任务关联；2. 通话记录新增平台筛选与 13 种通话状态解析；3. 线索记录新增 A–F 意向等级展示；4. 意向标签新增大众通信手动映射。</td>
+          </tr>
+          <tr>
+            <td>v1.1</td>
+            <td>2026-07-24</td>
+            <td>1. 大众通信任务链路按任务 ID（uuid）关联，任务及名单操作在 SaaS 完成；通话记录由回调 callid 生成并查询详情，默认将大众通信通话记录在列表中置顶展示；2.
+              通话统计和计费统计按截图精简展示；标签不从接口读取，由管理员在中台手工配置并映射；3. 清理电声通话状态基于中台状态强制推断的伪规则，仅保留电声回传状态与中台的直接映射。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>二. 项目范围</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>系统名称</th>
+            <th>涉及板块</th>
+            <th>功能范围</th>
+            <th>对接系统范围</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>智能外呼系统</td>
+            <td>系统管理</td>
+            <td>业务场景、意向标签</td>
+            <td>大众通信</td>
+          </tr>
+          <tr>
+            <td>智能外呼系统</td>
+            <td>外呼场景</td>
+            <td>外呼任务卡片及任务详情</td>
+            <td>大众通信</td>
+          </tr>
+          <tr>
+            <td>智能外呼系统</td>
+            <td>外呼结果</td>
+            <td>通话记录、线索记录</td>
+            <td>大众通信</td>
+          </tr>
+          <tr>
+            <td>智能外呼系统</td>
+            <td>统计分析</td>
+            <td>通话统计、计费统计</td>
+            <td>大众通信</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>三. 逻辑说明</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>流程名称</th>
+            <th>跳转地址</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>大众通信场景配置与结果回流</td>
+            <td><a href="../flowcharts/index.html" target="_blank" rel="noopener">查看本地流程图集</a></td>
+          </tr>
+          <tr>
+            <td>ProcessOn 流程</td>
+            <td>本期未提供 ProcessOn 流程链接。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>四. 功能说明</h2>
+    <hr class="section-divider">
+
+    <h3>1. 系统管理-业务场景-新增大众通信任务场景</h3>
+    <p><strong>1）功能名称：</strong> 新增大众通信业务场景</p>
+    <p><strong>2）交互说明：</strong> 点击“新增业务场景”，智能平台选择“大众通信”后，仅展示大众通信任务 ID（uuid）。重呼、并发、呼叫时间等任务策略不在中台重复配置。</p>
+    <p><strong>3）数据来源：</strong> 大众通信官方 API v2 字段口径、AI 智能外呼中台配置。</p>
+    <p><strong>4）逻辑说明：</strong> 先在大众通信 SaaS 创建任务并完成重呼、并发、呼叫时间、线路等策略配置，再将必填 uuid 粘贴到中台完成关联。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>智能平台</td>
+            <td>选择场景对接平台</td>
+            <td>前端配置</td>
+            <td>保留原有平台并新增大众通信</td>
+            <td>单选</td>
+            <td>--</td>
+            <td>未选择时不允许提交</td>
+          </tr>
+          <tr>
+            <td>大众通信任务 ID</td>
+            <td>关联外部任务</td>
+            <td>大众通信</td>
+            <td>取 uuid</td>
+            <td>字符串</td>
+            <td>--</td>
+            <td>缺失时提示“请输入大众通信任务 uuid”</td>
+          </tr>
+          <tr>
+            <td>任务策略配置</td>
+            <td>配置重呼、并发、呼叫时间、线路等策略</td>
+            <td>大众通信 SaaS</td>
+            <td>中台不展示配置控件，仅通过 uuid 关联已配置任务</td>
+            <td>--</td>
+            <td>--</td>
+            <td>需在 SaaS 完成配置后再进行中台关联</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h3>2. 外呼场景-外呼列表</h3>
+    <p><strong>1）功能名称：</strong> 大众通信外呼任务卡片</p>
+    <p><strong>2）交互说明：</strong> 外呼列表按关联任务 ID
+      展示大众通信任务卡片，操作区与一知、中科金保持“查看、编辑、更多”一致结构；大众任务的编辑按钮以及更多菜单中的删除、暂停、终止、启动均置灰不可点击。点击“查看”后，任务详情继续使用相同抽屉、Tab 和单列信息行。</p>
+    <p><strong>3）数据来源：</strong> 大众通信 <code>GET /agent-api/new/user/{user_id}/task/{task_id}/edit</code> 返回数据、AI 智能外呼中台
+      Mock 数据。</p>
+    <p><strong>4）逻辑说明：</strong> 远端任务状态 1/2/3 分别对应暂停中/执行中/等待执行；任务详情统一取新版 2.0 外呼任务编辑接口的 <code>new_task_extra</code> 数据，并使用
+      3.0 大模型相关接口口径，不再兼容旧版 2.0 的 <code>task_extras</code>。页面按中科金、一知的交互结构聚合为单列只读信息，空字段显示“-”，修改仍在大众通信 SaaS 完成。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>任务名称</td>
+            <td>展示外呼任务名称</td>
+            <td>AI 智能外呼中台</td>
+            <td>取 name</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>平台标识</td>
+            <td>展示任务所属平台</td>
+            <td>AI 智能外呼中台</td>
+            <td>大众通信任务显示大众通信</td>
+            <td>标签</td>
+            <td>--</td>
+            <td>--</td>
+          </tr>
+          <tr>
+            <td>任务状态</td>
+            <td>展示大众通信远端状态</td>
+            <td>大众通信</td>
+            <td>1=暂停中；2=执行中；3=等待执行</td>
+            <td>文本+状态点</td>
+            <td>--</td>
+            <td>无法识别时标记异常</td>
+          </tr>
+          <tr>
+            <td>关联任务 ID</td>
+            <td>标识 SaaS 任务</td>
+            <td>大众通信</td>
+            <td>取 uuid</td>
+            <td>只读文本</td>
+            <td>--</td>
+            <td>缺失时展示 -</td>
+          </tr>
+          <tr>
+            <td>意向分类与意向洞察</td>
+            <td>配置并展示大众通信意向等级分类与分布</td>
+            <td>大众通信意向结果/中台汇总</td>
+            <td>分类卡片、配置下拉和洞察图统一按 1–6 映射为 A-高意向、B-意向客户、C-潜在客户、D-一般意向、E-需再次跟进、F-号码无效</td>
+            <td>分类指标卡+配置下拉+环形图标签</td>
+            <td>A、B、C 为三个默认分类配置</td>
+            <td>非大众任务沿用原平台枚举</td>
+          </tr>
+          <tr>
+            <td>任务详情</td>
+            <td>与一知、中科金保持相同的信息行结构</td>
+            <td>新版 2.0 外呼任务编辑接口 + 3.0 大模型接口口径</td>
+            <td>仅取 new_task_extra 聚合展示任务名称、话术名称、任务 ID、任务描述、拨打时段、AI 坐席和自动重拨 7 项业务信息；自动重拨内逐项展示启用状态、首次外呼优先、间隔、次数、挂断原因和对话状态
+            </td>
+            <td>单列只读信息行</td>
+            <td>默认展示</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>任务操作</td>
+            <td>与其他平台保持相同操作布局</td>
+            <td>大众通信 SaaS</td>
+            <td>保留查看、编辑、更多；编辑、删除、暂停、终止和启动置灰且无点击行为</td>
+            <td>按钮/更多菜单</td>
+            <td>禁用</td>
+            <td>实际操作前往 SaaS；名单导入和移除入口不展示</td>
+          </tr>
+          <tr>
+            <td>查看</td>
+            <td>打开任务详情</td>
+            <td>前端行为</td>
+            <td>点击任务卡片查看</td>
+            <td>点击事件</td>
+            <td>--</td>
+            <td>数据不存在时不打开</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h3>3. 外呼结果-通话记录</h3>
+    <p><strong>1）功能名称：</strong> 大众通信通话记录</p>
+    <p><strong>2）交互说明：</strong> 通话记录支持按平台和关联任务 ID 筛选，默认视图将大众通信通话记录置顶展示。大众通信记录将 0–12
+      通话状态码转换为中文；点击详情后直接展示录音、通话文本、外呼结果和详细信息，不展示顶部回调或详情获取状态提示。</p>
+    <p><strong>3）数据来源：</strong> 大众通信通话结束回调、通话详情接口口径、AI 智能外呼中台 Mock 数据。</p>
+    <p><strong>4）逻辑说明：</strong> 通话记录列表默认优先将大众通信数据置顶呈现（用户主动点击表头列排序时按指定列升降序排列）。大众通信收到通话结束回调后，才使用回调 <code>callid</code>
+      生成通话记录，并将同值作为 <code>recordid</code> 查询通话详情。没有回调时列表中不产生记录，详情页也不存在等待回调状态；其他平台保持原有逻辑。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>所属平台</td>
+            <td>按平台筛选通话记录</td>
+            <td>AI 智能外呼中台</td>
+            <td>全部/一知科技/中科金智能/大众通信</td>
+            <td>下拉</td>
+            <td>全部</td>
+            <td>无匹配数据时展示空态</td>
+          </tr>
+          <tr>
+            <td>关联任务 ID</td>
+            <td>按大众任务归集和查询通话记录</td>
+            <td>大众通信</td>
+            <td>取 uuid</td>
+            <td>文本/查询框</td>
+            <td>--</td>
+            <td>其他平台展示 -</td>
+          </tr>
+          <tr>
+            <td>用户号码</td>
+            <td>展示用户手机号</td>
+            <td>大众通信/AI 中台</td>
+            <td>取 phone</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>通话时间</td>
+            <td>展示通话开始、结束与时长</td>
+            <td>大众通信</td>
+            <td>取通话时间与 duration/bill</td>
+            <td>日期时间/时长</td>
+            <td>-</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>通话状态</td>
+            <td>展示 13 种大众通信通话状态</td>
+            <td>大众通信</td>
+            <td>取 status 并按 0–12 转中文</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>未知码显示原值</td>
+          </tr>
+          <tr>
+            <td>会话 id</td>
+            <td>作为通话记录与详情查询标识</td>
+            <td>大众通信通话结束回调</td>
+            <td>展示名为会话 id，取回调 callid；内部按 recordid=callid 查询通话详情</td>
+            <td>只读文本</td>
+            <td>--</td>
+            <td>缺失时不生成通话记录</td>
+          </tr>
+          <tr>
+            <td>详细信息</td>
+            <td>查看通话底表字段</td>
+            <td>大众通信回调/通话详情接口、AI 中台</td>
+            <td>按指定顺序展示：会话 id、用户号码、关联中台场景编码、关联中台场景名称、对话时长、通话开始时间、通话结束时间、通话结果、转人工状态、转人工时间、用户关注、意向标签、通话标签；通话标签取
+              componet/component 返回且有值的非总结自定义字段名称，并以胶囊分行展示</td>
+            <td>只读文本行/胶囊标签</td>
+            <td>--</td>
+            <td>字段缺失显示 -；无通话标签显示 -</td>
+          </tr>
+          <tr>
+            <td>场景名称</td>
+            <td>展示通话所属场景</td>
+            <td>AI 智能外呼中台</td>
+            <td>按任务关联场景</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>详情</td>
+            <td>查看通话录音、通话文本与外呼结果</td>
+            <td>大众通信回调/通话详情接口、百炼智能体</td>
+            <td>录音地址取回调字段；以 callid=recordid 查询详情，将 records 中 question/answer_content 转为客户/AI 客服对话，过滤 ASR 中间结果；外呼小结优先取详情
+              componet/component 自定义组件中的大众总结，未返回时取百炼智能体通话总结；意向标签固定取百炼标签</td>
+            <td>录音播放+对话文本+外呼小结+意向标签</td>
+            <td>--</td>
+            <td>无录音或无文本时在对应区域显示空状态；大众和百炼总结均为空时显示 -</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h3>4. 外呼结果-线索记录</h3>
+    <p><strong>1）功能名称：</strong> 大众通信线索意向展示</p>
+    <p><strong>2）交互说明：</strong> 线索记录不新增平台筛选，大众通信线索与其他平台数据并列展示。</p>
+    <p><strong>3）数据来源：</strong> 大众通信意向结果、通话结束回调、通话详情 componet/component 自定义组件、百炼智能体、AI 智能外呼中台 Mock 数据。</p>
+    <p><strong>4）逻辑说明：</strong> 大众通信字段 intention_results 为 1–6 时分别显示 A–F；空值或超出范围时显示“未评级”。最后回访记录对应通话总结：优先取通话详情
+      componet/component 自定义组件中的总结，缺失时取百炼智能体总结。大众线索的客户详细标签取通话详情 componet/component
+      返回且有值的非总结自定义字段名称；线索内的通话详情外呼结果和详细信息与通话记录页保持同一套字段顺序和取值口径。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>平台来源</td>
+            <td>展示线索所属平台</td>
+            <td>AI 智能外呼中台</td>
+            <td>取 platform</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>意向等级</td>
+            <td>展示大众通信 A–F 意向</td>
+            <td>大众通信</td>
+            <td>1=A，2=B，3=C，4=D，5=E，6=F</td>
+            <td>标签</td>
+            <td>未评级</td>
+            <td>空值或越界值显示未评级</td>
+          </tr>
+          <tr>
+            <td>最后通话状态</td>
+            <td>展示线索最后一次通话结果</td>
+            <td>大众通信/AI 中台</td>
+            <td>取最新通话结果</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>最后回访记录</td>
+            <td>展示线索最近一次外呼摘要</td>
+            <td>大众通信通话详情/百炼智能体</td>
+            <td>对应通话总结；优先取 component 总结，缺失时取百炼总结</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>场景名称</td>
+            <td>展示线索所属场景</td>
+            <td>AI 智能外呼中台</td>
+            <td>按任务关联场景</td>
+            <td>文本</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+          <tr>
+            <td>客户详细标签</td>
+            <td>查看线索提取标签</td>
+            <td>大众通信通话详情</td>
+            <td>取 componet/component 中已返回值的非总结自定义字段名称</td>
+            <td>胶囊标签</td>
+            <td>--</td>
+            <td>无可用字段时显示 -</td>
+          </tr>
+          <tr>
+            <td>通话详情</td>
+            <td>查看线索关联通话外呼结果和详细信息</td>
+            <td>大众通信回调/通话详情接口、百炼智能体、AI 中台</td>
+            <td>按 callid=recordid 查询通话详情；外呼结果与详细信息字段顺序、总结优先级、意向标签和通话标签均与通话记录页一致</td>
+            <td>抽屉详情</td>
+            <td>--</td>
+            <td>字段缺失显示 -；无通话标签显示 -</td>
+          </tr>
+          <tr>
+            <td>详情</td>
+            <td>查看线索回访明细</td>
+            <td>前端行为/AI 中台</td>
+            <td>点击详情打开明细弹窗</td>
+            <td>点击事件</td>
+            <td>--</td>
+            <td>无明细时展示空态</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h3>5. 系统管理-意向标签</h3>
+    <p><strong>1）功能名称：</strong> 大众通信意向标签手动映射</p>
+    <p><strong>2）交互说明：</strong> 左侧供应商树选择“大众通信”，管理员在右侧手工维护供应商标签，并通过下拉框手动选择本地标准标签。</p>
+    <p><strong>3）数据来源：</strong> 管理员在 AI 智能外呼中台手工录入的大众通信标签及中台标准标签，不从大众通信接口自动读取。</p>
+    <p><strong>4）逻辑说明：</strong> 大众通信标签支持手工新增、编辑、删除、排序和启停；标签映射必须手动选择，禁止关键词自动映射或接口自动生成。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>供应商节点</td>
+            <td>选择大众通信标签池</td>
+            <td>AI 智能外呼中台</td>
+            <td>供应商 id=dazhong</td>
+            <td>树节点</td>
+            <td>--</td>
+            <td>停用时节点及卡片置灰</td>
+          </tr>
+          <tr>
+            <td>供应商标签</td>
+            <td>维护大众通信意向标签</td>
+            <td>AI 智能外呼中台</td>
+            <td>管理员手工新增、编辑、删除、排序和启停</td>
+            <td>可编辑列表</td>
+            <td>可预置 A-F 示例</td>
+            <td>不从接口读取，不自动生成</td>
+          </tr>
+          <tr>
+            <td>本地标签映射</td>
+            <td>手动关联中台标准标签</td>
+            <td>AI 智能外呼中台</td>
+            <td>管理员手动下拉选择</td>
+            <td>下拉</td>
+            <td>未映射</td>
+            <td>禁止启发式自动映射</td>
+          </tr>
+          <tr>
+            <td>排序</td>
+            <td>调整标签 sort 序号</td>
+            <td>前端行为</td>
+            <td>同层标签连续且唯一</td>
+            <td>整数</td>
+            <td>1–6</td>
+            <td>受影响标签自动移位</td>
+          </tr>
+          <tr>
+            <td>停用保护</td>
+            <td>禁用停用对象的编辑操作</td>
+            <td>AI 智能外呼中台</td>
+            <td>status=disabled 时触发</td>
+            <td>开关/界面状态</td>
+            <td>启用</td>
+            <td>停用时新增、修改、删除均禁用</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h3>6. 统计分析-通话统计</h3>
+    <p><strong>1）功能名称：</strong> 大众通信通话统计</p>
+    <p><strong>2）交互说明：</strong> 通话统计按截图保持精简筛选，仅展示呼叫时间和场景名称；大众通信统计由对应 uuid 的同步通话记录在数据层汇总生成，但页面不展示智能平台和关联任务 ID 字段。</p>
+    <p><strong>3）数据来源：</strong> 大众通信通话记录、AI 智能外呼中台前端聚合 Mock 数据。</p>
+    <p><strong>4）逻辑说明：</strong> 按日期和场景维度筛选，展示拨打、名单、接通、未接通、接通率、触达率和累计通话时长。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>呼叫时间</td>
+            <td>按呼叫日期筛选统计数据</td>
+            <td>前端行为</td>
+            <td>取统计日期范围</td>
+            <td>日期范围</td>
+            <td>近 30 天</td>
+            <td>无数据展示空态</td>
+          </tr>
+          <tr>
+            <td>场景名称</td>
+            <td>按场景过滤统计数据</td>
+            <td>AI 中台</td>
+            <td>匹配 sceneName</td>
+            <td>下拉</td>
+            <td>请选择</td>
+            <td>无数据展示空态</td>
+          </tr>
+          <tr>
+            <td>拨打总次数</td>
+            <td>展示外呼总次数</td>
+            <td>大众通信/AI 中台</td>
+            <td>按日期和场景聚合</td>
+            <td>整数</td>
+            <td>0</td>
+            <td>空值按 0 处理</td>
+          </tr>
+          <tr>
+            <td>接通数</td>
+            <td>展示接通通话数</td>
+            <td>大众通信</td>
+            <td>按接通状态聚合</td>
+            <td>整数</td>
+            <td>0</td>
+            <td>空值按 0 处理</td>
+          </tr>
+          <tr>
+            <td>未接通数</td>
+            <td>展示未接通通话数</td>
+            <td>大众通信</td>
+            <td>按未接通状态聚合</td>
+            <td>整数</td>
+            <td>0</td>
+            <td>空值按 0 处理</td>
+          </tr>
+          <tr>
+            <td>累计通话时长</td>
+            <td>展示统计期内通话时长</td>
+            <td>大众通信/AI 中台</td>
+            <td>汇总 duration</td>
+            <td>中文时长</td>
+            <td>0</td>
+            <td>空值按 0 处理</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h3>7. 统计分析-计费统计</h3>
+    <p><strong>1）功能名称：</strong> 大众通信计费统计</p>
+    <p><strong>2）交互说明：</strong> 计费统计按截图保持精简展示，顶部展示计费规则备注，筛选区仅保留计费日期和租户名称，列表仅展示计费日期、租户名称、计费时长和详情操作。</p>
+    <p><strong>3）数据来源：</strong> AI 智能外呼中台前端 Mock 计费数据。</p>
+    <p><strong>4）逻辑说明：</strong> 通话计费以客户接通为准，按分钟收费，未满 1 分钟按 1 分钟计费；智能平台和计费类型不在主列表展示，仅保留为数据层归类字段。</p>
+    <p><strong>5）功能明细</strong></p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>功能名称</th>
+            <th>功能说明</th>
+            <th>数据来源</th>
+            <th>取值逻辑</th>
+            <th>数据格式</th>
+            <th>默认值</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>计费日期</td>
+            <td>按计费日期筛选并展示统计周期</td>
+            <td>AI 智能外呼中台</td>
+            <td>取 dateFrom/dateTo</td>
+            <td>日期范围</td>
+            <td>2026-07-01~2026-07-23</td>
+            <td>无数据展示空态</td>
+          </tr>
+          <tr>
+            <td>租户名称</td>
+            <td>按租户过滤并展示计费数据</td>
+            <td>AI 智能外呼中台</td>
+            <td>匹配 tenantName</td>
+            <td>下拉/文本</td>
+            <td>请选择</td>
+            <td>无数据展示空态</td>
+          </tr>
+          <tr>
+            <td>计费时长</td>
+            <td>展示周期内计费分钟数</td>
+            <td>大众通信/AI 中台</td>
+            <td>汇总 durationMinutes</td>
+            <td>分钟</td>
+            <td>0</td>
+            <td>空值按 0 处理</td>
+          </tr>
+          <tr>
+            <td>详情</td>
+            <td>查看租户计费明细</td>
+            <td>AI 智能外呼中台</td>
+            <td>按租户和计费日期关联明细</td>
+            <td>表格</td>
+            <td>--</td>
+            <td>空值展示 -</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="section-divider">
+    <h2>五. 其他说明</h2>
+
+    <h3>1. 通话状态与中台状态映射</h3>
+    <p><strong>说明：</strong> 中台通话状态以 DCC
+      本地状态为准；一知、科大、中科金、电声和大众通信的外呼回传状态均按下表归并。通话记录列表和详情中的大众通信“通话状态/通话结果”仍可展示大众原始状态中文，跨平台统计、筛选或对账时使用本地状态。中科金
+      1-未拨打、2-等待接听、3-接听中为外呼过程中的中间态，不作为最终通话结果归入本表；电声仅保留电声回传状态与中台状态的直接映射（包括
+      answerStatus=301-接听、302-秒挂、303-伪接通、205-拒接、206-无应答 及 answerMainStatus=2/3 兜底），移除基于中台状态强制推断的伪映射规则。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>本地状态（DCC系统）</th>
+            <th>一知外呼回传状态</th>
+            <th>科大外呼回传状态</th>
+            <th>中科金外呼回传状态</th>
+            <th>电声外呼回传状态</th>
+            <th>大众通信回传状态</th>
+            <th>映射说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>已接通</td>
+            <td>已接听</td>
+            <td>1-已接通</td>
+            <td>7-已接听</td>
+            <td>answerStatus=301-接听；answerMainStatus=3 兜底</td>
+            <td>1-呼叫成功</td>
+            <td>接通类状态，计入接通数和有效通话客户数。</td>
+          </tr>
+          <tr>
+            <td>秒挂</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>answerStatus=302-秒挂</td>
+            <td>--</td>
+            <td>电声特有接通细分状态，计入接通口径。</td>
+          </tr>
+          <tr>
+            <td>伪接通</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>answerStatus=303-伪接通</td>
+            <td>--</td>
+            <td>电声特有接通细分状态，计入接通口径。</td>
+          </tr>
+          <tr>
+            <td>无人接听</td>
+            <td>无应答</td>
+            <td>2-无人接听</td>
+            <td>5-未接听；11-来电提醒</td>
+            <td>answerStatus=206-无应答</td>
+            <td>4-无应答/无人接听</td>
+            <td>用户未接听，归入未接通。</td>
+          </tr>
+          <tr>
+            <td>占线</td>
+            <td>忙线中</td>
+            <td>3-占线</td>
+            <td>9-占线</td>
+            <td>--</td>
+            <td>8-占线/用户正忙</td>
+            <td>用户忙线，归入未接通或待再次跟进；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>拒接</td>
+            <td>拒接</td>
+            <td>4-拒接</td>
+            <td>--</td>
+            <td>answerStatus=205-拒接</td>
+            <td>3-拒接</td>
+            <td>用户主动拒接，归入未接通。</td>
+          </tr>
+          <tr>
+            <td>空号</td>
+            <td>空号</td>
+            <td>5-空号</td>
+            <td>13-空号</td>
+            <td>--</td>
+            <td>5-空号</td>
+            <td>号码无效类，归入未接通；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>关机</td>
+            <td>关机</td>
+            <td>6-关机</td>
+            <td>15-关机</td>
+            <td>--</td>
+            <td>6-关机</td>
+            <td>终端关机，归入未接通；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>停机</td>
+            <td>停机</td>
+            <td>7-停机</td>
+            <td>14-停机</td>
+            <td>--</td>
+            <td>7-停机</td>
+            <td>号码停机，归入未接通；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>欠费</td>
+            <td>--</td>
+            <td>8-欠费</td>
+            <td>--</td>
+            <td>--</td>
+            <td>10-欠费</td>
+            <td>被叫侧或号码欠费导致触达失败；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>无法接通</td>
+            <td>无法接通</td>
+            <td>9-无法接通</td>
+            <td>12-无法接通</td>
+            <td>answerMainStatus=2 兜底</td>
+            <td>--</td>
+            <td>电声仅在 answerStatus 缺失或未知时使用主状态兜底；大众通信当前 0–12 枚举未提供同名状态。</td>
+          </tr>
+          <tr>
+            <td>黑名单过滤</td>
+            <td>--</td>
+            <td>10-黑名单过滤</td>
+            <td>--</td>
+            <td>--</td>
+            <td>11-黑名单；12-用户屏蔽</td>
+            <td>黑名单或用户屏蔽类限制；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>拦截规则</td>
+            <td>--</td>
+            <td>11-拦截规则</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>科大侧拦截规则命中；电声和大众通信当前 0–12 枚举未提供同名状态。</td>
+          </tr>
+          <tr>
+            <td>等待呼叫</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>0-等待呼叫</td>
+            <td>尚未形成最终外呼结果；不计入接通、未接通或呼损统计；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>待呼叫去重</td>
+            <td>--</td>
+            <td>12-待呼叫去重</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>中台或科大侧待呼叫去重状态，不承接大众 0-等待呼叫；电声不直接回传。</td>
+          </tr>
+          <tr>
+            <td>分机号错误</td>
+            <td>分机号错误</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>电声和大众通信当前枚举未提供同名状态。</td>
+          </tr>
+          <tr>
+            <td>呼叫受限</td>
+            <td>呼叫受限</td>
+            <td>--</td>
+            <td>8-限制拨打</td>
+            <td>--</td>
+            <td>9-呼入限制</td>
+            <td>号码或运营商限制呼入；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>主叫欠费</td>
+            <td>主叫欠费</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>主叫侧欠费导致触达失败；大众通信 10-欠费按本地“欠费”归并；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>呼损客户</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>外呼系统呼损类客户状态。</td>
+          </tr>
+          <tr>
+            <td>外呼失败</td>
+            <td>外呼失败</td>
+            <td>--</td>
+            <td>6-拨打失败</td>
+            <td>--</td>
+            <td>--</td>
+            <td>系统侧拨打失败；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>转人工呼损</td>
+            <td>转人工呼损</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>转人工环节呼损。</td>
+          </tr>
+          <tr>
+            <td>线路拦截</td>
+            <td>线路拦截</td>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+            <td>2-运营商拦截</td>
+            <td>线路或运营商侧拦截，归入本地“线路拦截”；电声当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>等待重呼</td>
+            <td>--</td>
+            <td>--</td>
+            <td>4-等待重呼</td>
+            <td>--</td>
+            <td>--</td>
+            <td>等待系统重新呼叫；大众通信和电声当前未提供同名状态。</td>
+          </tr>
+          <tr>
+            <td>号码故障</td>
+            <td>--</td>
+            <td>--</td>
+            <td>17-号码故障</td>
+            <td>--</td>
+            <td>--</td>
+            <td>中科金号码故障状态；电声和大众通信当前不直接回传。</td>
+          </tr>
+          <tr>
+            <td>线路故障</td>
+            <td>--</td>
+            <td>--</td>
+            <td>18-线路故障</td>
+            <td>--</td>
+            <td>--</td>
+            <td>中科金线路故障状态；电声和大众通信当前不直接回传。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2. 大众通信意向等级枚举</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>枚举值</th>
+            <th>展示等级</th>
+            <th>默认标签名称</th>
+            <th>异常处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>A 级</td>
+            <td>A- 高意向</td>
+            <td rowspan="6">空值或非 1–6 值展示“未评级”。</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>B 级</td>
+            <td>B- 意向客户</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>C 级</td>
+            <td>C- 潜在客户</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>D 级</td>
+            <td>D- 一般意向</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>E 级</td>
+            <td>E- 需再次跟进</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>F 级</td>
+            <td>F- 号码无效</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3. 大众通信任务状态枚举</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>枚举值</th>
+            <th>远端状态</th>
+            <th>中台卡片展示</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>暂停中</td>
+            <td>用户暂停</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>执行中</td>
+            <td>进行中</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>等待执行</td>
+            <td>未开始</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>4. 原型与交付边界</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>说明项</th>
+            <th>边界说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>技术形态</td>
+            <td>本交付为静态 HTML/CSS/JavaScript 原型，使用前端 Mock 数据，不发起真实 API 请求。</td>
+          </tr>
+          <tr>
+            <td>联调范围</td>
+            <td>不包含真实账号、线路可用性、价格结算、Token 鉴权与数据库联调。</td>
+          </tr>
+          <tr>
+            <td>计费字段</td>
+            <td>billingType 是 AI 智能外呼中台派生演示字段，不冒充大众通信官方 API 原生字段。</td>
+          </tr>
+          <tr>
+            <td>Loop 标注</td>
+            <td>当前交付入口已关闭标注样式、数据和运行时加载，页面不显示标注气泡。annotations/ 目录仅作为 loop 历史资产保留。</td>
+          </tr>
+          <tr>
+            <td>Loop 追溯</td>
+            <td>需求、来源、字段和验收分别以 memory/project.md、source-materials.md、field-map.md 和 acceptance-map.md 为准。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="../js/delivery-nav.js"></script>
+</body>
+
+</html>

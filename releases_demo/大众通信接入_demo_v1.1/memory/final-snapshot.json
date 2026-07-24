@@ -1,0 +1,122 @@
+{
+  "toolVersion": "2026-06-27-dispatch-runtime-v1",
+  "createdAt": "2026-06-29T17:30:47",
+  "gate": "final",
+  "files": [
+    {
+      "path": "annotations/annotations.js",
+      "sha256": "36ed9b01b998b7be3183f663c45f1e34ae78de9db3c84b74e1d34372aaff004f",
+      "mtime": "2026-06-29T17:29:32"
+    },
+    {
+      "path": "assets/css/app.css",
+      "sha256": "74a98c0966a4a7645f9a8ea1fe0016c5969f15c735311d85056bba336e917f87",
+      "mtime": "2026-06-29T16:38:18"
+    },
+    {
+      "path": "assets/css/global.css",
+      "sha256": "c3205ab25c5b181f4fae5cf864c0d34f77ec72e9d0fe9a40a9fd37630fd21109",
+      "mtime": "2026-06-29T16:40:24"
+    },
+    {
+      "path": "index.html",
+      "sha256": "44ad5bcd36e943c038c3bce7a92a13e385c14f35552156c9133487d6b7c479ca",
+      "mtime": "2026-06-29T16:37:47"
+    },
+    {
+      "path": "js/app.js",
+      "sha256": "577dfa534a97ff91e8706dec896c2eb9783c8f01ec0671700d09e2ca037e6a15",
+      "mtime": "2026-06-29T16:38:18"
+    },
+    {
+      "path": "js/common.js",
+      "sha256": "a95733d7bc6aeb4d97e18875433cfded72fa76d9a1e89493001ee8124fff376c",
+      "mtime": "2026-06-29T16:38:18"
+    },
+    {
+      "path": "js/nav.js",
+      "sha256": "4168dd413c9050dd4a38cd581e5ad03ce3e1703970adf68ec29569eef4de57ed",
+      "mtime": "2026-06-29T16:38:18"
+    },
+    {
+      "path": "js/pages/report-billing.js",
+      "sha256": "08ca1388af7484cf07bddad2b9b75c6da7fb46a6db2bf595d4309b2546137475",
+      "mtime": "2026-06-29T16:38:18"
+    },
+    {
+      "path": "js/pages/report-call.js",
+      "sha256": "2c0df6c916e4c11652a957bfd0baf0479d2f34fe0108a74a800bf61fb00ade8b",
+      "mtime": "2026-06-29T16:55:40"
+    },
+    {
+      "path": "js/pages/result-clue.js",
+      "sha256": "3ebafcb1e617fca0a807a9ba8a0ad801a15cfc303b0dbe69f5e053967ccad127",
+      "mtime": "2026-06-29T16:44:07"
+    },
+    {
+      "path": "js/pages/result-records.js",
+      "sha256": "fd2ecfdac1b807f248be0a4d71cc9bb687224c92e4f97be5d4cf0a56881223e7",
+      "mtime": "2026-06-29T16:43:42"
+    },
+    {
+      "path": "js/pages/scene-list.js",
+      "sha256": "6ec295f2fb9df4981af2e351a27c912ec768e685bd16829a7c7430e576adf329",
+      "mtime": "2026-06-29T17:00:37"
+    },
+    {
+      "path": "js/pages/sys-scene.js",
+      "sha256": "3c353ad7b6f0b3744736a76f1c5227c48c12f1af38eabf06c212921887dd8513",
+      "mtime": "2026-06-29T17:00:51"
+    },
+    {
+      "path": "js/pages/sys-tags.js",
+      "sha256": "d7d3c753322c29867dabe69e121d352c2d899ff7786eabf7ca6a73a593cd3074",
+      "mtime": "2026-06-29T16:44:31"
+    },
+    {
+      "path": "js/pages/sys-tenant.js",
+      "sha256": "6619d819abfffbf4597ae6e8c767e30c241dab90ac0b4a9f445e98371b55194f",
+      "mtime": "2026-06-29T16:38:18"
+    },
+    {
+      "path": "memory/acceptance-map.md",
+      "sha256": "df02866878aac67748b325120f3e69c8c57b26cfafd058ddc7d650d18a42a9a0",
+      "mtime": "2026-06-29T16:45:13"
+    },
+    {
+      "path": "memory/annotation-coverage.md",
+      "sha256": "25a787afdddb1319509f6814d958917d1c11e022428bb7c0905ee962dee5c9e8",
+      "mtime": "2026-06-29T17:30:44"
+    },
+    {
+      "path": "memory/annotation-prompt.md",
+      "sha256": "81d7f018b87618b4939f6a753d450e1e63dfdb3c10be84ca4a8e2bfb645492be",
+      "mtime": "2026-06-29T17:30:44"
+    },
+    {
+      "path": "memory/execution-steps.md",
+      "sha256": "f7e3caaf56e5937abf8efb70225e67744ff371c5a70f9fc77c1a394e59452351",
+      "mtime": "2026-06-29T16:41:17"
+    },
+    {
+      "path": "memory/field-map.md",
+      "sha256": "cb0710f313091981b84b82fd0c0972144ea7ac3c2c09adf9c753e2c42a2cf6f0",
+      "mtime": "2026-06-29T16:36:51"
+    },
+    {
+      "path": "memory/source-materials.md",
+      "sha256": "26f6b84d0d7772a149126b0530259a8bf5d8b926e2e2a32bc19526ec2ec8aa6f",
+      "mtime": "2026-06-29T16:36:44"
+    },
+    {
+      "path": "memory/verification-log.md",
+      "sha256": "b5fc06f28bf3a7a13cdcfbaff7a3dd5b0e4c0cf4a39102d5f73ebe2e437664c4",
+      "mtime": "2026-06-29T16:45:53"
+    },
+    {
+      "path": "mock/data.js",
+      "sha256": "28d2956062aef76ba1c6f5f8946f1573a08958a4cf2e4860b16ae34932dd5138",
+      "mtime": "2026-06-29T16:55:26"
+    }
+  ]
+}
