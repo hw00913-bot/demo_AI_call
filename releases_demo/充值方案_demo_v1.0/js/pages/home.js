@@ -223,13 +223,7 @@
               '<span class="tenant-call-status ' + summary.callStatusCls + '">' + summary.callStatus + '</span>' +
             '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="home-footer">' +
-          '<span class="home-footer-icon">&#x1F4A1;</span>' +
-          '<span>查看详细计费、充值记录、冻结任务，请前往</span>' +
-          '<a class="home-footer-link" data-anno="home-billing-link" onclick="navigateTo(\'sys-tenant\',\'sys-tenant\')">系统管理 → 租户管理 → 充值管理</a>' +
-        '</div>' +
-      '</div>';
+        '</div>';
   }
 
   function init() {}
