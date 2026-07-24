@@ -204,7 +204,7 @@
           '<div class="home-title">用量余额</div>' +
           '<div class="home-tenant-name">' + DEFAULT_TENANT + '</div>' +
         '</div>' +
-        '<div class="home-card-grid">' +
+        '<div class="home-card-grid" data-anno="home-usage-cards">' +
           '<div class="home-card">' +
             '<div class="home-card-label">大模型可用分钟数</div>' +
             '<div class="home-card-value">' + formatMinutes(summary.largeAvailableMinutes) + '</div>' +
@@ -227,7 +227,7 @@
         '<div class="home-footer">' +
           '<span class="home-footer-icon">&#x1F4A1;</span>' +
           '<span>查看详细计费、充值记录、冻结任务，请前往</span>' +
-          '<a class="home-footer-link" onclick="navigateTo(\'sys-tenant\',\'sys-tenant\')">系统管理 → 租户管理 → 充值管理</a>' +
+          '<a class="home-footer-link" data-anno="home-billing-link" onclick="navigateTo(\'sys-tenant\',\'sys-tenant\')">系统管理 → 租户管理 → 充值管理</a>' +
         '</div>' +
       '</div>';
   }
