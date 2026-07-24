@@ -2194,41 +2194,40 @@ p { margin-bottom: 8px; }
 
 /* ===== 首页用量余额 ===== */
 .home-page {
-  padding: 32px 40px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  padding: 32px 40px;
+  overflow: auto;
+  min-height: 0;
 }
 .home-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  margin-bottom: 28px;
 }
 .home-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
-  color: #000;
+  color: #1f1f1f;
   line-height: 1.4;
 }
 .home-tenant-name {
   font-size: 14px;
   color: #999;
-  line-height: 1.5;
+  margin-top: 4px;
 }
 .home-card-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+  margin-bottom: 32px;
 }
 .home-card {
   background: #fff;
   border-radius: 10px;
   padding: 24px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  border: 1px solid #f0f0f0;
-  transition: box-shadow 0.2s;
+  border: 1px solid #ebeef2;
 }
-.home-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
 .home-card-label {
   font-size: 14px;
   color: #666;
@@ -2236,9 +2235,9 @@ p { margin-bottom: 8px; }
   line-height: 1.5;
 }
 .home-card-value {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
-  color: #000;
+  color: #1677ff;
   line-height: 1.3;
 }
 .home-footer {
@@ -2283,4 +2282,12 @@ p { margin-bottom: 8px; }
   .tenant-activation-duration-summary { grid-template-columns: 1fr; }
   .tenant-pricing-modal-backdrop { padding: 12px; }
   .tenant-pricing-modal { max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); }
+}
+
+@media (max-width: 1100px) {
+  .home-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .home-card-grid { grid-template-columns: 1fr; }
+  .home-page { padding: 24px 20px; }
 }
