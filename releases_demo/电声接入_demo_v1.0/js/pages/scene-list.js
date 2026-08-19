@@ -29,10 +29,6 @@
     FINISHED: { text: '已结束', className: 'finished' },
     FAILED: { text: '执行失败', className: 'failed' },
   };
-  let OpenImportBatches = [
-    { taskId: 13, batchId: 'IMP202607020002', importedCount: 32, lastImportTime: '2026-07-02 10:18:45' },
-    { taskId: 14, batchId: 'IMP202607020004', importedCount: 18, lastImportTime: '2026-07-02 11:06:12' },
-  ];
   function getDianshengStatusType(item) {
     const detail = item && window.MockZkjTaskDetail && window.MockZkjTaskDetail[item.id];
     if (detail && detail.statusType !== undefined && detail.statusType !== null) return Number(detail.statusType);
@@ -1008,66 +1004,27 @@
   }
 
   /* ===== 手动导入弹窗 ===== */
-  function getCurrentOpenImportBatches() {
-    return OpenImportBatches.filter(function(batch) {
-      return !currentDetailItem || batch.taskId === currentDetailItem.id;
-    });
-  }
-
   function renderImportUploadContent() {
-    const openBatches = getCurrentOpenImportBatches();
-    const continueMode = openBatches.length > 0;
-    const batchOptions = openBatches.map(function(batch) {
-      return `<option value="${batch.batchId}">${batch.batchId}（已导入 ${batch.importedCount} 条，最近 ${batch.lastImportTime}）</option>`;
-    }).join('');
     return `
-      <div class="import-batch-setting">
-        <div class="import-batch-title"><span class="required-mark">*</span>导入批次</div>
-        <div class="import-batch-modes">
-          <label><input type="radio" name="importBatchMode" value="new" ${continueMode ? '' : 'checked'} onchange="window.Pages['scene-list'].updateImportBatchMode()"> 新建批次</label>
-          <label class="${continueMode ? '' : 'disabled'}"><input type="radio" name="importBatchMode" value="continue" ${continueMode ? 'checked' : ''} ${continueMode ? '' : 'disabled'} onchange="window.Pages['scene-list'].updateImportBatchMode()"> 继续未完成批次</label>
-        </div>
-        <div class="import-batch-field" id="importNewBatchField" style="display:${continueMode ? 'none' : 'flex'};">
-          <span class="import-batch-field-label">批次号</span>
-          <input value="首次上传成功后自动生成" disabled>
-        </div>
-        <div class="import-batch-field" id="importContinueBatchField" style="display:${continueMode ? 'flex' : 'none'};">
-          <span class="import-batch-field-label">批次号</span>
-          <select id="importBatchId">${batchOptions}</select>
-        </div>
-      </div>
       <div class="import-upload-area" onclick="showToast('上传功能开发中','info')">
         <div class="upload-icon">&#128228;</div>
         <div class="upload-text">点击或将文件拖拽到此处上传</div>
         <div class="upload-hint">
           支持文件：csv、xls、xlsx，单次号码数量不大于 50<br>
-          本批次未完成时，可使用同一导入批次号继续追加号码
+          每个号码自动生成独立批次，导入后默认完成
         </div>
-      </div>
-      <div class="import-complete-setting">
-        <label class="import-complete-option"><input type="checkbox" id="importIsCompleted" checked> 本次为该批次最后一次导入</label>
-        <div class="import-complete-help">勾选后该批次不再接收新号码，并按任务配置进入后续呼叫流程；不勾选时保留该批次，后续可继续追加号码。</div>
       </div>
     `;
   }
 
-  function updateImportBatchMode() {
-    const mode = document.querySelector('input[name="importBatchMode"]:checked');
-    const isContinue = mode && mode.value === 'continue';
-    const newField = document.getElementById('importNewBatchField');
-    const continueField = document.getElementById('importContinueBatchField');
-    if (newField) newField.style.display = isContinue ? 'none' : 'flex';
-    if (continueField) continueField.style.display = isContinue ? 'flex' : 'none';
-  }
-
   function renderImportRecordContent() {
     const records = [
-      { id: 1, batchId: 'IMP202607020001', name: '渝发518.xlsx', total: 50, success: 49, fail: 1, status: '已完成', time: '2026-07-02 09:15:23', op: '张三' },
-      { id: 2, batchId: 'IMP202607020002', name: '客户名单0702.csv', total: 32, success: 30, fail: 2, status: '可继续导入', time: '2026-07-02 10:18:45', op: '张三' },
+      { id: 1, batchCount: 49, name: '渝发518.xlsx', total: 50, success: 49, fail: 1, status: '已完成', time: '2026-07-02 09:15:23', op: '张三' },
+      { id: 2, batchCount: 30, name: '客户名单0702.csv', total: 32, success: 30, fail: 2, status: '已完成', time: '2026-07-02 10:18:45', op: '张三' },
     ];
     const rows = records.map(r => `
       <tr>
-        <td>${r.batchId}</td>
+        <td>${r.batchCount}</td>
         <td>${r.name}</td>
         <td>${r.total.toLocaleString()}</td>
         <td>${r.success.toLocaleString()}</td>
@@ -1083,7 +1040,7 @@
       <div class="scene-detail-table-wrap" style="margin-top:12px;">
         <table class="scene-detail-table">
           <thead><tr>
-            <th>导入批次号</th>
+            <th>生成批次数</th>
             <th>文件名</th>
             <th>导入总数</th>
             <th>成功数</th>
@@ -1155,57 +1112,46 @@
   }
 
   function doStartUpload() {
-    const completed = document.getElementById('importIsCompleted');
-    const mode = document.querySelector('input[name="importBatchMode"]:checked');
-    const isContinue = mode && mode.value === 'continue';
-    const batchSelect = document.getElementById('importBatchId');
-    const batchId = isContinue && batchSelect && batchSelect.value
-      ? batchSelect.value
-      : 'IMP' + new Date().toISOString().replace(/\D/g, '').slice(0, 14);
-    const isCompleted = !!(completed && completed.checked);
-    const importedCount = 50;
-    const existingBatch = OpenImportBatches.find(function(batch) { return batch.batchId === batchId; });
-    if (existingBatch) {
-      existingBatch.importedCount += importedCount;
-      existingBatch.lastImportTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
-    }
-    let executeBatchId = '';
-    if (isCompleted) {
-      OpenImportBatches = OpenImportBatches.filter(function(batch) { return batch.batchId !== batchId; });
-      const detail = currentDetailItem && window.MockZkjTaskDetail ? window.MockZkjTaskDetail[currentDetailItem.id] : null;
-      executeBatchId = 'EXE' + new Date().toISOString().replace(/\D/g, '').slice(0, 14);
-      if (detail) {
-        detail.importBatchId = batchId;
-        detail.executeBatchId = executeBatchId;
-        detail.executeStatus = 'WAIT_START';
-      }
-      window.MockDianshengExecuteBatches = window.MockDianshengExecuteBatches || [];
+    const importedCount = 3;
+    const detail = currentDetailItem && window.MockZkjTaskDetail ? window.MockZkjTaskDetail[currentDetailItem.id] : null;
+    const timestamp = new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+    const importedPhones = ['13800000001', '13800000002', '13800000003'];
+    const importBatchIds = [];
+    const executeBatchIds = [];
+    window.MockDianshengExecuteBatches = window.MockDianshengExecuteBatches || [];
+    for (let index = 0; index < importedCount; index += 1) {
+      const suffix = String(index + 1).padStart(2, '0');
+      const importBatchId = `IMP${timestamp}${suffix}`;
+      const executeBatchId = `EXE${timestamp}${suffix}`;
+      importBatchIds.push(importBatchId);
+      executeBatchIds.push(executeBatchId);
       window.MockDianshengExecuteBatches.unshift({
         taskId: currentDetailItem ? currentDetailItem.id : 0,
         strategyCode: detail ? detail.strategyCode : '',
+        phoneNumber: importedPhones[index],
         executeBatchId: executeBatchId,
-        importBatchId: batchId,
+        importBatchId: importBatchId,
+        isCompleted: true,
         executeStatus: 'WAIT_START',
-        leadCount: existingBatch ? existingBatch.importedCount : importedCount,
-        runningCount: existingBatch ? existingBatch.importedCount : importedCount,
+        leadCount: 1,
+        runningCount: 1,
         completedCount: 0,
         blockedCount: 0,
         cancelledCount: 0,
         startTime: '-',
         endTime: '-'
       });
-    } else if (!OpenImportBatches.some(function(batch) { return batch.batchId === batchId; })) {
-      OpenImportBatches.push({
-        taskId: currentDetailItem ? currentDetailItem.id : 0,
-        batchId: batchId,
-        importedCount: importedCount,
-        lastImportTime: new Date().toISOString().replace('T', ' ').slice(0, 19)
-      });
+    }
+    if (detail) {
+      detail.importBatchIds = importBatchIds;
+      detail.executeBatchIds = executeBatchIds;
+      detail.isCompleted = true;
+      detail.importBatchId = importBatchIds[importBatchIds.length - 1];
+      detail.executeBatchId = executeBatchIds[executeBatchIds.length - 1];
+      detail.executeStatus = 'WAIT_START';
     }
     closeImportModal();
-    showToast(isCompleted
-      ? `批次 ${batchId} 已完成，已生成执行批次 ${executeBatchId}`
-      : `已导入批次 ${batchId}，本次未完成，后续可继续追加号码`, 'success');
+    showToast(`已导入 ${importedCount} 个号码，生成 ${importedCount} 个已完成批次`, 'success');
   }
 
   function exportImportResult(failCount) {
@@ -1655,5 +1601,5 @@
   }
 
   window.Pages = window.Pages || {};
-  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, showExecuteBatchModal, closeExecuteBatchModal, showStopBatchConfirm, closeStopBatchConfirm, submitStopBatch, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, updateImportBatchMode, switchImportTab, exportImportResult, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption, showCallRecordList, closeCallRecordList, showCallRecordDetail, closeCallRecordDetail, switchCallRecordTab, terminateSingleCall, terminateBatchCalls };
+  window.Pages['scene-list'] = { render, init, showDetail, switchSubTab, switchMainTab, renderMainTabContent, closeDetail, showExecuteBatchModal, closeExecuteBatchModal, showStopBatchConfirm, closeStopBatchConfirm, submitStopBatch, toggleMoreMenu, closeMoreMenu, onMenuAction, showImportModal, closeImportModal, doStartUpload, switchImportTab, exportImportResult, showIntentConfig, closeIntentConfig, saveIntentConfig, toggleIntentDropdown, toggleIntentOption, showCallRecordList, closeCallRecordList, showCallRecordDetail, closeCallRecordDetail, switchCallRecordTab, terminateSingleCall, terminateBatchCalls };
 })();

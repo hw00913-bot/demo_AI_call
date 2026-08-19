@@ -4,10 +4,8 @@
 
 - **外呼任务 (Call Strategy)**：由东风日产在智能外呼中台创建业务场景后，通过新版 `/strategy/policy/create` 在电声侧生成或维护的任务配置，以 `strategyCode` 作为外部唯一编码。
   - 新建电声业务场景提交时必须先调用电声接口。仅当响应 `code=S0000` 且返回 `strategyId`、`strategyCode` 后，才写入本地业务场景、外呼任务和任务详情；接口失败时本地不入库。
-- **导入批次 (Import Batch)**：通过新版 `/lead/batch/async/import` 触发的批量客户线索列表，对应一个唯一的 `importBatchId`，导入受理成功不代表全部入库或任务创建完成。
-  - 单次请求最多导入 50 条线索，超过上限时不提交。
-  - `isCompleted=false` 表示批次尚未完成，可继续使用同一 `importBatchId` 追加导入，且不会触发呼叫流程；最后一次导入传 `isCompleted=true`，再按任务配置进入后续呼叫流程。
-- **执行批次 (Execute Batch)**：当导入接口传 `isCompleted=true` 时，电声按任务配置进入执行流程并返回 `executeBatchId`。当前版本没有独立启动接口，执行批次仅支持查询和整批停止。
+- **导入批次 (Import Batch)**：上传文件单次最多包含 50 条线索，中台按号码逐条调用新版 `/lead/batch/async/import`。每个号码生成一个唯一 `importBatchId`，固定提交 `isCompleted=true`，不保留未完成批次。
+- **执行批次 (Execute Batch)**：每个完成态导入批次按任务配置进入执行流程并返回 `executeBatchId`。当前版本没有独立启动接口，执行批次仅支持查询和整批停止。
 - **客户线索 (Customer / Lead)**：以电话号码为唯一标识的呼叫对象，包含门店编码 `dlrCode`、最后通话状态及最终意向。
 - **通话记录 (Call Record)**：单次物理通话产生的流水记录，包括录音 URL、起止时间、接听状态和小结信息。
 - **通话小结 (Call Summary)**：AI 外呼引擎对通话进行 NLU 解析后产出的结构化意向评级与标签。
@@ -56,7 +54,7 @@
   - 开启自动重拨时，至少需要保留一条已选择首次呼叫状态的重呼规则。
 - **呼叫名单与执行批次规则**：
   - 已分配、待呼叫、已呼叫、已过滤、呼叫失败是中台号码流转状态，不直接等同于电声执行批次状态或线索状态。
-  - 电声导入接口在 `isCompleted=true` 时返回 `executeBatchId`，中台必须保存“任务—策略编码—导入批次号—执行批次号”关系。
+  - 电声导入接口固定传 `isCompleted=true` 并返回 `executeBatchId`，中台必须按号码保存“任务—策略编码—号码—导入批次号—执行批次号”关系。
   - 执行批次入口位于任务查看抽屉的“呼叫名单”中；批次详情按本地批次号逐条调用 `/execute/batch/detail/query` 刷新。
   - `WAIT_START`、`RUNNING` 批次可停止；`STOPPED`、`FINISHED`、`FAILED` 不可重复停止。停止接口失败时本地状态不变。
   - 停止批次只更新批次状态及未完成线索，不修改电声策略 `statusType` 和中台任务状态。
@@ -95,7 +93,7 @@
 
 - 新版外呼任务创建：见 [ diansheng-api 20260707 - 新增外呼任务 ](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档_20260707.md#L132)
 - 新版批量导入线索：见 [ diansheng-api 20260707 - 批量导入线索 ](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档_20260707.md#L759)
-- 最新执行流程：`isCompleted=true` 的导入批次进入执行流程；执行批次只提供详情查询和整批停止，见 [diansheng-api 20260713](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档_20260713.pdf)。
+- 最新执行流程：中台按一号码一批次固定提交 `isCompleted=true`；执行批次只提供详情查询和整批停止，见 [diansheng-api 20260713](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档_20260713.pdf)。
 - D01 (旧版批量导入线索)：见 [ diansheng-api - 接口 1 ](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档.md#L191)
 - D08 (导入结果回调)：见 [ diansheng-api - 导入回调 ](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档.md#L300)
 - D05 (外呼前过滤上报)：见 [ diansheng-api - 过滤接口 ](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档.md#L350)

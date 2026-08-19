@@ -98,7 +98,7 @@
     <p><strong>1）功能名称：</strong> 电声外呼任务卡片与三页签详情</p>
     <p><strong>2）交互说明：</strong> 用户可按电声平台筛选任务，点击“查看”打开详情抽屉，并在数据概览、呼叫名单、任务详情三个页签间切换。呼叫名单包含已分配、待呼叫、已呼叫、已过滤和呼叫失败五个子页签。</p>
     <p><strong>3）数据来源：</strong> SRC-003、SRC-004、SRC-008；字段对应 FLD-001～FLD-004、FLD-013、FLD-024、FLD-025。</p>
-    <p><strong>4）逻辑说明：</strong> 线索通过 <code>/lead/batch/async/import</code> 返回 <code>importBatchId</code> 后，中台必须在本地保存导入批次编码，并建立其与本地任务、<code>strategyCode</code> 的关联。<code>isCompleted=false</code> 时保留该批次为“可继续导入”，后续通过本地保存的 <code>importBatchId</code> 继续追加；仅当 <code>isCompleted=true</code> 时才进入执行流程，返回 <code>executeBatchId</code> 后再保存导入批次与执行批次的关联。电声不提供单线索停止，运营只能通过 <code>/execute/batch/stop</code> 停止整个执行批次。</p>
+    <p><strong>4）逻辑说明：</strong> 上传文件最多包含 50 个号码。中台按号码逐条调用 <code>/lead/batch/async/import</code>，每个号码生成独立 <code>importBatchId</code> 并固定提交 <code>isCompleted=true</code>。中台逐条保存号码、本地任务、<code>strategyCode</code>、导入批次和执行批次的关联。电声不提供单线索停止，运营只能通过 <code>/execute/batch/stop</code> 停止该号码对应的执行批次。</p>
     <p><strong>5）功能明细</strong></p>
     <div class="table-wrap"><table>
       <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
@@ -106,7 +106,7 @@
         <tr><td>任务卡片</td><td>展示电声任务、平台和执行概况</td><td>SRC-005 / Mock</td><td>按平台和筛选条件渲染任务</td><td>卡片</td><td>全部任务</td><td>无匹配任务时显示空状态</td></tr>
         <tr><td>意向分类</td><td>沿用中台意向等级配置和分类统计功能</td><td>SRC-009 / FLD-009、FLD-010</td><td>电声任务的标签下拉仅提供 A（高意向）、B（中意向）、C（低意向）、D（无意向）</td><td>配置弹窗 + 6 项统计卡片</td><td>默认配置 A、B、C</td><td>不展示 E、F 选项</td></tr>
         <tr><td>意向洞察</td><td>沿用原有环形图和通话时长图</td><td>SRC-009 / FLD-010</td><td>电声环形图图例使用 A=高意向、B=中意向、C=低意向、D=无意向</td><td>环形图 + 通话时长图</td><td>原型示例数据</td><td>未接通由主、子接听状态承载，不作为意向枚举</td></tr>
-        <tr><td>导入批次</td><td>跟踪异步线索导入并支持续传</td><td>SRC-008 / FLD-002</td><td>导入成功后将 <code>importBatchId</code>、<code>strategyCode</code>、本地任务、<code>isCompleted</code>、累计导入数和最近导入时间保存在本地；未完成批次用原 <code>importBatchId</code> 继续导入</td><td>字符串 + 本地关联记录</td><td>-</td><td>受理成功不代表全部线索已入库；接口失败不新增或更新本地批次</td></tr>
+        <tr><td>导入批次</td><td>跟踪每个号码的异步导入</td><td>SRC-009 / FLD-002</td><td>每个号码单独生成 <code>importBatchId</code>，固定 <code>isCompleted=true</code>；中台保存号码、<code>strategyCode</code>、导入批次和执行批次关联</td><td>逐号码关联记录</td><td>默认完成</td><td>单个号码失败不生成其批次关联，其他号码不受影响</td></tr>
         <tr><td>执行批次</td><td>跟踪启动、查询和停止</td><td>SRC-008 / FLD-002</td><td>以 <code>executeBatchId</code> 查询执行状态</td><td>字符串 + 状态</td><td>-</td><td>查询失败时保留最近状态并提示</td></tr>
         <tr><td>已过滤名单</td><td>展示被电声黑名单拦截的号码</td><td>SRC-009 / FLD-013</td><td><code>leadStatus=BLOCKED</code> 或 <code>finalCallResult=BLOCKED</code> 时映射本地“黑名单过滤”，不单独展示电声原始结果字段</td><td>表格 + 标签</td><td>无</td><td>缺少枚举时显示“-”</td></tr>
         <tr><td>任务详情</td><td>展示本期开放的任务基础信息和任务配置</td><td>SRC-009 / FLD-024、FLD-025</td><td>按任务编码读取机器人、场景类型、时段、N天M呼、黑名单、自动启动、备注及创建/更新时间；不展示任务状态、转人工或执行批次字段</td><td>详情页签</td><td>-</td><td>缺失对象显示“-”</td></tr>

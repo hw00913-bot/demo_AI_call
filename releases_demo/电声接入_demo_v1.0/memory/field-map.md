@@ -14,7 +14,7 @@
 | Field ID | Source ID | Page / Area | API / Data Field | Display Name | Display Format | Enum / Mapping | Empty / Error Rule | Annotation Point | Used In |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | FLD-001 | SRC-008 | 新建场景提交结果, 任务详情 | `strategyCode` / `strategyId` | 外呼任务编码 | 文本 | `strategyCode` 为外部唯一编码，`strategyId` 为电声内部生成 | 新建表单不手填任务 id；任务创建失败则创建失败 | 提交生成任务后的基准键 | sys-scene.js, scene-list.js |
-| FLD-002 | SRC-009 | 导入结果, 详情 | `importBatchId` / `executeBatchId` | 导入/执行批次号 | 文本 | 导入批次由导入接口返回；`isCompleted=true` 且进入执行流程后返回执行批次 | 新建任务时不预生成批次；`isCompleted=false` 不触发执行 | 导入与执行的批次关联键 | scene-list.js |
+| FLD-002 | SRC-009 | 导入结果, 详情 | `phoneNumber` / `importBatchId` / `executeBatchId` / `isCompleted` | 号码、导入/执行批次号 | 逐号码关联记录 | 一个号码生成一个 `importBatchId`；`isCompleted` 固定为 `true` | 单个号码导入失败时不生成其批次关联 | 中台保存任务、策略编码、号码、导入批次和执行批次的一对一关系 | scene-list.js |
 | FLD-003 | SRC-008 | 通话记录, 线索记录 | `leadId` / `contextId` | 线索ID | 文本 | 字符串 | 必须唯一 | 关联具体客户线索的基准键 | result-records.js, result-clue.js |
 | FLD-004 | SRC-001 | 呼叫名单, 通话/线索记录 | `phoneNumber` / `phone` | 被叫手机号 | 脱敏文本 | 11位手机号，如 `138****8000` | 必填 | 客户号码标识 | js/pages/* |
 | FLD-005 | SRC-001 | 线索记录, 呼叫名单 | `dlrCode` | 门店编码 | 文本 | 字符串，如 `H2901` | 空展示为 `-` | 门店匹配字段 | result-clue.js, scene-list.js |
