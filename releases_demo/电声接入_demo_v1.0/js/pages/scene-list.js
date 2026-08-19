@@ -207,12 +207,15 @@
       exportBtn: false,
       cols: ['用户号码','号码提交时间','已拨打次数','过滤原因','过滤时间'],
       rows: MockFilteredRows,
-      renderRow: r => `
+      renderRow: r => {
+        const localFilterStatus = r.localCallStatus || (r.finalCallResult === 'BLOCKED' ? '黑名单过滤' : (r.filterReason || '-'));
+        return `
         <td>${r.phone}</td>
         <td>${r.submitTime || '-'}</td>
         <td>${r.dialCount}</td>
-        <td><span class="tag tag-orange" title="${r.filterReason || ''}">过滤/拉黑（${r.finalCallResult || 'BLOCKED'}）</span></td>
-        <td>${r.filterTime}</td>`
+        <td><span class="tag tag-orange" title="${r.finalCallResult || r.filterReason || ''}">${localFilterStatus}</span></td>
+        <td>${r.filterTime}</td>`;
+      }
     },
     '呼叫失败': {
       summary: `共 ${MockFailedRows.length} 个外呼号码，呼叫失败。`,

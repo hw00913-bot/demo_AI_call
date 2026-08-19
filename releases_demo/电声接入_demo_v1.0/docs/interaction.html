@@ -108,7 +108,7 @@
         <tr><td>意向洞察</td><td>沿用原有环形图和通话时长图</td><td>SRC-009 / FLD-010</td><td>电声环形图图例使用 A=高意向、B=中意向、C=低意向、D=无意向</td><td>环形图 + 通话时长图</td><td>原型示例数据</td><td>未接通由主、子接听状态承载，不作为意向枚举</td></tr>
         <tr><td>导入批次</td><td>跟踪异步线索导入并支持续传</td><td>SRC-008 / FLD-002</td><td>导入成功后将 <code>importBatchId</code>、<code>strategyCode</code>、本地任务、<code>isCompleted</code>、累计导入数和最近导入时间保存在本地；未完成批次用原 <code>importBatchId</code> 继续导入</td><td>字符串 + 本地关联记录</td><td>-</td><td>受理成功不代表全部线索已入库；接口失败不新增或更新本地批次</td></tr>
         <tr><td>执行批次</td><td>跟踪启动、查询和停止</td><td>SRC-008 / FLD-002</td><td>以 <code>executeBatchId</code> 查询执行状态</td><td>字符串 + 状态</td><td>-</td><td>查询失败时保留最近状态并提示</td></tr>
-        <tr><td>已过滤名单</td><td>展示被电声过滤或拉黑的号码</td><td>SRC-009 / FLD-013</td><td><code>finalCallResult=BLOCKED</code> 时在“过滤原因”列统一显示“过滤/拉黑（BLOCKED）”，不单独展示最终呼叫结果字段</td><td>表格 + 标签</td><td>无</td><td>缺少枚举时显示“-”</td></tr>
+        <tr><td>已过滤名单</td><td>展示被电声黑名单拦截的号码</td><td>SRC-009 / FLD-013</td><td><code>leadStatus=BLOCKED</code> 或 <code>finalCallResult=BLOCKED</code> 时映射本地“黑名单过滤”，不单独展示电声原始结果字段</td><td>表格 + 标签</td><td>无</td><td>缺少枚举时显示“-”</td></tr>
         <tr><td>任务详情</td><td>展示本期开放的任务基础信息和任务配置</td><td>SRC-009 / FLD-024、FLD-025</td><td>按任务编码读取机器人、场景类型、时段、N天M呼、黑名单、自动启动、备注及创建/更新时间；不展示任务状态、转人工或执行批次字段</td><td>详情页签</td><td>-</td><td>缺失对象显示“-”</td></tr>
         <tr><td>任务卡片</td><td>展示电声任务状态并支持暂停</td><td>SRC-009 / FLD-025A</td><td><code>statusType=1</code> 映射“进行中”，<code>statusType=0</code> 映射“用户暂停”；更多菜单固定为“删除、暂停、终止、启动”，当前仅“暂停”可用并调用失效策略接口</td><td>更多操作菜单</td><td>成功提示并刷新卡片</td><td>接口失败时保持原状态；不展示“停止执行批次”</td></tr>
         <tr><td>呼叫名单</td><td>查看当前任务关联的电声执行批次</td><td>SRC-009 / FLD-025B</td><td>点击“执行批次”后从中台读取关联批次号，再调用批次详情接口刷新状态和统计</td><td>按钮+弹窗表格</td><td>展示最新批次状态</td><td>无批次显示空状态，查询失败提示重试</td></tr>
@@ -165,7 +165,7 @@
     <p><strong>1）功能名称：</strong> 电声通话记录与会话详情</p>
     <p><strong>2）交互说明：</strong> 用户可按号码、场景、状态和平台查询记录，点击详情查看录音卡片、机器人会话文本、外呼小结、百炼外呼结果标签和详细话单字段。本期不展示挂机类型和转人工信息。</p>
     <p><strong>3）数据来源：</strong> SRC-001、SRC-006、SRC-007；字段对应 FLD-003、FLD-004、FLD-006～FLD-012、FLD-014。</p>
-    <p><strong>4）逻辑说明：</strong> 中台只有一个“通话状态”字段。优先按电声 <code>answerStatus</code> 映射具体状态，子状态缺失或未知时再用 <code>answerMainStatus</code> 兜底；页面不独立展示主、子接听状态。列表和详情均不展示线路类型、数字员工岗位和加微状态；是否重拨在线索回访明细中根据拨打次数派生。</p>
+    <p><strong>4）逻辑说明：</strong> 中台只有一个“通话状态”字段，并新增“秒挂、伪接通”两个标准状态。优先按电声 <code>answerStatus</code> 映射中台标准状态，子状态缺失或未知时再用 <code>answerMainStatus</code> 兜底；页面不独立展示主、子接听状态。通话记录和线索记录的筛选统一使用中台 25 项完整状态字典。列表和详情均不展示线路类型、数字员工岗位和加微状态；是否重拨在线索回访明细中根据拨打次数派生。</p>
     <p><strong>5）功能明细</strong></p>
     <div class="table-wrap"><table>
       <thead><tr><th>功能名称</th><th>功能说明</th><th>数据来源</th><th>取值逻辑</th><th>数据格式</th><th>默认值</th><th>异常处理</th></tr></thead>
@@ -266,7 +266,7 @@
         <tr><td>已分配</td><td>暂无电声呼叫状态</td><td>号码已进入中台本地库，但尚未成功提交电声。</td></tr>
         <tr><td>待呼叫</td><td>导入接口成功，尚未收到话单回调</td><td>号码已传入电声；执行批次可为 <code>WAIT_START</code> 或 <code>RUNNING</code>，但批次状态不直接替代名单状态。</td></tr>
         <tr><td>已呼叫</td><td>已收到话单回调且非 <code>BLOCKED</code></td><td>将电声状态映射到中台单一“通话状态”字段。</td></tr>
-        <tr><td>已过滤</td><td><code>finalCallResult=BLOCKED</code></td><td>过滤原因显示“过滤/拉黑（BLOCKED）”。</td></tr>
+        <tr><td>已过滤</td><td><code>leadStatus=BLOCKED</code> 或 <code>finalCallResult=BLOCKED</code></td><td>本地通话状态和过滤原因均显示“黑名单过滤”。</td></tr>
         <tr><td>呼叫失败</td><td>提交电声接口失败</td><td>号码未成功进入电声呼叫流程，中台保留失败记录并允许重新提交。</td></tr>
       </tbody>
     </table></div>
@@ -276,19 +276,41 @@
     <div class="table-wrap"><table>
       <thead><tr><th>映射优先级</th><th>电声原始字段和值</th><th>中台通话状态</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td>优先</td><td><code>answerStatus=301</code></td><td>已接听</td><td rowspan="5">中台不新增主、子接听状态字段，只展示映射后的单一通话状态。</td></tr>
+        <tr><td>优先</td><td><code>answerStatus=301</code></td><td>已接通</td><td rowspan="5">中台不新增主、子接听状态字段，只展示映射后的单一通话状态；电声子状态原值保留在供应商原始数据中。</td></tr>
         <tr><td>优先</td><td><code>answerStatus=302</code></td><td>秒挂</td></tr>
         <tr><td>优先</td><td><code>answerStatus=303</code></td><td>伪接通</td></tr>
         <tr><td>优先</td><td><code>answerStatus=205</code></td><td>拒接</td></tr>
-        <tr><td>优先</td><td><code>answerStatus=206</code></td><td>无应答</td></tr>
-        <tr><td>兜底</td><td><code>answerMainStatus=3</code></td><td>已接听</td><td>仅在子状态缺失或未知时使用。</td></tr>
-        <tr><td>兜底</td><td><code>answerMainStatus=2</code></td><td>未接通</td><td>仅在子状态缺失或未知时使用。</td></tr>
+        <tr><td>优先</td><td><code>answerStatus=206</code></td><td>无人接听</td></tr>
+        <tr><td>兜底</td><td><code>answerMainStatus=3</code></td><td>已接通</td><td>仅在子状态缺失或未知时使用。</td></tr>
+        <tr><td>兜底</td><td><code>answerMainStatus=2</code></td><td>无法接通</td><td>仅在子状态缺失或未知时使用，不推测更细原因。</td></tr>
         <tr><td>意向等级</td><td>A / B / C / D</td><td>高 / 中 / 低 / 无意向</td><td>对应 FLD-010</td></tr>
-        <tr><td>过滤结果</td><td>BLOCKED</td><td>过滤/拉黑</td><td>电声不返回空号、停机、重复号码等细分过滤原因</td></tr>
+        <tr><td>过滤结果</td><td>BLOCKED</td><td>黑名单过滤</td><td>当前电声策略只提供黑名单拦截配置，因此统一映射本地“黑名单过滤”；保留原值便于后续接口扩展。</td></tr>
       </tbody>
     </table></div>
 
-    <h3>4. 数据来源与可信度</h3>
+    <h3>4. 中台完整通话状态字典及电声覆盖范围</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>中台通话状态</th><th>电声或中台依据</th><th>处理规则</th></tr></thead>
+      <tbody>
+        <tr><td>已接通</td><td><code>answerStatus=301</code>；兜底 <code>answerMainStatus=3</code></td><td>电声直接支持；主状态仅在子状态缺失或未知时兜底。</td></tr>
+        <tr><td>秒挂</td><td><code>answerStatus=302</code></td><td>中台新增标准状态，统计时归入接通类。</td></tr>
+        <tr><td>伪接通</td><td><code>answerStatus=303</code></td><td>中台新增标准状态，统计时归入接通类。</td></tr>
+        <tr><td>无人接听</td><td><code>answerStatus=206</code></td><td>电声直接支持。</td></tr>
+        <tr><td>拒接</td><td><code>answerStatus=205</code></td><td>电声直接支持。</td></tr>
+        <tr><td>无法接通</td><td>子状态缺失或未知，且 <code>answerMainStatus=2</code></td><td>电声兜底映射，不推测具体未接通原因。</td></tr>
+        <tr><td>等待呼叫</td><td>中台已进入呼叫流程但尚未发起首次呼叫</td><td>中台流程状态，不由电声话单回调产生。</td></tr>
+        <tr><td>等待重呼</td><td>中台或电声策略已安排下一次呼叫</td><td>中台流程状态；收到下一通话单后更新为实际结果。</td></tr>
+        <tr><td>待呼叫去重</td><td>中台提交前命中去重规则</td><td>中台流程状态，不提交电声。</td></tr>
+        <tr><td>外呼失败</td><td>调用电声提交接口失败，或明确的中台外呼执行失败</td><td>中台失败状态；允许按业务规则重试。</td></tr>
+        <tr><td>黑名单过滤</td><td>中台命中黑名单，或电声返回 <code>BLOCKED</code></td><td>电声当前统一映射到该状态。</td></tr>
+        <tr><td>拦截规则</td><td>明确命中中台业务拦截规则</td><td>由中台拦截环节产生。</td></tr>
+        <tr><td>线路拦截</td><td>明确命中线路侧拦截</td><td>必须有线路侧明确结果；电声当前无对应细分码。</td></tr>
+        <tr><td>占线、空号、关机、停机、欠费、分机号错误、呼叫受限、主叫欠费、呼损客户、转人工呼损、号码故障、线路故障</td><td>电声当前无对应细分状态码</td><td>仅在其他供应商或中台环节提供明确依据时写入；电声记录不得推测生成。</td></tr>
+      </tbody>
+    </table></div>
+    <p>中台完整字典共 25 项，其中“秒挂、伪接通”为本次新增状态。电声原始字段、呼叫名单状态、执行批次状态和中台通话状态分别保存，禁止相互覆盖。</p>
+
+    <h3>5. 数据来源与可信度</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>来源编号</th><th>来源</th><th>本项目用途</th><th>边界</th></tr></thead>
       <tbody>
@@ -302,7 +324,7 @@
       </tbody>
     </table></div>
 
-    <h3>5. 已知限制与未决事项</h3>
+    <h3>6. 已知限制与未决事项</h3>
     <div class="table-wrap"><table>
       <thead><tr><th>说明项</th><th>说明</th></tr></thead>
       <tbody>

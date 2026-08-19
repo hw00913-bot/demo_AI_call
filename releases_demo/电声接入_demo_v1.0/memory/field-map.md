@@ -18,16 +18,16 @@
 | FLD-003 | SRC-008 | 通话记录, 线索记录 | `leadId` / `contextId` | 线索ID | 文本 | 字符串 | 必须唯一 | 关联具体客户线索的基准键 | result-records.js, result-clue.js |
 | FLD-004 | SRC-001 | 呼叫名单, 通话/线索记录 | `phoneNumber` / `phone` | 被叫手机号 | 脱敏文本 | 11位手机号，如 `138****8000` | 必填 | 客户号码标识 | js/pages/* |
 | FLD-005 | SRC-001 | 线索记录, 呼叫名单 | `dlrCode` | 门店编码 | 文本 | 字符串，如 `H2901` | 空展示为 `-` | 门店匹配字段 | result-clue.js, scene-list.js |
-| FLD-006 | SRC-001 | 通话记录, 数据概览 | `answerMainStatus` | 通话状态（兜底来源） | 单一状态标签 | `2` → 未接通, `3` → 已接听 | 无法识别显示 `-` | 仅当 `answerStatus` 缺失或未知时使用；页面不展示原始主状态 | result-records.js, scene-list.js |
-| FLD-007 | SRC-001 | 通话记录, 呼叫名单 | `answerStatus` | 通话状态（优先来源） | 单一状态标签 | `301` → 已接听, `302` → 秒挂, `303` → 伪接通, `205` → 拒接, `206` → 无应答 | 未识别时回退 FLD-006 | 中台不新增子接听状态字段；原始值只在供应商数据中保留 | result-records.js, scene-list.js |
+| FLD-006 | SRC-001 | 通话记录, 数据概览 | `answerMainStatus` | 通话状态（兜底来源） | 单一状态标签 | `2` → 无法接通, `3` → 已接通 | 无法识别显示 `-` | 仅当 `answerStatus` 缺失或未知时使用；页面不展示原始主状态 | result-records.js, scene-list.js |
+| FLD-007 | SRC-001 | 通话记录, 呼叫名单 | `answerStatus` | 通话状态（优先来源） | 单一状态标签 | `301` → 已接通, `302` → 秒挂, `303` → 伪接通, `205` → 拒接, `206` → 无人接听 | 未识别时回退 FLD-006 | 中台使用 25 项统一状态字典；秒挂和伪接通为新增标准状态 | result-records.js, scene-list.js |
 | FLD-008 | SRC-001 | 通话记录, 统计报表 | `callDurationSeconds` | 实际通话时长 | 文本 (如 `45秒`) | 整数 (秒) | 未接通显示为 `-` | 实际时长统计 | result-records.js, report-call.js |
 | FLD-009 | SRC-009 | 通话详情, 数据概览 | `intentionStatus` | 意向状态 | 单值胶囊 | `0` 无结果, `1` 无意向, `2` 有意向 | 默认为 `0` | 详细信息归入“意向研判”小节；不作为百炼外呼结果来源 | result-records.js, scene-list.js |
 | FLD-010 | SRC-009 | 通话详情, 线索记录, 任务意向配置与洞察 | `intentionRank` | 意向等级 | 单值胶囊/配置选项/图表图例 | `A`(高意向), `B`(中意向), `C`(低意向), `D`(无意向) | 空值按原有页面规则展示 | 详细信息使用胶囊；电声配置下拉和洞察图例不提供 E/F | result-records.js, result-clue.js, scene-list.js |
 | FLD-010A | SRC-009 | 通话详情 | `intentionTag` | 意向标签 | 多胶囊 | 兼容 Object、Array 和 String；对象拆成独立“字段：值”胶囊 | 空展示为“无”胶囊 | 多标签自动换行；不作为百炼外呼结果来源 | result-records.js |
-| FLD-010B | SRC-009 | 已过滤名单 | `finalCallResult` | 过滤原因 | 状态标签 | `BLOCKED` -> “过滤/拉黑（BLOCKED）” | 空展示为 `-` | 完整枚举为 `COMPLETED`、`EXHAUSTED`、`BLOCKED`、`CANCELLED`；原型不独立展示最终结果，仅将 `BLOCKED` 合并到过滤原因列 | scene-list.js |
+| FLD-010B | SRC-009 | 已过滤名单 | `leadStatus` / `finalCallResult` | 通话状态、过滤原因 | 状态标签 | `BLOCKED` -> “黑名单过滤” | 空展示为 `-` | 电声原始值保留在供应商数据中；页面展示中台标准状态 | scene-list.js |
 | FLD-011 | SRC-001 | 通话记录, 线索记录 | `wechatStatus` | 加微状态 | 文本 | `0` 未加微, `1` 已加微 | 默认为 `0` | 只读展现加微研判结果 | result-records.js, result-clue.js |
 | FLD-012 | SRC-009 | 接口固定参数 | `humanTransfer.enabled` | 转人工开关 | 隐藏字段 | 固定为 `false` | 必传 | 本期不考虑转人工；前端不配置、不展示，仅为满足接口必填结构提交关闭值 | sys-scene.js |
-| FLD-013 | SRC-009 | 已过滤名单 tab | `finalCallResult` | 过滤结果 | 标签 | `BLOCKED` -> “过滤/拉黑（BLOCKED）” | 空展示为 `-` | 电声不返回空号、停机、重复号码等细分过滤原因 | scene-list.js |
+| FLD-013 | SRC-009 | 已过滤名单 tab | `leadStatus` / `finalCallResult` | 过滤结果 | 标签 | `BLOCKED` -> “黑名单过滤” | 空展示为 `-` | 当前电声拦截能力来自策略关联黑名单；不映射为拦截规则或线路拦截 | scene-list.js |
 | FLD-014 | SRC-009 | 执行批次线索明细, 线索记录 | `attemptCount` | 是否重拨 | 派生文本 | `attemptCount > 1` -> "是"，否则为“否” | 次数缺失时展示 `-` | 20260713 话单回调无 `isRedial`，不可直接读取 | scene-list.js, result-clue.js |
 | FLD-015 | SRC-003 | 历史任务详情 | `callLine` | 使用线路 | 文本 | `INTERNAL` (内部测试线路), `NISSAN` (日产电话线路) | 新建电声场景不再配置 | 历史任务或 Mock 详情兼容字段 | scene-list.js |
 | FLD-016 | SRC-008 | 新建场景-呼叫任务配置, 任务详情 | `leadTypeRobotMapping.robotCode` | 匹配机器人 | 只读文本 | 新线索=`robot_ds_nissan_001`；冷线索=`robot_ds_nissan_002`；名称和编码来自 `config/diansheng-robots.json` | 页面不可选；映射缺失时禁止生成任务 | 电声任务创建接口入参 | sys-scene.js |

@@ -80,7 +80,7 @@ var MockCallRecordRows = [
     endTime: '2026-07-02 10:15:45',
     duration: '45秒',
     sceneName: '东风日产-新线索-内部调优',
-    status: '已接听',
+    status: '已接通',
     finalCallResult: 'COMPLETED',
     summary: '客户对东风日产品牌首保项目感兴趣，确认周日到店，购车意向较强。已推送至门店系统。',
     bailianSummary: '客户确认周日到店，关注首保礼包，建议门店提前确认预约。',
@@ -236,7 +236,7 @@ var MockCallRecordRows = [
     endTime: '2026-07-01 16:22:50',
     duration: '50秒',
     sceneName: '东风日产-冷线索-上线验证',
-    status: '已接听',
+    status: '已接通',
     finalCallResult: 'COMPLETED',
     summary: '客户表示车已经卖了，不需要后续的服务回访。判定为无意向流失保客。',
     bailianSummary: '客户车辆已售，不需要继续回访。',
@@ -409,7 +409,7 @@ var MockSupplierTagPool = {
     { id: 'ds_4', localCode: 'TAG-DS-004', name: 'D-无意向', sort: 4, platformTagId: 'intentionRank:D' },
     { id: 'ds_6', localCode: 'TAG-DS-006', name: '已加微', sort: 6, platformTagId: 'wechatStatus:added' },
     { id: 'ds_7', localCode: 'TAG-DS-007', name: '需重拨', sort: 7, platformTagId: 'derived:attemptCount>1' },
-    { id: 'ds_8', localCode: 'TAG-DS-008', name: '过滤/拉黑', sort: 8, platformTagId: 'finalCallResult:BLOCKED' }
+    { id: 'ds_8', localCode: 'TAG-DS-008', name: '黑名单过滤', sort: 8, platformTagId: 'finalCallResult:BLOCKED' }
   ]
 };
 
@@ -494,10 +494,10 @@ var MockFailedRows = [
   { phone: '188****5555', submitTime: '2026-07-02 10:00:00', reason: 'D01导入失败: 电话格式非合法11位手机号' }
 ];
 
-/* ===== 已过滤数据（电声只返回 BLOCKED，不返回细分过滤原因） ===== */
+/* ===== 已过滤数据（电声 BLOCKED 映射本地“黑名单过滤”） ===== */
 var MockFilteredRows = [
-  { phone: '130****9991', submitTime: '2026-07-02 10:02:00', dialCount: 0, finalCallResult: 'BLOCKED', filterTime: '2026-07-02 10:02:10' },
-  { phone: '131****9992', submitTime: '2026-07-02 10:03:00', dialCount: 0, finalCallResult: 'BLOCKED', filterTime: '2026-07-02 10:03:15' }
+  { phone: '130****9991', submitTime: '2026-07-02 10:02:00', dialCount: 0, leadStatus: 'BLOCKED', finalCallResult: 'BLOCKED', localCallStatus: '黑名单过滤', filterTime: '2026-07-02 10:02:10' },
+  { phone: '131****9992', submitTime: '2026-07-02 10:03:00', dialCount: 0, leadStatus: 'BLOCKED', finalCallResult: 'BLOCKED', localCallStatus: '黑名单过滤', filterTime: '2026-07-02 10:03:15' }
 ];
 
 /* ===== 线索流回 Mock 数据 ===== */
@@ -582,22 +582,22 @@ var ZkjCallStatusLabels = {
 };
 
 var ZkjStatusToLocal = {
-  '301': '已接听',
+  '301': '已接通',
   '302': '秒挂',
-  '303': '已接听',
+  '303': '伪接通',
   '205': '拒接',
-  '206': '无应答'
+  '206': '无人接听'
 };
 
 /* ===== 线索记录明细 (电声Mock数据) ===== */
 var MockClueDetailNEV = [
-  { no: 1, time: '2026-07-02 09:00', code: 'CLUE_DS_01', scene: '东风日产-新线索-内部调优', type: '新线索', phone: '138****0001', storeCode: 'DLR_01', storeName: '广州花都店', callTime: '2026-07-02 10:15', status: '已接听', duration: '45秒', level: 'A', dispatch: '已下发' },
+  { no: 1, time: '2026-07-02 09:00', code: 'CLUE_DS_01', scene: '东风日产-新线索-内部调优', type: '新线索', phone: '138****0001', storeCode: 'DLR_01', storeName: '广州花都店', callTime: '2026-07-02 10:15', status: '已接通', duration: '45秒', level: 'A', dispatch: '已下发' },
   { no: 2, time: '2026-07-02 09:10', code: 'CLUE_DS_02', scene: '东风日产-新线索-内部调优', type: '新线索', phone: '181****0003', storeCode: 'DLR_02', storeName: '深圳香蜜湖店', callTime: '2026-07-02 09:12', status: '拒接', duration: '-', level: 'C', dispatch: '未下发' }
 ];
 
 var MockClueDetailICE = [
   { no: 1, time: '2026-07-02 09:00', code: 'CLUE_DS_03', scene: '东风日产-冷线索-上线验证', type: '冷线索', phone: '139****0002', storeCode: 'DLR_03', storeName: '上海徐汇店', callTime: '2026-07-02 09:30', status: '秒挂', duration: '10秒', level: 'D', dispatch: '已下发' },
-  { no: 2, time: '2026-07-01 16:00', code: 'CLUE_DS_04', scene: '东风日产-冷线索-上线验证', type: '冷线索', phone: '185****0004', storeCode: 'DLR_04', storeName: '上海静安店', callTime: '2026-07-01 16:22', status: '已接听', duration: '50秒', level: 'D', dispatch: '已下发' }
+  { no: 2, time: '2026-07-01 16:00', code: 'CLUE_DS_04', scene: '东风日产-冷线索-上线验证', type: '冷线索', phone: '185****0004', storeCode: 'DLR_04', storeName: '上海静安店', callTime: '2026-07-01 16:22', status: '已接通', duration: '50秒', level: 'D', dispatch: '已下发' }
 ];
 
 /* ===== 线索统计 Mock 数据 ===== */

@@ -3,6 +3,41 @@
  * 提取自原 script.js 的通用模块
  */
 
+/* ===== 中台统一通话状态 ===== */
+window.MiddleCallStatuses = [
+  '已接通',
+  '秒挂',
+  '伪接通',
+  '无人接听',
+  '占线',
+  '拒接',
+  '空号',
+  '关机',
+  '停机',
+  '欠费',
+  '无法接通',
+  '黑名单过滤',
+  '拦截规则',
+  '待呼叫去重',
+  '分机号错误',
+  '呼叫受限',
+  '主叫欠费',
+  '呼损客户',
+  '外呼失败',
+  '转人工呼损',
+  '线路拦截',
+  '等待重呼',
+  '号码故障',
+  '线路故障',
+  '等待呼叫'
+];
+
+window.renderMiddleCallStatusOptions = function () {
+  return window.MiddleCallStatuses.map(function (status) {
+    return '<option value="' + status + '">' + status + '</option>';
+  }).join('');
+};
+
 /* ===== 全局通知（Toast） ===== */
 function showToast(msg, type = 'default') {
   let toast = document.getElementById('toast-tip');

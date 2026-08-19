@@ -41,7 +41,7 @@
 - **外呼任务 (CallStrategy)**：含任务编码、任务名称、模型类型、账号、机器人编码、线索类型映射、呼叫时段、重试配置、黑名单校验、自动启动、创建时间和状态。
 - **执行批次 (ExecuteBatch)**：含导入批次号、执行批次号、执行状态、线索数、完成数、拦截数、停止数和起止时间。
 - **客户 (Customer)**：含被叫号码、姓名、所属门店 dlrCode、呼叫子状态（301/302/303/205/206）及意向大类（intentionStatus/intentionRank）。
-- **过滤记录 (FilterRecord)**：含被叫号码、`BLOCKED` 过滤/拉黑结果和本地更新时间；电声不返回细分过滤原因。
+- **过滤记录 (FilterRecord)**：含被叫号码、电声 `BLOCKED` 原始结果、本地通话状态“黑名单过滤”和本地更新时间。
 
 ## 交付方式
 
@@ -83,4 +83,4 @@
 | **项目底座** | 中科金接入_demo_v1.0 | 选用中科金作为底座 | 相比最早默认的“冰兰”，改为以中科金为模板重构。 | [中科金接入_demo_v1.0](file:///Users/huhaowen/Documents/33-智能外呼/demo_AI_call/releases_demo/中科金接入_demo_v1.0) (SRC-005) |
 | **排除项** | 排除通道选择与加微配置 | 不在前端提供这两项的配置 | 剔除了 WIKI 中提及的 `addWechatAccountName` 等加微控制配置，简化了新建场景弹窗。 | [电声接入.md](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/wiki/项目知识/电声接入.md) (SRC-002) |
 | **特有字段** | 呼叫任务配置与通话小结 | 新建电声场景配置机器人编码、线索类型映射、时段、重试配置、黑名单校验和自动启动；通话详情展示录音、文本与小结 | 新版接口以 `strategyCode` 作为任务引用键，通话记录列表不再展示线路类型和加微状态。 | [电声-日产AI语音外呼对接API文档_20260707.md](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/raw/external/diansheng-api/电声-日产AI语音外呼对接API文档_20260707.md) (SRC-008) |
-| **状态映射** | 子接听状态与过滤结果分类 | 按照电声呼叫状态码与线索结果做状态机流转 | 子状态 301/302/303 归为接通，205/206 归为未接通，`BLOCKED` 统一归为过滤/拉黑。 | [通话状态码.md](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/wiki/概念对齐/通话状态码.md) (SRC-006) |
+| **状态映射** | 子接听状态与过滤结果分类 | 按照电声呼叫状态码与线索结果做状态机流转 | 301/302/303 分别映射已接通/秒挂/伪接通，205/206 映射拒接/无人接听，`BLOCKED` 映射黑名单过滤。 | [通话状态码.md](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/wiki/概念对齐/通话状态码.md) (SRC-006) |

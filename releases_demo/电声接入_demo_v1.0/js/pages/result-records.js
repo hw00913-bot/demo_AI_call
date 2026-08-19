@@ -9,15 +9,21 @@
   var sortOrder = 'asc';  // 'asc' | 'desc'
   var IntentionStatusMap = { '0': '无结果', '1': '无意向', '2': '有意向' };
   var IntentionRankMap = { A: 'A（高意向）', B: 'B（中意向）', C: 'C（低意向）', D: 'D（无意向）' };
-  var DianshengCallStatusMap = { '301': '已接听', '302': '秒挂', '303': '伪接通', '205': '拒接', '206': '无应答' };
+  var DianshengCallStatusMap = {
+    '301': '已接通',
+    '302': '秒挂',
+    '303': '伪接通',
+    '205': '拒接',
+    '206': '无人接听'
+  };
   var BailianOutboundFields = ['意向标签', '计划到店时间', '预计购车时间', '意向品牌中文名', '意向车系中文名'];
 
   function getCallStatusText(item) {
     if (item.platform !== '电声平台') return item.status || '-';
     var detailStatus = DianshengCallStatusMap[String(item.answerStatus || '')];
     if (detailStatus) return detailStatus;
-    if (String(item.answerMainStatus) === '3') return '已接听';
-    if (String(item.answerMainStatus) === '2') return '未接通';
+    if (String(item.answerMainStatus) === '3') return '已接通';
+    if (String(item.answerMainStatus) === '2') return '无法接通';
     return item.status || '-';
   }
 
@@ -211,12 +217,7 @@
   function init() {
     var statusSelect = document.querySelector('.record-filter-card .record-select');
     if (statusSelect) {
-      statusSelect.innerHTML = '<option value="">请选择</option>' +
-        '<option value="已接听">已接听</option>' +
-        '<option value="秒挂">秒挂</option>' +
-        '<option value="伪接通">伪接通</option>' +
-        '<option value="拒接">拒接</option>' +
-        '<option value="无应答">无应答</option>';
+      statusSelect.innerHTML = '<option value="">请选择</option>' + window.renderMiddleCallStatusOptions();
     }
   }
 

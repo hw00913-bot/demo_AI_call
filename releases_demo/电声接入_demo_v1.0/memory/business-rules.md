@@ -17,6 +17,9 @@
 - **中台通话状态映射 (`answerMainStatus` / `answerStatus`)** [FLD-006, FLD-007]：
   - 中台只有一个“通话状态”字段，不新增主接听状态和子接听状态字段。
   - 优先按 `answerStatus` 映射具体状态；缺失或未知时才按 `answerMainStatus` 兜底。
+  - 中台在原有状态基础上新增“秒挂、伪接通”，完整 25 项枚举为：已接通、秒挂、伪接通、无人接听、占线、拒接、空号、关机、停机、欠费、无法接通、黑名单过滤、拦截规则、待呼叫去重、分机号错误、呼叫受限、主叫欠费、呼损客户、外呼失败、转人工呼损、线路拦截、等待重呼、号码故障、线路故障、等待呼叫。
+  - 电声直接映射：`301` → 已接通，`302` → 秒挂，`303` → 伪接通，`205` → 拒接，`206` → 无人接听；子状态不可识别时，`answerMainStatus=3` → 已接通，`answerMainStatus=2` → 无法接通。
+  - 电声当前不提供占线、空号、关机、停机、欠费等细分状态，不允许推测生成。
   - 电声原始字段保存在供应商原始数据中用于排查，不在中台业务页面独立展示。
 - **意向研判分类 (`intentionStatus` / `intentionRank`)** [FLD-009, FLD-010]：
   - `intentionStatus` 为是否有意向的大类标定。
@@ -58,8 +61,9 @@
   - `WAIT_START`、`RUNNING` 批次可停止；`STOPPED`、`FINISHED`、`FAILED` 不可重复停止。停止接口失败时本地状态不变。
   - 停止批次只更新批次状态及未完成线索，不修改电声策略 `statusType` 和中台任务状态。
 - **通话状态码映射表** (依据 [通话状态码.md](file:///Users/huhaowen/Documents/00_automatic_prototype/01_WIKI_LLM/wiki/概念对齐/通话状态码.md) 权威核对)：
-  - `answerStatus=301` → 已接听；`302` → 秒挂；`303` → 伪接通；`205` → 拒接；`206` → 无应答。
-  - 子状态无法识别时，`answerMainStatus=3` → 已接听，`answerMainStatus=2` → 未接通。
+  - `answerStatus=301` → 已接通；`302` → 秒挂；`303` → 伪接通；`205` → 拒接；`206` → 无人接听。
+  - 子状态无法识别时，`answerMainStatus=3` → 已接通，`answerMainStatus=2` → 无法接通。
+  - 电声 `leadStatus=BLOCKED` 或 `finalCallResult=BLOCKED` 将呼叫名单归为已过滤，并映射本地通话状态“黑名单过滤”。
 - **外呼过滤结果**：
   - 电声仅通过 `BLOCKED` 标识线索被过滤或拉黑，不返回空号、停机、重复号码等细分过滤原因。
   - 黑名单只支持手工或 API 维护，通话回调不会自动新增黑名单记录。
@@ -81,7 +85,7 @@
   5. MD5 加密（UTF-8）后生成 32 位小写签名，写入 `x_sign_custom`。
 - **话单推送重试机制**：
   - 话单回调接口由电声推送给中台，中台的 HTTP 响应体必须在 5 秒内返回 `"code": "S0000"`，否则电声将触发最多 3 次重试。
-- **过滤结果展示**：原型不单独展示 `finalCallResult`。当值为 `BLOCKED` 时，在已过滤名单的“过滤原因”列显示“过滤/拉黑（BLOCKED）”；完整枚举为 `COMPLETED`、`EXHAUSTED`、`BLOCKED`、`CANCELLED`，具体通话状态继续读取 `answerStatus`。
+- **过滤结果展示**：原型不单独展示 `finalCallResult`。当 `leadStatus` 或 `finalCallResult` 为 `BLOCKED` 时，在已过滤名单的“过滤原因”列显示中台状态“黑名单过滤”；完整枚举原值继续保存在供应商数据中，非拦截类通话状态读取 `answerStatus`。
 - **通话详情外呼结果来源**：
   - 外呼小结优先读取电声 `summary`；无值时读取百炼 `bailianSummary`；两者均无值时显示 `-`。
   - 外呼结果内容只读取百炼智能体 `bailianAgentTags`，固定展示意向标签、计划到店时间、预计购车时间、意向品牌中文名、意向车系中文名，缺失值显示 `-`。
